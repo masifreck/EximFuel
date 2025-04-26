@@ -5261,10 +5261,10 @@ react-native-html-to-pdf@^0.12.0:
   resolved "https://registry.npmjs.org/react-native-html-to-pdf/-/react-native-html-to-pdf-0.12.0.tgz"
   integrity sha512-Yb5WO9SfF86s5Yv9PqXQ7fZDr9zZOJ+6jtweT9zFLraPNHWX7pSxe2dSkeg3cGiNrib65ZXGN6ksHymfYLFSSg==
 
-react-native-image-picker@^7.1.2:
-  version "7.1.2"
-  resolved "https://registry.npmjs.org/react-native-image-picker/-/react-native-image-picker-7.1.2.tgz"
-  integrity sha512-b5y5nP60RIPxlAXlptn2QwlIuZWCUDWa/YPUVjgHc0Ih60mRiOg1PSzf0IjHSLeOZShCpirpvSPGnDExIpTRUg==
+react-native-image-picker@^7.2.3:
+  version "7.2.3"
+  resolved "https://registry.npmjs.org/react-native-image-picker/-/react-native-image-picker-7.2.3.tgz"
+  integrity sha512-zKIZUlQNU3EtqizsXSH92zPeve4vpUrsqHu2kkpCxWE9TZhJFZBb+irDsBOY8J21k0+Edgt06TMQGJ+iPUIXyA==
 
 react-native-linear-gradient@^2.8.3:
   version "2.8.3"
@@ -6035,7 +6035,7 @@ ts-object-utils@0.0.5:
     react-native-gesture-handler "^2.18.1"
     react-native-gifted-charts "^1.4.29"
     react-native-html-to-pdf "^0.12.0"
-    react-native-image-picker "^7.1.2"
+    react-native-image-picker "^7.2.3"
     react-native-linear-gradient "^2.8.3"
     react-native-maps "^1.11.3"
     react-native-mmkv "^2.12.2"

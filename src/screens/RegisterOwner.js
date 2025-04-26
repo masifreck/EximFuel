@@ -20,6 +20,7 @@ import CalendarModal from '../components/Calander';
 import CustomInput from '../components/CustomInput';
 import CustomDropbox from '../components/CustomDropbox';
 import {CustomRequestOptions} from '../components/CustomRequestOptions';
+import CustomImagePicker from '../components/CustomeImagePicker';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const RegisterOwner = () => {
@@ -64,7 +65,7 @@ const RegisterOwner = () => {
   const [IfscCode, setIfscCode] = useState('');
   const [TotalVehicles, setTotalVehicles] = useState(0);
   const [ShortageRecovery, setShortageRecovery] = useState(0);
-
+  const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [hasBorder, setHasBorder] = useState(false); // State for border
 
   const handleShowToast = () => {
@@ -147,35 +148,35 @@ const RegisterOwner = () => {
     }
   };
 
-  useEffect(() => {
-    if (banksearch && apiTokenReceived !== null) {
-      fetchData1();
-    }
-    if (apiTokenReceived !== null) {
-      fetchData2();
-    }
-  }, [banksearch, apiTokenReceived]);
-  useEffect(() => {
-    console.log(data1, data2, 'data is here');
-    if (data1.length === 0 || data2.length === 0) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-      setis_everything_ok(true);
-    }
-  }, [data1, data2]);
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (is_everything_ok === false) {
-        // Redirect to home page if is_everything_ok is still false after 45 seconds
-        console.log('Redirecting to home page...');
-        setErrorMessage('Unexpected Error! Login Again');
-        setShowAlert(true);
-      }
-    }, 45000); // 45 seconds in milliseconds
+  // useEffect(() => {
+  //   if (banksearch && apiTokenReceived !== null) {
+  //     fetchData1();
+  //   }
+  //   if (apiTokenReceived !== null) {
+  //     fetchData2();
+  //   }
+  // }, [banksearch, apiTokenReceived]);
+  // useEffect(() => {
+  //   console.log(data1, data2, 'data is here');
+  //   if (data1.length === 0 || data2.length === 0) {
+  //     setIsLoading(true);
+  //   } else {
+  //     setIsLoading(false);
+  //     setis_everything_ok(true);
+  //   }
+  // }, [data1, data2]);
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     if (is_everything_ok === false) {
+  //       // Redirect to home page if is_everything_ok is still false after 45 seconds
+  //       console.log('Redirecting to home page...');
+  //       setErrorMessage('Unexpected Error! Login Again');
+  //       setShowAlert(true);
+  //     }
+  //   }, 45000); // 45 seconds in milliseconds
 
-    return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
-  }, [is_everything_ok]);
+  //   return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
+  // }, [is_everything_ok]);
 
   // ============================================================
   const registertheOwner = () => {
@@ -256,12 +257,20 @@ const RegisterOwner = () => {
       setIsVerified(false);
     }
   };
-
+  const handleLrPhotoPress = () => {
+    setImagePickerVisible(true); // Show Image Picker
+  };
+  
+  const handleSaveImageData = (image) => {
+    //console.log('Selected Image Data:', image);
+    setCapturedPhoto(image);
+  };
+  
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
-      {IsLoading ? (
+      {/* {IsLoading ? (
         <LoadingIndicator />
-      ) : (
+      ) : ( */}
         <View style={styles.container}>
           <View style={styles.imgContainer}>
             <Image
@@ -441,13 +450,14 @@ const RegisterOwner = () => {
               isMandatory={true}
               isend="true"
             />
+            <CustomImagePicker title="PAN CARD PHOTO" iconName='card-account-details-outline' onImagePicked={handleSaveImageData} />
           </View>
 
           <TouchableOpacity style={styles.button} onPress={registertheOwner}>
             <Text style={styles.text}>Register</Text>
           </TouchableOpacity>
         </View>
-      )}
+      {/* )} */}
       <CustomAlert
         visible={showAlert}
         message={errorMessage}

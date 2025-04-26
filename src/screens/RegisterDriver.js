@@ -21,6 +21,7 @@ import CustomInput from '../components/CustomInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
 import { CustomRequestOptions } from '../components/CustomRequestOptions';
+import CustomImagePicker from '../components/CustomFilePicker';
 const RegisterDriver = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -82,7 +83,9 @@ const RegisterDriver = () => {
   const [email, setEmail] = useState('');
   const [driverAddress, setdriverAddress] = useState('');
   const [PanNo, setPanNo] = useState('');
-
+ const [capturedPhoto1, setCapturedPhoto1] = useState(null);
+  const [capturedPhoto2, setCapturedPhoto2] = useState(null);
+   const [capturedPhoto3, setCapturedPhoto3] = useState(null);
   const registertheDriver = () => {
     setIsLoading(true);
     const postData = {
@@ -175,7 +178,18 @@ const RegisterDriver = () => {
 
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
-
+  const handleSaveImageData1 = (image) => {
+    //console.log('Selected Image Data:', image);
+    setCapturedPhoto1(image);
+  };
+  const handleSaveImageData2 = (image) => {
+    //console.log('Selected Image Data:', image);
+    setCapturedPhoto2(image);
+  };
+  const handleSaveImageData3 = (image) => {
+    //console.log('Selected Image Data:', image);
+    setCapturedPhoto3(image);
+  };
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       {IsLoading ? (
@@ -299,9 +313,26 @@ const RegisterDriver = () => {
               isaddress={true}
             />
           </View>
-          <TouchableOpacity style={styles.button} onPress={registertheDriver}>
+          <View style={styles.levelContainer}>
+            <Text
+              style={{
+                color: '#453D98ff',
+                fontSize: 15,
+                marginBottom: 10,
+                marginTop: 8,
+                textAlign: 'center',
+                fontFamily: 'PoppinsBold',
+              }}>
+              Attachments
+            </Text>
+            
+            <CustomImagePicker title="DRIVER PHOTO 1" iconName='card-account-details-outline' onImagePicked={handleSaveImageData1} />
+            <CustomImagePicker title="DRIVER PHOTO 2" iconName='card-account-details-outline' onImagePicked={handleSaveImageData2} />
+            <CustomImagePicker title="DRIVER PHOTO 3" iconName='card-account-details-outline' onImagePicked={handleSaveImageData3}/>
+            </View>
+          <TouchabeOpacity style={styles.button} onPress={registertheDriver}>
             <Text style={styles.text}>Register</Text>
-          </TouchableOpacity>
+          </TouchabeOpacity>
         </View>
       )}
       {/* custom alert code==================================== */}
