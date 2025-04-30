@@ -257,9 +257,7 @@ const RegisterOwner = () => {
       setIsVerified(false);
     }
   };
-  const handleLrPhotoPress = () => {
-    setImagePickerVisible(true); // Show Image Picker
-  };
+
   
   const handleSaveImageData = (image) => {
     //console.log('Selected Image Data:', image);

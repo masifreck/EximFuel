@@ -5,8 +5,9 @@ const CustomInput = ({
   labelText,
   placeholdername,
   onChangeText,
+  isIcon,
   hasBorder = false,
-  width = '100%',
+  width = isIcon?'60%':'100%',
   keyboardTypename = 'default',
   stringlength = 500,
   isMandatory = false,
@@ -17,6 +18,7 @@ const CustomInput = ({
 }) => {
   return (
     <>
+    <View style={[width=isIcon?'85%':'100%',{flexDirection:'column'}]}>
       <Text style={styles.levelText}>
         {labelText} {isMandatory && <Text style={{color: 'red'}}>*</Text>}
       </Text>
@@ -47,18 +49,26 @@ const CustomInput = ({
           value={value}
         />
         {width === '85%' ? (
-          isVerified ? (
-            <Image
-              style={styles.rightIcon}
-              source={require('../assets/verified.png')}
-            />
-          ) : (
-            <Image
-              style={styles.wrongIcon}
-              source={require('../assets/delete-cross.png')}
-            />
-          )
-        ) : null}
+  <>
+    {isVerified ? (
+      <Image
+        style={styles.rightIcon}
+        source={require('../assets/verified.png')}
+      />
+    ) : (
+      <Image
+        style={styles.wrongIcon}
+        source={require('../assets/delete-cross.png')}
+      />
+    )}
+
+   
+  </>
+) : null}
+</View>
+
+
+        
       </View>
     </>
   );

@@ -9,6 +9,8 @@ import {
   Animated,
   ScrollView,
   ActivityIndicator,
+  Linking,
+  Alert
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import CustomAlert from '../components/CustomAlert';
@@ -21,7 +23,8 @@ import CustomInput from '../components/CustomInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
 import { CustomRequestOptions } from '../components/CustomRequestOptions';
-import CustomImagePicker from '../components/CustomFilePicker';
+import CustomImagePicker from '../components/CustomeImagePicker';
+import { Width } from '../components/constant';
 const RegisterDriver = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -190,6 +193,20 @@ const RegisterDriver = () => {
     //console.log('Selected Image Data:', image);
     setCapturedPhoto3(image);
   };
+  const openDialScreen = (number) => {
+    console.log('phone',number)
+    if (!/^\d{10}$/.test(number)) {
+      Alert.alert('Error', 'Please enter a valid 10-digit mobile number');
+      return;
+    }
+    
+    if (Platform.OS === 'ios') {
+      number = `telprompt:${number}`;
+    } else {
+      number = `tel:${number}`;
+    }
+    Linking.openURL(number);
+  };
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       {IsLoading ? (
@@ -233,17 +250,7 @@ const RegisterDriver = () => {
               hasBorder={hasBorder}
               isMandatory={true}
             />
-            <CustomInput
-              labelText="Aadhar Number"
-              placeholdername="Enter Aadhar Number"
-              onChangeText={text => setAdharNumber(text)}
-              hasBorder={hasBorder}
-              stringlength={12}
-              keyboardTypename="numeric"
-              isMandatory={true}
-            />
-
-            <Text style={styles.levelText}>
+                 <Text style={styles.levelText}>
               Date Of Birth <Text style={{color: 'red'}}>*</Text>
             </Text>
             <View
@@ -277,6 +284,17 @@ const RegisterDriver = () => {
               </TouchableOpacity>
             </View>
             <CustomInput
+              labelText="Aadhar Number"
+              placeholdername="Enter Aadhar Number"
+              onChangeText={text => setAdharNumber(text)}
+              hasBorder={hasBorder}
+              stringlength={12}
+              keyboardTypename="numeric"
+              isMandatory={true}
+            />
+
+<View style={{flexDirection:'row',gap:-5,justifyContent:'center',alignItems:'center'}}>
+            <CustomInput
               labelText="Primary Contact Number"
               placeholdername="Enter Mobile Number"
               onChangeText={text => setPrimaryContact(text)}
@@ -285,7 +303,14 @@ const RegisterDriver = () => {
               keyboardTypename="numeric"
               isMandatory={true}
             />
-
+              <TouchableOpacity onPress={()=>openDialScreen(primaryContact)}>
+        <Image
+          style={{width: 30, height: 30,marginTop:22}}
+          source={require('../assets/phone-call.png')}
+        />
+      </TouchableOpacity>
+      </View>
+<View style={{flexDirection:'row',gap:-5,justifyContent:'center',alignItems:'center'}}>
             <CustomInput
               labelText="Secondary Contact Number"
               placeholdername="Enter Mobile Number"
@@ -293,7 +318,14 @@ const RegisterDriver = () => {
               stringlength={10}
               keyboardTypename="numeric"
             />
-
+ 
+      <TouchableOpacity onPress={()=>openDialScreen(secondaryContact)}>
+        <Image
+          style={{width: 30, height: 30,marginTop:22}}
+          source={require('../assets/phone-call.png')}
+        />
+      </TouchableOpacity>
+      </View>
             <CustomInput
               labelText="Pan Number"
               placeholdername="Enter Pan Number"
@@ -326,13 +358,13 @@ const RegisterDriver = () => {
               Attachments
             </Text>
             
-            <CustomImagePicker title="DRIVER PHOTO 1" iconName='card-account-details-outline' onImagePicked={handleSaveImageData1} />
-            <CustomImagePicker title="DRIVER PHOTO 2" iconName='card-account-details-outline' onImagePicked={handleSaveImageData2} />
-            <CustomImagePicker title="DRIVER PHOTO 3" iconName='card-account-details-outline' onImagePicked={handleSaveImageData3}/>
+            <CustomImagePicker title="DRIVER PHOTO 1" iconName='camera-enhance' onImagePicked={handleSaveImageData1} />
+            <CustomImagePicker title="DRIVER PHOTO 2" iconName='camera-enhance' onImagePicked={handleSaveImageData2} />
+            <CustomImagePicker title="DRIVER PHOTO 3" iconName='camera-enhance' onImagePicked={handleSaveImageData3}/>
             </View>
-          <TouchabeOpacity style={styles.button} onPress={registertheDriver}>
+          <TouchableOpacity style={styles.button} onPress={registertheDriver}>
             <Text style={styles.text}>Register</Text>
-          </TouchabeOpacity>
+          </TouchableOpacity>
         </View>
       )}
       {/* custom alert code==================================== */}
@@ -344,7 +376,7 @@ const RegisterDriver = () => {
 
       <Modal transparent={true} animationType="fade" visible={calendarVisible}>
         {calendarVisible && (
-          <View style={styles.modalContainer}>
+          <View style={[styles.modalContainer]}>
             <View style={styles.alertContainer}>
               <CalendarPicker
                 onDateChange={onDateChange}
@@ -352,7 +384,7 @@ const RegisterDriver = () => {
                 todayBackgroundColor="#9894e6"
                 selectedDayTextColor="#453D98ff"
                 height={400}
-                width={400}
+                width={Width*0.9}
                 textStyle={{
                   fontFamily: 'PoppinsBold',
                   color: 'white',
@@ -530,6 +562,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0)', // Semi-transparent background
+    
   },
 
   closeButton: {
