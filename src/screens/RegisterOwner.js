@@ -28,7 +28,7 @@ const RegisterOwner = () => {
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      console.log('Retrieved token:', token);
+     // console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
@@ -68,6 +68,16 @@ const RegisterOwner = () => {
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [hasBorder, setHasBorder] = useState(false); // State for border
 
+
+  const [bankName,setBankName]=useState('');
+  const [bankData,setBankData]=useState([]);
+  const [serachBank,setSearchBank]=useState('');
+
+  const [acType,setACType]=useState('');
+  const [acTypeData,setAcTypeData]=useState([]);
+  const [searchAcType,setSearchAcType]=useState('');
+
+
   const handleShowToast = () => {
     setHasBorder(true);
   };
@@ -81,72 +91,7 @@ const RegisterOwner = () => {
 
   const [banksearch, setbanksearch] = useState('bank');
 
-  const fetchData1 = async () => {
-    try {
-      const response = await fetch(
-        `https://Exim.Tranzol.com/api/OwnerApi/GetBankNameList?search=${banksearch}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Basic ${apiTokenReceived}`,
-            clientId: 'TRANZOLBOSS',
-            clientSecret: 'TRANZOLBOSSPAN',
-          },
-          redirect: 'follow',
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const result = await response.json();
-      if (result) {
-        // console.log(result);
-        const formattedData = result.apiResult.Result.map(bank => ({
-          label: bank.Name.toString(),
-          value: bank.Id, // Assuming Id is a number; convert to string if needed
-        }));
-        setData1(formattedData);
-        // console.log(data1);
-      } else {
-        console.log('Unexpected API response:', result);
-      }
-    } catch (error) {
-      console.log('Error fetching bank details:', error);
-    }
-  };
 
-  const fetchData2 = async () => {
-    try {
-      const response = await fetch(
-        'https://Exim.Tranzol.com/api/OwnerApi/GetBankAccountType',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Basic ${apiTokenReceived}`, //Basic SnlvdGk6SnlvdGlAMTIz
-            clientId: 'TRANZOLBOSS',
-            clientSecret: 'TRANZOLBOSSPAN',
-          },
-          redirect: 'follow',
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const result = await response.json();
-      if (result) {
-        // console.log(result);
-        const formattedData = result.apiResult.Result.map(banktype => ({
-          label: banktype.Type.toString(),
-          value: banktype.Id, // Assuming Id is a number; convert to string if needed
-        }));
-        setData2(formattedData);
-      } else {
-        console.log('Unexpected API response:', result);
-      }
-    } catch (error) {
-      console.log('Error fetching GetBankAccountType:', error);
-    }
-  };
 
   // useEffect(() => {
   //   if (banksearch && apiTokenReceived !== null) {
@@ -192,8 +137,8 @@ const RegisterOwner = () => {
       Address: ownerAddress,
       EmailAddress: email,
       AccountNo: acnumber,
-      BankId: bankname,
-      AccountTypeId: actype,
+      BankId: bankName,
+      AccountTypeId: acType,
       IFSCCode: IfscCode,
       TotalNoVehicle: TotalVehicles,
       ShortageRecovery: ShortageRecovery,
@@ -231,7 +176,9 @@ const RegisterOwner = () => {
             setErrorMessage(errorMessage);
             setShowAlert(true);
           } else {
-            handleShowToast();
+            const errorMessage= data.apiResult.Error;
+            setErrorMessage(errorMessage);
+            setShowAlert(true)
             console.log('logged', data.apiResult);
           }
         }
@@ -253,6 +200,7 @@ const RegisterOwner = () => {
     if (panRegex.test(input)) {
       setpanno(input.toUpperCase());
       setIsVerified(true);
+      setpanno(input)
     } else {
       setIsVerified(false);
     }
@@ -263,6 +211,86 @@ const RegisterOwner = () => {
     //console.log('Selected Image Data:', image);
     setCapturedPhoto(image);
   };
+
+
+
+  useEffect(() => {
+    if (serachBank) {
+      fetchBankName(serachBank);
+    }
+  }, [serachBank ]);
+  const fetchBankName = async (search) => {
+    try {
+      console.log('Fetching Association with search:', search);
+      const encodedSearch = encodeURIComponent(search);
+      const url = `https://Exim.Tranzol.com/api/OwnerApi/GetBankNameList?search=${encodedSearch}`;
+      console.log('Request URL:', url);
+  
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Basic ${apiTokenReceived}`, // assuming this token is defined correctly
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+  
+        if (data.apiResult && data.apiResult.Result) {
+          const BankData = data.apiResult.Result.map((item) => ({
+            label: item.Name,
+            value: item.Id,
+          }));
+          setBankData(BankData);
+        } else {
+          console.log('No bank results found.');
+        }
+      } else {
+        console.log('Error in fetching bank data. Status:', response.status);
+      }
+    } catch (error) {
+      console.log('Error in fetching bank data:', error);
+    }
+  };
+  useEffect(()=>{
+    const fetchAcountType = async (search) => {
+      try {
+        console.log('Fetching Association with search:', search);
+        const encodedSearch = encodeURIComponent(search);
+        const url = `https://Exim.Tranzol.com/api/OwnerApi/GetBankAccountType?search=${encodedSearch}`;
+        console.log('Request URL:', url);
+    
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            Authorization: `Basic ${apiTokenReceived}`, // assuming this token is defined correctly
+          },
+        });
+    
+        if (response.ok) {
+          const data = await response.json();
+          console.log('API Response:', data);
+    
+          if (data.apiResult && data.apiResult.Result) {
+            const Data = data.apiResult.Result.map((item) => ({
+              label: item.Type,
+              value: item.Id,
+            }));
+            setAcTypeData(Data);
+          } else {
+            console.log('No bank results found.');
+          }
+        } else {
+          console.log('Error in fetching bank data. Status:', response.status);
+        }
+      } catch (error) {
+        console.log('Error in fetching bank data:', error);
+      }
+    };
+    fetchAcountType(searchAcType);
+  },[searchAcType])
+  
   
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
@@ -302,6 +330,7 @@ const RegisterOwner = () => {
               stringlength={10}
               isVerified={isVerified}
               isMandatory={true}
+              
             />
 
             <CustomInput
@@ -418,27 +447,31 @@ const RegisterOwner = () => {
             <CustomDropbox
               hasBorder={hasBorder}
               labelText="Bank Name"
-              dropData={data1}
+              dropData={bankData}
               placeholdername={'Enter Bank Name'}
               searchPlaceholdername={'Enter Bank Name'}
-              value={bankname}
+              value={bankName}
               onChange={item => {
-                setbankname(item.value);
+                setBankName(item.value);
+                setbanksearch(banksearch)
               }}
-              onChangeText={text => setbanksearch(text)}
+              onChangeText={text => setSearchBank(text)}
             />
 
             <CustomDropbox
               hasBorder={hasBorder}
               labelText="Account Type"
-              dropData={data2}
+              dropData={acTypeData}
               placeholdername={'Select Account Type'}
               searchPlaceholdername={'Search...'}
-              value={actype}
+
+              value={acType}
               onChange={item => {
                 setactype(item.value);
+                setSearchAcType(searchAcType);
               }}
-              showSearch={false}
+              showSearch={true}
+              onChangeText={t=>setSearchAcType(t)}
             />
             <CustomInput
               labelText="IFSC Code"
@@ -448,11 +481,14 @@ const RegisterOwner = () => {
               isMandatory={true}
               isend="true"
             />
-            <CustomImagePicker title="PAN CARD PHOTO" iconName='card-account-details-outline' onImagePicked={handleSaveImageData} />
+            {/* <CustomImagePicker title="PAN CARD PHOTO" iconName='card-account-details-outline' onImagePicked={handleSaveImageData} /> */}
           </View>
 
           <TouchableOpacity style={styles.button} onPress={registertheOwner}>
-            <Text style={styles.text}>Register</Text>
+            {IsLoading?(
+              <ActivityIndicator size="small" color="white"/>
+            ):(
+            <Text style={styles.text}>Register</Text>)}
           </TouchableOpacity>
         </View>
       {/* )} */}

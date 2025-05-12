@@ -12,7 +12,7 @@
 // //     return resjson;
 // // }
 
-const apiUrl = 'https://exim.tranzol.com/api/Test/APILogin?';
+const apiUrl = 'https://Exim.Tranzol.com/api/AccountApi/Login';
 
 export const myFetchPostRequest = async (Data) => {
     const response = await fetch(apiUrl, {

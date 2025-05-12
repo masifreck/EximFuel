@@ -345,7 +345,7 @@ const RegisterDriver = () => {
               isaddress={true}
             />
           </View>
-          <View style={styles.levelContainer}>
+          {/* <View style={styles.levelContainer}>
             <Text
               style={{
                 color: '#453D98ff',
@@ -361,7 +361,7 @@ const RegisterDriver = () => {
             <CustomImagePicker title="DRIVER PHOTO 1" iconName='camera-enhance' onImagePicked={handleSaveImageData1} />
             <CustomImagePicker title="DRIVER PHOTO 2" iconName='camera-enhance' onImagePicked={handleSaveImageData2} />
             <CustomImagePicker title="DRIVER PHOTO 3" iconName='camera-enhance' onImagePicked={handleSaveImageData3}/>
-            </View>
+            </View> */}
           <TouchableOpacity style={styles.button} onPress={registertheDriver}>
             <Text style={styles.text}>Register</Text>
           </TouchableOpacity>

@@ -22,7 +22,6 @@ import RegisterVehicle from './screens/RegisterVehicle';
 import ShowVehicleDetails from './screens/ShowVehicleDetails';
 import NewChalan from './screens/NewChalan';
 import DrawerNavigation from './DrawerNavigation';
-
 import UnloadingEntry from './screens/UnloadingEntry';
 import MinesChalan from './screens/MinesChalan';
 import PrintChallan from './screens/PrintChallan';
