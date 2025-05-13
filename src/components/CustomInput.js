@@ -14,7 +14,8 @@ const CustomInput = ({
   isVerified,
   isend = false,
   isaddress = false,
-  value
+  value,
+   autoCapitalize  
 }) => {
   return (
     <>
@@ -47,6 +48,7 @@ const CustomInput = ({
           onChangeText={onChangeText}
           maxLength={stringlength}
           value={value}
+          autoCapitalize = {autoCapitalize?"characters":''}
         />
         {width === '85%' ? (
   <>

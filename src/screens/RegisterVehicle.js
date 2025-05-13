@@ -3,7 +3,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,ScrollView
+  TextInput,ScrollView,Image
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 // import {ScrollView} from 'react-native-gesture-handler';
@@ -17,6 +17,7 @@ import CustomDropbox from '../components/CustomDropbox';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
 import {CustomRequestOptions} from '../components/CustomRequestOptions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { darkBlue } from '../components/constant';
 const RegisterVehicle = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -55,48 +56,53 @@ const RegisterVehicle = () => {
   const [ownerNameSelected, setOwnerNameSelected] = useState('');
   // dummy=========
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch(
-        `https://Exim.Tranzol.com/api/OwnerApi/GetOwnerListByName?search=${PanNumber}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Basic ${apiTokenReceived}`,
-            clientId: 'TRANZOLBOSS',
-            clientSecret: 'TRANZOLBOSSPAN',
-          },
-          redirect: 'follow',
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+useEffect(() => {
+  const delayDebounce = setTimeout(() => {
+    if (PanNumber && PanNumber.length >= 3) {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(
+            `https://Exim.Tranzol.com/api/OwnerApi/GetOwnerListByName?search=${PanNumber}`,
+            {
+              method: 'GET',
+              headers: {
+                Authorization: `Basic ${apiTokenReceived}`,
+                clientId: 'TRANZOLBOSS',
+                clientSecret: 'TRANZOLBOSSPAN',
+              },
+              redirect: 'follow',
+            }
+          );
 
-      const result = await response.json();
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
 
-      if (result.apiResult.Result) {
-        const formattedData = result.apiResult.Result.map(owner => ({
-          label: owner.OwnerName,
-          value: owner.Id,
-        }));
+          const result = await response.json();
+          console.log('owner list', result);
 
-        setOwnerData(formattedData);
-        // console.log('formatted data is here', formattedData);
-      } else {
-        console.log('No data found.');
-      }
-    } catch (error) {
-      console.log('Error fetching owner data:', error);
-    }
-  };
+          if (result.apiResult?.Result?.length) {
+            const formattedData = result.apiResult.Result.map(owner => ({
+              label: owner.OwnerName,
+              value: owner.Id,
+            }));
+            setOwnerData(formattedData);
+          } else {
+            console.log('No data found.');
+          }
+        } catch (error) {
+          console.log('Error fetching owner data:', error);
+        }
+      };
 
-  useEffect(() => {
-    if (PanNumber) {
-      console.log('after fetching', ownerNameSelected);
       fetchData();
     }
-  }, [PanNumber]);
+  }, 500); // delay in ms
+
+  return () => clearTimeout(delayDebounce); // cleanup on input change
+}, [PanNumber]);
+
+
 
   // ========================
   const [IsLoading, setIsLoading] = useState(true);
@@ -195,6 +201,7 @@ const RegisterVehicle = () => {
 
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
+console.log('PanNumber is:', PanNumber);
 
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
@@ -202,6 +209,12 @@ const RegisterVehicle = () => {
         <LoadingIndicator />
       ) : (
         <View style={styles.container}>
+           <View style={styles.imgContainer}>
+                      <Image
+                        style={styles.img}
+                        source={require('../assets/Truck.png')}
+                      />
+                    </View>
           <View style={styles.levelContainer}>
             <Text
               style={{
@@ -361,6 +374,7 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     borderRadius: 50,
+    backgroundColor:darkBlue
   },
   Uploadimg: {
     height: 30,

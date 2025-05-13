@@ -124,7 +124,54 @@ const RegisterOwner = () => {
   // }, [is_everything_ok]);
 
   // ============================================================
+const validation = () => {
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const adharRegex = /^\d{12}$/;
+if (!panRegex.test(panno)) {
+    setErrorMessage('Please enter a valid PAN number (e.g., ABCDE1234F)');
+    setShowAlert(true);
+    return false;
+  }
+  if (!name) {
+    setErrorMessage('Please enter Owner Name');
+    setShowAlert(true);
+    return false;
+  }
+  if(!ConvSelectedStartDate){
+    setErrorMessage('Please Choose the DOB')
+        setShowAlert(true);
+    return false;
+  }
+  if (!adharRegex.test(adharNumber)) {
+    setErrorMessage('Please enter a valid 12-digit Aadhar number');
+    setShowAlert(true);
+    return false;
+  }
+
+  if(!partytype){
+    setErrorMessage('Please Choose TDS Type');
+    setShowAlert(true);
+    return false; 
+  }
+  if(!primaryContact){
+     setErrorMessage('Please enter a valid primary contact');
+    setShowAlert(true);
+    return false;
+  }
+
+  if (!emailRegex.test(email)) {
+    setErrorMessage('Please enter a valid email address');
+    setShowAlert(true);
+    return false;
+  }
+
+
+  return true;
+};
+
   const registertheOwner = () => {
+     if (!validation()) return;
     setIsLoading(true);
     const postData = {
       OwnerName: name,
@@ -192,19 +239,23 @@ const RegisterOwner = () => {
   };
   const closeAlert = () => {
     setShowAlert(false);
-    navigation.navigate('OwnerDetails');
+    //navigation.navigate('OwnerDetails');
   };
 
-  const handlePanChange = input => {
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
-    if (panRegex.test(input)) {
-      setpanno(input.toUpperCase());
-      setIsVerified(true);
-      setpanno(input)
-    } else {
-      setIsVerified(false);
-    }
-  };
+  // const handlePanChange = input => {
+  //   const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+  //   if (panRegex.test(input)) {
+  //     setpanno(input.toUpperCase());
+  //     setIsVerified(true);
+  //     setpanno(input)
+  //   } else {
+  //     setIsVerified(false);
+  //   }
+  // };
+const handlePanChange = (text) => {
+  const upperText = text.toUpperCase();
+  setpanno(upperText); // assuming setPanno is your state setter
+};
 
   
   const handleSaveImageData = (image) => {
@@ -330,7 +381,7 @@ const RegisterOwner = () => {
               stringlength={10}
               isVerified={isVerified}
               isMandatory={true}
-              
+               autoCapitalize={true}
             />
 
             <CustomInput
@@ -467,7 +518,7 @@ const RegisterOwner = () => {
 
               value={acType}
               onChange={item => {
-                setactype(item.value);
+                setACType(item.value);
                 setSearchAcType(searchAcType);
               }}
               showSearch={true}
@@ -476,9 +527,10 @@ const RegisterOwner = () => {
             <CustomInput
               labelText="IFSC Code"
               placeholdername="Enter IFSC Code"
-              onChangeText={text => setIfscCode(text)}
+              onChangeText={text => setIfscCode(text.toUpperCase())}
               hasBorder={hasBorder}
               isMandatory={true}
+              autoCapitalize={true}
               isend="true"
             />
             {/* <CustomImagePicker title="PAN CARD PHOTO" iconName='card-account-details-outline' onImagePicked={handleSaveImageData} /> */}

@@ -17,10 +17,21 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import useApiToken from '../components/Token';
 import LoadingIndicator from '../components/LoadingIndicator';
 import CalendarModal from '../components/Calander';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const UpdateOwner = () => {
   const route = useRoute();
-  const apiTokenReceived = useApiToken();
-  console.log(apiTokenReceived);
+ const [apiTokenReceived, setapiTokenReceived] = useState();
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+     // console.log('Retrieved token:', token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+      console.log('Received token', apiTokenReceived);
+      console.log('Error retrieving token:', error);
+    });
 
   const {ownerDetails} = route.params;
   const FetchOwnerDetails = ownerDetails.apiResult.Result;
@@ -82,7 +93,7 @@ const UpdateOwner = () => {
 
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
-  const [banksearch, setbanksearch] = useState('bank');
+  const [banksearch, setbanksearch] = useState('');
 
   const fetchData1 = async () => {
     try {
@@ -92,10 +103,8 @@ const UpdateOwner = () => {
           method: 'GET',
           headers: {
             Authorization: `Basic ${apiTokenReceived}`,
-            clientId: 'TRANZOLBOSS',
-            clientSecret: 'TRANZOLBOSSPAN',
+          
           },
-          redirect: 'follow',
         }, //what happened and
       );
       if (!response.ok) {
@@ -103,13 +112,13 @@ const UpdateOwner = () => {
       }
       const result = await response.json();
       if (result) {
-        // console.log(result);
+        console.log(result);
         const formattedData = result.apiResult.Result.map(bank => ({
           label: bank.Name.toString(),
           value: bank.Id, // Assuming Id is a number; convert to string if needed
         }));
         setData1(formattedData);
-        // console.log(data1);
+        console.log(data1);
       } else {
         console.log('Unexpected API response:', result);
       }
@@ -126,10 +135,9 @@ const UpdateOwner = () => {
           method: 'GET',
           headers: {
             Authorization: `Basic ${apiTokenReceived}`,
-            clientId: 'TRANZOLBOSS',
-            clientSecret: 'TRANZOLBOSSPAN',
+            
           },
-          redirect: 'follow',
+        
         },
       );
       if (!response.ok) {
@@ -224,7 +232,7 @@ const UpdateOwner = () => {
     redirect();
   };
   const redirect = () => {
-    navigation.navigate('OwnerDetails');
+    //navigation.navigate('OwnerDetails');
   };
 
   const [IsLoading, setIsLoading] = useState(false);
@@ -260,9 +268,9 @@ const UpdateOwner = () => {
 
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
-      {IsLoading ? (
+      {/* {IsLoading ? (
         <LoadingIndicator />
-      ) : (
+      ) : ( */}
         <View style={styles.container}>
           <View style={styles.levelContainer}>
             <Text
@@ -554,7 +562,7 @@ const UpdateOwner = () => {
             <Text style={styles.text}>Update</Text>
           </TouchableOpacity>
         </View>
-      )}
+      {/* )} */}
       <CustomAlert
         visible={showAlert}
         message={errorMessage}
@@ -596,6 +604,7 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 15,
     color: '#6c6f73',
+    padding:5,
     fontFamily: 'PoppinsMedium',
   },
 

@@ -21,8 +21,18 @@ const UpdateDriver = () => {
   const route = useRoute();
   const {driverDetails} = route.params;
   const FetchDriverDetails = driverDetails.apiResult.Result;
-  const apiTokenReceived = useApiToken();
-  console.log('Received token', apiTokenReceived);
+ const [apiTokenReceived, setapiTokenReceived] = useState(null);
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+      console.log('Retrieved token:', token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+      console.log('Received token', apiTokenReceived);
+      console.log('Error retrieving token:', error);
+    });
   // console.log(FetchDriverDetails);
   const InputField = ({label, placeholder, onChangeText}) => {
     return (
@@ -197,9 +207,9 @@ const UpdateDriver = () => {
 
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
-      {IsLoading ? (
+      {/* {IsLoading ? (
         <LoadingIndicator />
-      ) : (
+      ) : ( */}
         <View style={styles.container}>
           <View style={styles.levelContainer}>
             <Text
@@ -387,7 +397,7 @@ const UpdateDriver = () => {
             <Text style={styles.text}>Update Details</Text>
           </TouchableOpacity>
         </View>
-      )}
+      {/* )} */}
       {/* custom alert code==================================== */}
       <CustomAlert
         visible={showAlert}
