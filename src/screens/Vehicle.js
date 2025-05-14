@@ -160,6 +160,7 @@ const Vehicle = () => {
             autoCorrect={false}
             value={vehicleNo}
             onChangeText={text => setVehicleNo(text)}
+            autoCapitalize = {"characters"}
           />
         </View>
 

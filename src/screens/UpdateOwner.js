@@ -159,74 +159,124 @@ const UpdateOwner = () => {
     }
   };
   // ============================================================
-  const registertheOwner = () => {
-    setIsLoading(true);
-    const postData = {
-      Id: Id,
-      OwnerName: name,
-      PanNo: panno,
-      AdharNo: adharNumber,
-      DobOwner: ConvSelectedStartDate,
-      TdsTypeId: partytype,
-      PrimaryMobileNo: primaryContact,
-      SecondaryMobileNo: secondaryContact,
-      Address: ownerAddress,
-      EmailAddress: email,
-      AccountNo: acnumber,
-      BankId: bankname,
-      AccountTypeId: actype,
-      IFSCCode: IfscCode,
-      TotalNoVehicle: TotalVehicles,
-      ShortageRecovery: ShortageRecovery,
-    };
-    console.log('posted data', postData);
 
-    const url = 'https://Exim.Tranzol.com/api/OwnerApi/CreateOwner';
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${apiTokenReceived}`,
-        clientId: 'TRANZOLBOSS',
-        clientSecret: 'TRANZOLBOSSPAN',
-      },
-      redirect: 'follow',
-      body: JSON.stringify(postData),
-    };
-    fetch(url, requestOptions)
-      .then(response => {
-        setIsLoading(false);
-        if (!response.ok) {
-          const error = 'Network response was not ok';
-          setErrorMessage(error);
-          setShowAlert(true);
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setIsLoading(false);
-        if (data.apiResult.Result !== null) {
-          const errorMessage = 'Update Successfull!';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
-        } else if (data.apiResult.Result === null) {
-          const errorMessage = 'Something Went Wrong!';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
-        } else {
-          const errorMessage = 'Fill Mandatory Fields';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
-        }
-      })
-      .catch(error => {
-        setIsLoading(false);
-        console.log('Error:', error);
-        setErrorMessage('Network Error');
+  const validation = () => {
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const adharRegex = /^\d{12}$/;
+if (!panRegex.test(panno)) {
+    setErrorMessage('Please enter a valid PAN number (e.g., ABCDE1234F)');
+    setShowAlert(true);
+    return false;
+  }
+  if (!name) {
+    setErrorMessage('Please enter Owner Name');
+    setShowAlert(true);
+    return false;
+  }
+  if(!ConvSelectedStartDate){
+    setErrorMessage('Please Choose the DOB')
         setShowAlert(true);
-      });
+    return false;
+  }
+  if (!adharRegex.test(adharNumber)) {
+    setErrorMessage('Please enter a valid 12-digit Aadhar number');
+    setShowAlert(true);
+    return false;
+  }
+
+  if(!partytype){
+    setErrorMessage('Please Choose TDS Type');
+    setShowAlert(true);
+    return false; 
+  }
+  if(!primaryContact){
+     setErrorMessage('Please enter a valid primary contact');
+    setShowAlert(true);
+    return false;
+  }
+
+  if (!emailRegex.test(email)) {
+    setErrorMessage('Please enter a valid email address');
+    setShowAlert(true);
+    return false;
+  }
+
+
+  return true;
+};
+  const registertheOwner = () => {
+  if (!validation()) return;
+
+  setIsLoading(true);
+
+  const postData = {
+    Id: Id,
+    OwnerName: name,
+    PanNo: panno,
+    AdharNo: adharNumber,
+    DobOwner: ConvSelectedStartDate,
+    TdsTypeId: partytype,
+    PrimaryMobileNo: primaryContact,
+    SecondaryMobileNo: secondaryContact,
+    Address: ownerAddress,
+    EmailAddress: email,
+    AccountNo: acnumber,
+    BankId: bankname,
+    AccountTypeId: actype,
+    IFSCCode: IfscCode,
+    TotalNoVehicle: TotalVehicles,
+    ShortageRecovery: ShortageRecovery,
   };
+
+  console.log('Posted Data:', postData);
+
+  const url = 'https://Exim.Tranzol.com/api/OwnerApi/CreateOwner';
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Basic ${apiTokenReceived}`,
+      clientId: 'TRANZOLBOSS',
+      clientSecret: 'TRANZOLBOSSPAN',
+    },
+    redirect: 'follow',
+    body: JSON.stringify(postData),
+  };
+
+  fetch(url, requestOptions)
+    .then(async response => {
+      setIsLoading(false);
+      
+      const data = await response.json(); // ✅ Await before using
+      console.log('Response Data:', data); // ✅ Log actual response JSON
+
+      if (!response.ok) {
+        const error = 'Network response was not ok';
+        setErrorMessage(error);
+        setShowAlert(true);
+        throw new Error(error);
+      }
+
+      if (data.apiResult?.Result !== null) {
+        setErrorMessage('Update Successful!');
+        setShowAlert(true);
+      } else if (data.apiResult?.Result === null) {
+        setErrorMessage(data.apiResult?.Error || 'Unknown Error');
+        setShowAlert(true);
+      } else {
+        setErrorMessage('Fill Mandatory Fields');
+        setShowAlert(true);
+      }
+    })
+    .catch(error => {
+      setIsLoading(false);
+      console.log('Error:', error.message);
+      setErrorMessage('Network Error');
+      setShowAlert(true);
+    });
+};
+
   const closeAlert = () => {
     setShowAlert(false);
     redirect();
@@ -255,22 +305,22 @@ const UpdateOwner = () => {
       setis_everything_ok(true);
     }
   }, [data1, data2]);
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (is_everything_ok === false) {
-        setErrorMessage('Unexpected Error! Login Again');
-        setShowAlert(true);
-      }
-    }, 45000); // 45 seconds in milliseconds
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     if (is_everything_ok === false) {
+  //       setErrorMessage('Unexpected Error! Login Again');
+  //       setShowAlert(true);
+  //     }
+  //   }, 45000); // 45 seconds in milliseconds
 
-    return () => clearTimeout(timeoutId);
-  }, [is_everything_ok]);
+  //   return () => clearTimeout(timeoutId);
+  // }, [is_everything_ok]);
 
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
-      {/* {IsLoading ? (
+      {IsLoading ? (
         <LoadingIndicator />
-      ) : ( */}
+      ) : (
         <View style={styles.container}>
           <View style={styles.levelContainer}>
             <Text
@@ -328,7 +378,7 @@ const UpdateOwner = () => {
             <View style={[styles.inputContainer]}>
               <TouchableOpacity
                 style={{width: '85%'}}
-                onPress={() => setCalendarVisible(true)}>
+                onPress={() => setModalVisible(true)}>
                 <TextInput
                   placeholderTextColor={'#6c6f73'}
                   style={{
@@ -562,7 +612,7 @@ const UpdateOwner = () => {
             <Text style={styles.text}>Update</Text>
           </TouchableOpacity>
         </View>
-      {/* )} */}
+       )} 
       <CustomAlert
         visible={showAlert}
         message={errorMessage}

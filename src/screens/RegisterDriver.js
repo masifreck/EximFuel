@@ -30,7 +30,7 @@ const RegisterDriver = () => {
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      console.log('Retrieved token:', token);
+     // console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
@@ -89,8 +89,69 @@ const RegisterDriver = () => {
  const [capturedPhoto1, setCapturedPhoto1] = useState(null);
   const [capturedPhoto2, setCapturedPhoto2] = useState(null);
    const [capturedPhoto3, setCapturedPhoto3] = useState(null);
+
+  const validation = () => {
+  const cleanDL = dlNumber.replace(/[\s-]/g, ''); // assuming dlNumber is your state variable
+ const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  const regex = /^[A-Z]{2}[0-9]{2}[0-9]{4}[0-9]{7}$/;
+ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const adharRegex = /^\d{12}$/;
+  if (!(cleanDL.length === 15 || cleanDL.length === 16) || !regex.test(cleanDL)) {
+    setErrorMessage('Please enter a valid DL No.');
+    setShowAlert(true);
+    return false;
+  }
+if(!name){
+  setErrorMessage('Please enter Driver Name');
+    setShowAlert(true);
+    return false;
+}
+if (
+  !convselectedStartDate ||
+  convselectedStartDate.includes('undefined') ||
+  convselectedStartDate.trim() === '' ||
+  convselectedStartDate === 'undefined/undefined/'
+) {
+  setErrorMessage('Please enter a valid DOB');
+  setShowAlert(true);
+  return false;
+}
+
+  if (!adharRegex.test(adharNumber)) {
+    setErrorMessage('Please enter a valid 12-digit Aadhar number');
+    setShowAlert(true);
+    return false;
+  }
+   if (!primaryContact || !/^\d{10}$/.test(primaryContact)) {
+  setErrorMessage('Please enter a valid primary contact (10 digits)');
+  setShowAlert(true);
+  return false;
+}
+
+   if (secondaryContact && !/^\d{10}$/.test(secondaryContact)) {
+    setErrorMessage('Please enter a valid secondary contact (10 digits).');
+    setShowAlert(true);
+    return false;
+  }
+ 
+if (PanNo && !panRegex.test(PanNo)) {
+    setErrorMessage('Please enter a valid PAN number (e.g., ABCDE1234F)');
+    setShowAlert(true);
+    return false;
+  }
+if (email && !emailRegex.test(email)) {
+  setErrorMessage('Please enter a valid email address');
+  setShowAlert(true);
+  return false;
+}
+
+  // If valid
+  return true;
+};
+
   const registertheDriver = () => {
-    setIsLoading(true);
+       if (!validation()) return;
+   // setIsLoading(true);
     const postData = {
       DLNumber: dlNumber,
       DriverName: name,
@@ -102,6 +163,7 @@ const RegisterDriver = () => {
       DriverAddress: driverAddress,
       PanNo: PanNo,
     };
+    console.log('data',postData)
     const {url, requestOptions} = CustomRequestOptions(
       'https://Exim.Tranzol.com/api/OwnerApi/CreateDriver',
       apiTokenReceived,
@@ -150,7 +212,7 @@ const RegisterDriver = () => {
   };
   const closeAlert = () => {
     setShowAlert(false);
-    navigation.navigate('Driver');
+   // navigation.navigate('Driver');
   };
 
   // Verification code=======================================================================

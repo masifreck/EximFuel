@@ -54,122 +54,32 @@ const ShowOwnerDetails = () => {
             }}>
             Owner Contact Details
           </Text>
-          <View style={styles.inputContainer}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Mobile Number :
-              </Text>
+           <View style={styles.inputContainer}>
+      <View style={styles.row}>
+        <Text style={styles.label}>Mobile Number :</Text>
+        <Text style={styles.value}>{FetchOwnerDetails.PrimaryMobileNo}</Text>
+      </View>
 
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 5,
-                  color: '#363432',
-                  padding: 10,
-                }}>
-                {FetchOwnerDetails.PrimaryMobileNo}
-              </Text>
-            </View>
+      <View style={styles.row}>
+        <Text style={styles.label}>Secondary Number :</Text>
+        <Text style={styles.value}>{FetchOwnerDetails.SecondaryNo}</Text>
+      </View>
 
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Secondary Number :
-              </Text>
+      <View style={styles.row}>
+        <Text style={styles.label}>Date Of Birth :</Text>
+        <Text style={styles.value}>{FetchOwnerDetails.DobOwner1}</Text>
+      </View>
 
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 5,
-                  color: '#363432',
-                  padding: 10,
-                }}>
-                {FetchOwnerDetails.SecondaryNo}
-              </Text>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Date Of Birth :
-              </Text>
+      <View style={styles.row}>
+        <Text style={styles.label}>Address :</Text>
+        <Text style={styles.value}>{FetchOwnerDetails.Address}</Text>
+      </View>
 
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 5,
-                  color: '#363432',
-                  padding: 10,
-                }}>
-                {FetchOwnerDetails.DobOwner1}
-              </Text>
-            </View>
-
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Address :
-              </Text>
-
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 5,
-                  color: '#363432',
-                  padding: 10,
-                  width: 250,
-                }}>
-                {FetchOwnerDetails.Address}
-              </Text>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                TDS Type Name:
-              </Text>
-
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 5,
-                  color: '#363432',
-                  padding: 10,
-                  width: 200,
-                }}>
-                {FetchOwnerDetails.TDSTypeName}
-              </Text>
-            </View>
-          </View>
+      <View style={styles.row}>
+        <Text style={styles.label}>TDS Type Name:</Text>
+        <Text style={styles.value}>{FetchOwnerDetails.TDSTypeName}</Text>
+      </View>
+    </View>
 
           <View style={{flexDirection: 'row'}}>
             <Text
@@ -186,166 +96,41 @@ const ShowOwnerDetails = () => {
               Bank Details
             </Text>
           </View>
-          <View style={styles.inputContainer}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Account Number :
-              </Text>
+        <View style={styles.inputContainer}>
+        <View style={styles.row}>
+          <Text style={styles.label}>Account Number :</Text>
+          <Text style={styles.value}>{FetchOwnerDetails.AccountNo}</Text>
+        </View>
 
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 0.3,
-                  color: '#363432',
-                  padding: 9,
-                  width:200,
-                 
-                }}>
-                {FetchOwnerDetails.AccountNo}
-              </Text>
-            </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Bank Name :</Text>
+          <Text style={styles.value}>{FetchOwnerDetails.BankNameName}</Text>
+        </View>
 
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Bank Name :
-              </Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Account Type :</Text>
+          <Text style={styles.value}>{FetchOwnerDetails.BankTypeName}</Text>
+        </View>
 
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 0.5,
-                  color: '#363432',
-                  padding: 10,
-                  width:230,
-              
-                }}>
-                {FetchOwnerDetails.BankNameName}
-              </Text>
-            </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>IFSC Code :</Text>
+          <Text style={styles.value}>{FetchOwnerDetails.IFSCCode}</Text>
+        </View>
+      </View>
 
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Account Type :
-              </Text>
+      <Text style={styles.sectionHeader}>Other Details</Text>
 
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 0.5,
-                  color: '#363432',
-                  padding: 10,
-                  width:210,
-           
-                }}>
-                {FetchOwnerDetails.BankTypeName}
-              </Text>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                IFSC Code :
-              </Text>
+      <View style={styles.inputContainer}>
+        <View style={styles.row}>
+          <Text style={styles.label}>Total No Vehicle :</Text>
+          <Text style={styles.value}>{FetchOwnerDetails.TotalNoVehicle}</Text>
+        </View>
 
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 0.5,
-                  color: '#363432',
-                  padding: 10,
-                  width:230,
-             
-                }}>
-                {FetchOwnerDetails.IFSCCode}
-              </Text>
-            </View>
-          </View>
-
-          <Text
-            style={{
-              color: '#453D98ff',
-              fontSize: 20,
-              marginBottom: 10,
-              marginTop: 20,
-              textAlign: 'center',
-              fontFamily: 'PoppinsBold',
-            }}>
-            Other Details
-          </Text>
-          <View style={styles.inputContainer}>
-
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Total No Vehicle :
-              </Text>
-
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 5,
-                  color: '#363432',
-                  padding: 10,
-                }}>
-                {FetchOwnerDetails.TotalNoVehicle}
-              </Text>
-            </View>
-
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  fontWeight: '900',
-                  fontSize: 17,
-                  color: 'black',
-                  padding: 10,
-                }}>
-                Shortage Recovery :
-              </Text>
-
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 17,
-                  marginLeft: 5,
-                  color: '#363432',
-                  padding: 10,
-                }}>
-                {FetchOwnerDetails.ShortageRecovery}
-              </Text>
-            </View>
-          </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Shortage Recovery :</Text>
+          <Text style={styles.value}>{FetchOwnerDetails.ShortageRecovery}</Text>
+        </View>
+      </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -371,6 +156,26 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginVertical: 5,
     // paddingLeft:10
+  },
+    label: {
+    fontWeight: '900',
+    fontSize: 17,
+    color: 'black',
+    width: '35%',
+    padding: 10,
+  },
+    row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 5,
+  },
+  value: {
+    fontWeight: '500',
+    fontSize: 17,
+    color: '#363432',
+    padding: 10,
+    width: '60%',
+    flexWrap: 'wrap',
   },
   view1: {
     height: 110,
@@ -402,6 +207,14 @@ const styles = StyleSheet.create({
     height: 150,
     width: '100%',
     // backgroundColor: 'white'
+  },
+    sectionHeader: {
+    color: '#453D98ff',
+    fontSize: 20,
+    marginBottom: 10,
+    marginTop: 20,
+    textAlign: 'center',
+    fontFamily: 'PoppinsBold',
   },
   inputContainer: {
     // height: 200,
@@ -438,6 +251,41 @@ const PanCard = () => {
         }}
         source={require('../assets/pan-card.png')}
       />
+       <Text
+        style={{
+          color: 'black',
+          position: 'absolute',
+          top: 30,
+          left: 15,
+          fontSize: 13,
+          fontWeight: '700',
+          width:'70%'
+        }}>
+        {FetchOwnerDetails.OwnerName}
+      </Text>
+       <Text
+        style={{
+          color: 'black',
+          position: 'absolute',
+          top: 44,
+          left: 15,
+          fontSize: 11,
+          fontWeight: '700',
+        }}>
+        {FetchOwnerDetails.DobOwner1}
+      </Text>
+       <Text
+        style={{
+          color: 'black',
+          position: 'absolute',
+          bottom: 65,
+          left: 15,
+          fontSize: 9,
+          fontWeight: '700',
+          width:'70%'
+        }}>
+        {FetchOwnerDetails.Address}
+      </Text>
       <Text
         style={{
           color: 'black',
@@ -474,7 +322,42 @@ const AdharCard = () => {
         }}
         source={require('../assets/aadhaar.png')}
       />
+ <Text
+        style={{
+          color: 'black',
+          position: 'absolute',
+          top: 40,
+          left: 80,
+          fontSize: 13,
+          fontWeight: '700',
+          width:'65%'
+        }}>
+        {FetchOwnerDetails.OwnerName}
+      </Text>
+       <Text
+        style={{
+          color: 'black',
+          position: 'absolute',
+          top: 60,
+          left: 80,
+          fontSize: 11,
+          fontWeight: '700',
+        }}>
+       DOB: {FetchOwnerDetails.DobOwner1}
+      </Text>
+       <Text
+        style={{
+          color: 'black',
+          position: 'absolute',
+          bottom: 30,
+          left: 80,
 
+          fontSize: 9,
+          fontWeight: '700',
+          width:'65%'
+        }}>
+        {FetchOwnerDetails.Address}
+      </Text>
       <Text
         style={{
           color: 'black',

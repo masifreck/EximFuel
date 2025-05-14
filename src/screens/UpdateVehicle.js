@@ -51,7 +51,7 @@ const UpdateVehicle = () => {
   const [fitness, setFitness] = useState(FetchVehicleDetails.FitnessNo);
   const [permit, setPermit] = useState(FetchVehicleDetails.StatePermitNo);
   const [VehicleTyres, setVehicleTyres] = useState(
-   FetchVehicleDetails.VehicleTyre? FetchVehicleDetails.VehicleTyre.toString():'',
+   FetchVehicleDetails.TyreNo? FetchVehicleDetails.TyreNo.toString():'',
   );
   const [roadTax, setRoadTax] = useState(FetchVehicleDetails.RoadTaxNo);
 

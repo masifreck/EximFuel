@@ -66,6 +66,7 @@ const ShowDriverDetails = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <DLCard driver={FetchDriverDetails} />
       <FlatList
         data={data}
         renderItem={renderItem}
@@ -73,10 +74,10 @@ const ShowDriverDetails = ({route}) => {
         ListHeaderComponent={
           <View style={styles.header}>
             <View>
-              <Image
+              {/* <Image
                 style={styles.img}
                 source={require('../assets/driver.png')}
-              />
+              /> */}
             </View>
             {/* <View style={styles.driverInfo}>
               <Text style={styles.nameTxt}>
@@ -88,6 +89,41 @@ const ShowDriverDetails = ({route}) => {
         }
       />
     </SafeAreaView>
+  );
+};
+
+const DLCard = ({driver}) => {
+    function convertDateFormat(inputDate) {
+    const [year, month, day] = inputDate.split('T')[0].split('-');
+    return `${day}-${month}-${year}`;
+  }
+  function convertDateFormat(inputDate) {
+    const [year, month, day] = inputDate.split('T')[0].split('-');
+    return `${day}-${month}-${year}`;
+  }
+  const dob = driver.Dob;
+
+  let formattedDate;
+  if (dob) {
+    formattedDate = convertDateFormat(dob);
+  } else {
+    formattedDate = ''; // Or any other appropriate message or action
+  }
+  return (
+    <View style={styles.dlCard}>
+      <View style={styles.dlCardHeader}>
+        <Text style={styles.dlCardTitle}>DRIVING LICENSE</Text>
+      </View>
+      <View style={styles.dlCardBody}>
+        <Image source={require('../assets/driver.png')} style={styles.dlPhoto} />
+        <View style={styles.dlDetails}>
+          <Text style={styles.dlText}>Name:  {driver.DriverName}</Text>
+          <Text style={styles.dlText}>DL No:  {driver.DLNumber}</Text>
+          <Text style={styles.dlText}>DOB:     {formattedDate ? formattedDate : '-'}</Text>
+          <Text style={styles.dlText}>Contact: {driver.PrimaryContactNo}</Text>
+        </View>
+      </View>
+    </View>
   );
 };
 
@@ -142,6 +178,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
+    paddingHorizontal:20,
   },
   label: {
     fontWeight: '900',
@@ -156,6 +193,45 @@ const styles = StyleSheet.create({
     color: '#363432',
     flex: 1,
   },
+  dlCard: {
+  backgroundColor: '#e8f0fe',
+  borderRadius: 10,
+  margin: 16,
+  padding: 12,
+  shadowColor: '#000',
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 5,
+},
+dlCardHeader: {
+  alignItems: 'center',
+  marginBottom: 8,
+},
+dlCardTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#1a237e',
+},
+dlCardBody: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+dlPhoto: {
+  height: 70,
+  width: 70,
+  borderRadius: 8,
+  marginRight: 10,
+},
+dlDetails: {
+  flex: 1,
+},
+dlText: {
+  fontSize: 14,
+  color: '#000',
+  marginBottom: 4,
+},
+
 });
 
 const AdharCard = () => {

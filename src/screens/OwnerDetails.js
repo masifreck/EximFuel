@@ -177,6 +177,7 @@ const OwnerDetails = () => {
             value={panNumber}
             maxLength={10}
             onChangeText={text => setPanNumber(text)}
+            autoCapitalize = {"characters"}
             // onChangeText={handleUserIdChange}
           />
         </View>

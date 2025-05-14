@@ -52,7 +52,7 @@ const ShowVehicleDetails = ({route}) => {
       <Text style={styles.levelText}>Vehicle Details</Text>
       <View style={styles.inputContainer}>
         <TableRow title="VehicleNo" value={FetchVehicleDetails.VehicleNo} />
-        <TableRow title="TyreNo" value={FetchVehicleDetails.VehicleTyre} />
+        <TableRow title="TyreNo" value={FetchVehicleDetails.TyreNo} />
         {/* <TableRow title="OwnerName" value={FetchVehicleDetails.OwnerName} /> */}
         <TableRow title="ChassicNo" value={FetchVehicleDetails.ChassicNo} />
         <TableRow title="EngineNo" value={FetchVehicleDetails.EngineNo} />

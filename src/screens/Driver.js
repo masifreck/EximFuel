@@ -176,6 +176,7 @@ const OwnerDetails = () => {
             placeholder="Enter DL Number"
             value={dlNumber}
             onChangeText={text => setDLNumber(text)}
+            autoCapitalize = {"characters"}
           />
         </View>
         <TouchableOpacity
