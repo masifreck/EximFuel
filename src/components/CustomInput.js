@@ -19,7 +19,7 @@ const CustomInput = ({
 }) => {
   return (
     <>
-    <View style={[width=isIcon?'85%':'100%',{flexDirection:'column'}]}>
+    <View style={[width=isIcon?'80%':'100%',{flexDirection:'column'}]}>
       <Text style={styles.levelText}>
         {labelText} {isMandatory && <Text style={{color: 'red'}}>*</Text>}
       </Text>

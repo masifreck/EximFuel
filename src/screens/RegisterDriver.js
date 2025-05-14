@@ -24,7 +24,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
 import { CustomRequestOptions } from '../components/CustomRequestOptions';
 import CustomImagePicker from '../components/CustomeImagePicker';
-import { Width } from '../components/constant';
+import { darkBlue, Width } from '../components/constant';
+import CustomOTPVerify from '../components/CustomOTPVerify';
 const RegisterDriver = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -89,6 +90,9 @@ const RegisterDriver = () => {
  const [capturedPhoto1, setCapturedPhoto1] = useState(null);
   const [capturedPhoto2, setCapturedPhoto2] = useState(null);
    const [capturedPhoto3, setCapturedPhoto3] = useState(null);
+
+   const [primaryOTPUI,setprimaryOTPUI]=useState(false);
+   const [secondaryOTPUI, setSecondaryOTPUI]=useState(false);
 
   const validation = () => {
   const cleanDL = dlNumber.replace(/[\s-]/g, ''); // assuming dlNumber is your state variable
@@ -257,10 +261,11 @@ if (email && !emailRegex.test(email)) {
   };
   const openDialScreen = (number) => {
     console.log('phone',number)
-    if (!/^\d{10}$/.test(number)) {
-      Alert.alert('Error', 'Please enter a valid 10-digit mobile number');
-      return;
-    }
+    if (!primaryContact || !/^\d{10}$/.test(number)) {
+  setErrorMessage('Please enter a valid primary contact (10 digits)');
+  setShowAlert(true);
+  return false;
+}
     
     if (Platform.OS === 'ios') {
       number = `telprompt:${number}`;
@@ -269,6 +274,42 @@ if (email && !emailRegex.test(email)) {
     }
     Linking.openURL(number);
   };
+
+  const handleOtpSubmit1 = (otp) => {
+    console.log('OTP to send to server:', otp);
+    // ✅ Now send this OTP to your backend
+  }
+    const handleOtpSubmit2 = (otp) => {
+    console.log('OTP to send to server:', otp);
+    // ✅ Now send this OTP to your backend
+  }
+
+  const handleOTP1=()=>{
+  if (!primaryContact || !/^\d{10}$/.test(primaryContact)) {
+  setErrorMessage('Please enter a valid primary contact (10 digits)');
+  setShowAlert(true);
+  return false;
+}
+try{
+setprimaryOTPUI(true)
+}catch(error){
+console.log(error)
+}
+  
+  }
+  const handleOTP2=()=>{
+  if (!primaryContact || !/^\d{10}$/.test(secondaryContact)) {
+  setErrorMessage('Please enter a valid secondary contact (10 digits)');
+  setShowAlert(true);
+  return false;
+}
+try{
+setSecondaryOTPUI(true)
+}catch(error){
+console.log(error)
+}
+
+}
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       {IsLoading ? (
@@ -305,14 +346,7 @@ if (email && !emailRegex.test(email)) {
               isVerified={isVerified}
               isMandatory={true}
             />
-            <CustomInput
-              labelText="Name"
-              placeholdername="Enter Driver Name"
-              onChangeText={text => setName(text)}
-              hasBorder={hasBorder}
-              isMandatory={true}
-            />
-                 <Text style={styles.levelText}>
+                <Text style={styles.levelText}>
               Date Of Birth <Text style={{color: 'red'}}>*</Text>
             </Text>
             <View
@@ -346,6 +380,14 @@ if (email && !emailRegex.test(email)) {
               </TouchableOpacity>
             </View>
             <CustomInput
+              labelText="Name"
+              placeholdername="Enter Driver Name"
+              onChangeText={text => setName(text)}
+              hasBorder={hasBorder}
+              isMandatory={true}
+            />
+             
+            <CustomInput
               labelText="Aadhar Number"
               placeholdername="Enter Aadhar Number"
               onChangeText={text => setAdharNumber(text)}
@@ -358,36 +400,54 @@ if (email && !emailRegex.test(email)) {
 <View style={{flexDirection:'row',gap:-5,justifyContent:'center',alignItems:'center'}}>
             <CustomInput
               labelText="Primary Contact Number"
-              placeholdername="Enter Mobile Number"
+              placeholdername="Enter Mobile N0."
               onChangeText={text => setPrimaryContact(text)}
               hasBorder={hasBorder}
               stringlength={10}
               keyboardTypename="numeric"
               isMandatory={true}
+              isIcon={true}
             />
-              <TouchableOpacity onPress={()=>openDialScreen(primaryContact)}>
+              <TouchableOpacity style={{position:'absolute',right:95,top:20}} onPress={()=>openDialScreen(primaryContact)}>
         <Image
-          style={{width: 30, height: 30,marginTop:22}}
-          source={require('../assets/phone-call.png')}
+          style={{width: 35, height: 35,marginTop:22}}
+          source={require('../assets/phonecall.png')}
         />
       </TouchableOpacity>
+      <TouchableOpacity style={{width:70,height:50,backgroundColor:darkBlue,alignItems:'center',justifyContent:'center',
+        elevation:4,borderRadius:10,marginTop:35
+      }} onPress={handleOTP1}>
+        <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>GET OTP</Text>
+        {/* <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>OTP</Text> */}
+      </TouchableOpacity>
       </View>
+      {primaryOTPUI &&
+        <CustomOTPVerify onVerify={handleOtpSubmit1} />}
 <View style={{flexDirection:'row',gap:-5,justifyContent:'center',alignItems:'center'}}>
             <CustomInput
               labelText="Secondary Contact Number"
-              placeholdername="Enter Mobile Number"
+              placeholdername="Enter Mobile No"
               onChangeText={text => setSecondaryContact(text)}
               stringlength={10}
               keyboardTypename="numeric"
+              isIcon={true}
             />
  
-      <TouchableOpacity onPress={()=>openDialScreen(secondaryContact)}>
+         <TouchableOpacity style={{position:'absolute',right:95,top:20}} onPress={()=>openDialScreen(primaryContact)}>
         <Image
-          style={{width: 30, height: 30,marginTop:22}}
-          source={require('../assets/phone-call.png')}
+          style={{width: 35, height: 35,marginTop:22}}
+          source={require('../assets/phonecall.png')}
         />
       </TouchableOpacity>
+      <TouchableOpacity style={{width:70,height:50,backgroundColor:darkBlue,alignItems:'center',justifyContent:'center',
+        elevation:4,borderRadius:10,marginTop:35
+      }} onPress={handleOTP2}>
+        <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>GET OTP</Text>
+        {/* <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>OTP</Text> */}
+      </TouchableOpacity>
       </View>
+      {secondaryOTPUI &&
+        <CustomOTPVerify onVerify={handleOtpSubmit2} /> }
             <CustomInput
               labelText="Pan Number"
               placeholdername="Enter Pan Number"

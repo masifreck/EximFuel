@@ -1,4 +1,4 @@
-import {View, Text, Image, StyleSheet, FlatList} from 'react-native';
+import {View, Text, Image, StyleSheet, FlatList,ImageBackground} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -110,20 +110,30 @@ const DLCard = ({driver}) => {
     formattedDate = ''; // Or any other appropriate message or action
   }
   return (
-    <View style={styles.dlCard}>
+    <ImageBackground
+  source={require('../assets/DL.png')} // replace with your background image
+  style={styles.dlCard}
+  imageStyle={{ borderRadius: 10, }} // optional: applies rounded corners to the background
+>
+    
       <View style={styles.dlCardHeader}>
-        <Text style={styles.dlCardTitle}>DRIVING LICENSE</Text>
+       
       </View>
-      <View style={styles.dlCardBody}>
-        <Image source={require('../assets/driver.png')} style={styles.dlPhoto} />
+      <Text style={[styles.dlText,{position:'absolute',top:25,left:70,fontWeight:'bold'}]}>{driver.DLNumber}</Text>
+     
+       
         <View style={styles.dlDetails}>
-          <Text style={styles.dlText}>Name:  {driver.DriverName}</Text>
-          <Text style={styles.dlText}>DL No:  {driver.DLNumber}</Text>
-          <Text style={styles.dlText}>DOB:     {formattedDate ? formattedDate : '-'}</Text>
-          <Text style={styles.dlText}>Contact: {driver.PrimaryContactNo}</Text>
-        </View>
+        
+          
+          <Text style={[styles.dlText,{position:'absolute',top:85,left:70,fontSize:10}]}> {formattedDate ? formattedDate : '-'}</Text>
+          {/* <Text style={styles.dlText}>{driver.PrimaryContactNo}</Text> */}
+            <Text style={[styles.dlText,{position:'absolute',bottom:22,left:10,fontSize:11}]}>{driver.DriverName}</Text>
+       
+        
+         <Image source={require('../assets/driver.png')} style={[styles.dlPhoto,{position:'absolute',right:-10,top:35}]} />
       </View>
-    </View>
+   
+    </ImageBackground>
   );
 };
 
@@ -194,7 +204,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dlCard: {
-  backgroundColor: '#e8f0fe',
+height:200,
+width:320,
+backgroundColor:'red',
   borderRadius: 10,
   margin: 16,
   padding: 12,
