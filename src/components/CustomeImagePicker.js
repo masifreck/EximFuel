@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Image, StyleSheet, Alert, PermissionsAndroid, Platform, Modal, Text, SafeAreaView, Pressable, TouchableOpacity ,Dimensions} from 'react-native';
+import { View, Button, Image, StyleSheet, Alert, PermissionsAndroid, Platform, Modal, Text, SafeAreaView, Pressable, TouchableOpacity ,Dimensions, ImageBackground} from 'react-native';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { darkBlue, inputbgColor, textColor } from './constant';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const ScreenWidth=Dimensions.get('window').width
-const CustomImagePicker = ({ onImagePicked,title,iconName }) => {
+const CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width}) => {
     const [imageData, setImageData] = useState(null);
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -99,25 +99,31 @@ const CustomImagePicker = ({ onImagePicked,title,iconName }) => {
     };
 
     return (
-        <View style={{width:ScreenWidth*0.9}}>
-            
-                <TouchableOpacity style={styles.pickbtn} onPress={()=>setModalVisible(true)}>
-                <Icon name={iconName} size={30} color={textColor} />
-
-                    <Text style={styles.pickbtntext}>
+        <>
+        <View style={{flexDirection:'column'}}>
+          <Text style={styles.pickbtntext}>
                         {title}
                     </Text>
+        <ImageBackground source={imageData ? { uri: imageData.uri } : bgImage } style={{width:width?width:120,height:80,margin:10,
+        }}  imageStyle={{ borderRadius: 10, }}>
+            
+                <TouchableOpacity style={styles.pickbtn} onPress={()=>onlyCamera? takePhotoWithCamera() :setModalVisible(true)}>
+                {/* <Icon name={iconName} size={30} color={textColor} /> */}
+
+                  
                 </TouchableOpacity>
-            {imageData && (
-                <View style={styles.imagePreviewContainer}>
-                    <Image source={{ uri: imageData.uri }} style={styles.imagePreview} />
-                   {/* <Text style={styles.imageDetails}>
-                        Filename: {imageData.fileName}{'\n'}
-                        Type: {imageData.type}{'\n'}
-                        Size: {imageData.fileSize / 1024} KB
-                    </Text>*/}
-                </View>
-            )}
+            {
+            // imageData && (
+            //     <View style={styles.imagePreviewContainer}>
+            //         <Image source={{ uri: imageData.uri }} style={styles.imagePreview} />
+            //        {/* <Text style={styles.imageDetails}>
+            //             Filename: {imageData.fileName}{'\n'}
+            //             Type: {imageData.type}{'\n'}
+            //             Size: {imageData.fileSize / 1024} KB
+            //         </Text>*/}
+            //     </View>
+            // )
+            }
             <Modal
                 visible={isModalVisible}
                 transparent={true}
@@ -147,7 +153,10 @@ const CustomImagePicker = ({ onImagePicked,title,iconName }) => {
                     </SafeAreaView>
                 </View>
             </Modal>
-        </View>
+        </ImageBackground>
+        
+</View>
+        </>
     );
 };
 
@@ -178,14 +187,14 @@ justifyContent:'',
 gap:20,
 alignItems:'center',
 borderRadius:10,
-backgroundColor:inputbgColor,
 height:50,margin:10,paddingHorizontal:20
     },
     pickbtntext:{
         color:textColor,
-        fontSize:16,
+        fontSize:12,
         fontWeight:'bold',
-        textAlign:'left'
+        textAlign:'left',
+        marginLeft:10,marginBottom:10
     },
     buttons: {
         backgroundColor: 'white',

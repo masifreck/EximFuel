@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Keyboard } from 'react-native';
 
-const CustomOTPVerify = ({ onVerify }) => {
+const CustomOTPVerify = ({ onVerify ,onResend }) => {
   const [otp, setOtp] = useState(new Array(6).fill(''));
   const inputRefs = useRef([]);
   const [timer, setTimer] = useState(60);
@@ -46,13 +46,16 @@ const CustomOTPVerify = ({ onVerify }) => {
     }
   };
 
-  const handleResend = () => {
-    setOtp(new Array(6).fill(''));
-    inputRefs.current[0]?.focus();
-    setTimer(60);
-    setIsResendDisabled(true);
-    console.log('Resend OTP triggered'); // <- You can trigger resend API here
-  };
+const handleResend = () => {
+  setOtp(new Array(6).fill(''));
+  inputRefs.current[0]?.focus();
+  setTimer(60);
+  setIsResendDisabled(true);
+  
+  console.log('Resend OTP triggered');
+  onResend(); // 🔁 This will call your resend OTP logic in parent
+};
+
 
   return (
     <View style={styles.container}>
