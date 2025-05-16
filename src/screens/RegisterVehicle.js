@@ -3,7 +3,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,ScrollView,Image
+  TextInput,ScrollView,Image,
+  ImageBackground
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 // import {ScrollView} from 'react-native-gesture-handler';
@@ -215,6 +216,30 @@ console.log('PanNumber is:', PanNumber);
                         source={require('../assets/Truck.png')}
                       />
                     </View>
+                    <ScrollView horizontal={true} style={{flexDirection:'row'}}>
+<ImageBackground source={require('../assets/rcfront.png')} imageStyle={{borderRadius:10}}
+style={styles.dlCard}>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:73}}>123456789012</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:130}}>20-05-2023</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:180}}>20-05-2038</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:63,left:73}}>P53AFDCB9CEA07330</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:85,left:73}}>M2SA0107ED3805</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:103,left:73}}>SURESWAR DASH</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:122,left:73}}>SURESWAR DASH SURESWAR DASH SURESWAR DASH</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:143,left:73}}>SURESWAR DASH</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:159,left:73,width:200}}>Address SURESWAR DASH
+  SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR 
+</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',bottom:22,left:6}}>Fuel Type</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',width:65,top:165,left:6}}>Emissionfgjhlbnmtyuioghjklbnm</Text>
+
+
+</ImageBackground>
+<ImageBackground source={require('../assets/rcbackwitout.png')} imageStyle={{borderRadius:10}}
+style={styles.dlCard}>
+
+</ImageBackground>
+                    </ScrollView>
           <View style={styles.levelContainer}>
             <Text
               style={{
@@ -327,6 +352,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#6c6f73',
   },
+    dlCard: {
+height:180,
+width:290,
+backgroundColor:'red',
+  borderRadius: 10,
+  margin: 16,
+  padding: 12,
+  shadowColor: '#000',
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 5,
+},
   inputSearchStyle: {
     height: 40,
     fontSize: 15,

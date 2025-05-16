@@ -27,6 +27,7 @@ import CustomImagePicker from '../components/CustomeImagePicker';
 import {darkBlue, Width} from '../components/constant';
 import CustomOTPVerify from '../components/CustomOTPVerify';
 import CustomCheckbox from '../components/CustomeCheckBox';
+import SmsSending from '../components/SmsSending';
 const RegisterDriver = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -438,18 +439,44 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
   }
 };
 
+const [currentPage, setCurrentPage] = useState(1);
+const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
   return (
+     <>
+    {isOTP2loading ? (
+      <SmsSending />
+    ) : (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       {IsLoading ? (
         <LoadingIndicator />
       ) : (
         <View style={styles.container}>
+
           <View style={styles.imgContainer}>
             <Image
               style={styles.img}
               source={require('../assets/driver.png')}
             />
           </View>
+           <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center',marginBottom:20}}>
+                <View style={{width:80,height:80,borderRadius:40,
+                  borderColor:'limegreen',borderWidth:8,
+                  justifyContent:'center',alignItems:'center'
+                }}>
+          {currentPage===1 &&<Text style={{color:'gray',fontWeight:'bold',fontSize:35}}>1</Text>}
+          {currentPage===2 && <Image style={{width:50,height:50}} source={require('../assets/check-mark.png')}/>}
+                </View>
+                <View style={{width:60,height:8,backgroundColor:bgcolor2}}>
+               
+                </View>
+                <View style={{width:80,height:80,borderRadius:40,
+                  borderColor:bgcolor2,borderWidth:8,
+                  justifyContent:'center',alignItems:'center'
+                }}>
+          <Text style={{color:'gray',fontWeight:'bold',fontSize:35}}>2</Text>
+                </View>
+                </View>
+          {currentPage === 1 && (
           <View style={styles.levelContainer}>
             <Text
               style={{
@@ -601,7 +628,7 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
   style={{
     width: 70,
     height: 50,
-    backgroundColor: darkBlue,
+    backgroundColor:secondaryOTPUI?'grey': darkBlue,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,
@@ -654,8 +681,9 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
               isend="true"
               isaddress={true}
             />
-          </View>
-          <View style={[styles.levelContainer, {alignItems: 'center'}]}>
+          </View> )}
+            {currentPage === 2 && (
+          <View style={[styles.levelContainer, {alignItems: 'center',paddingVertical:30,paddingHorizontal:20}]}>
             <Text
               style={{
                 color: '#453D98ff',
@@ -733,11 +761,34 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
               onImagePicked={handleSaveImageData3}
             />
             </View>
-          </View>
+          </View>)}
 
-          <TouchableOpacity style={styles.button} onPress={registertheDriver}>
+          {/* <TouchableOpacity style={styles.button} onPress={registertheDriver}>
             <Text style={styles.text}>Register</Text>
+          </TouchableOpacity> */}
+                  <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          {currentPage > 1 && (
+              <View style={{flexDirection:'row',justifyContent:'space-between',gap:50}}>
+            <TouchableOpacity style={styles.navButton} onPress={() => setCurrentPage(currentPage - 1)}>
+              <Text style={styles.navtext}>Previous</Text>
+            </TouchableOpacity>
+             
+              <TouchableOpacity style={styles.navButton} onPress={registertheDriver}>
+            <Text style={styles.navtext}>Register</Text>
           </TouchableOpacity>
+          </View>
+          )}
+          {currentPage < 2 && (
+          
+            <TouchableOpacity style={styles.navButton} onPress={() => setCurrentPage(currentPage + 1)}>
+              <Text style={styles.navtext}>Next</Text>
+           </TouchableOpacity>
+          
+          )}
+        </View>
+
+     
+
         </View>
       )}
       {/* custom alert code==================================== */}
@@ -781,7 +832,8 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
           </View>
         )}
       </Modal>
-    </ScrollView>
+    </ScrollView>)}
+    </>
   );
 };
 
@@ -832,6 +884,15 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 13,
     fontFamily: 'PoppinsMedium',
+  },
+  navButton:{
+    width:120,height:50,backgroundColor:darkBlue,elevation:4,borderRadius:10,
+    justifyContent:'center',alignItems:'center',marginBottom:10
+  },
+  navtext:{
+    color:'#fff',
+    fontSize:16,
+    fontWeight:'bold',
   },
   imgContainer: {
     height: 110,

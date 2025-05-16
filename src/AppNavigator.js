@@ -95,11 +95,15 @@ const AppNavigator = () => {
           options={{headerShown: false}}
         />
         {/* Owenrdata================= */}
-        <Stack.Screen
-          name="OwnerDetails"
-          component={OwnerDetails}
-          options={getScreenOptions('Owner')}
-        /> 
+      <Stack.Screen
+  name="OwnerDetails"
+  component={OwnerDetails}
+  options={{
+    ...getScreenOptions('Owner'),
+    animation: 'slide_from_bottom',
+  }}
+/>
+
         <Stack.Screen
           name="ShowOwnerDetails"
           component={ShowOwnerDetails}
@@ -119,7 +123,10 @@ const AppNavigator = () => {
         <Stack.Screen
           name="Driver"
           component={Driver}
-          options={getScreenOptions('Driver')}
+          options={{
+            ...getScreenOptions('Driver'),
+          animation:'slide_from_left',
+          }}
         />
         <Stack.Screen
           name="ShowDriverDetails"

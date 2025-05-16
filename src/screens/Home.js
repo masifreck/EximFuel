@@ -7,9 +7,10 @@ import {
   View,
   SafeAreaView,
   ScrollView,
+  Animated,
+  Easing,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-// import {ScrollView} from 'react-native-gesture-handler';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from '../components/Header';
 import Card from '../components/Card';
 import {useNavigation} from '@react-navigation/native';
@@ -18,11 +19,29 @@ import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
+  const navigation = useNavigation();
+  const [userId, setUserid] = useState('');
+  const [value, setValue] = useState(null);
+
+  const cardAnimations = useRef(
+    Array.from({length: 7}, () => new Animated.Value(0)),
+  ).current;
+
   useEffect(() => {
     getUserID();
-  }, []);
 
-  const [userId, setUserid] = useState('');
+    const animations = cardAnimations.map((animValue, index) =>
+      Animated.timing(animValue, {
+        toValue: 1,
+        duration: 1000,
+        delay: index * 150,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.exp),
+      }),
+    );
+
+    Animated.stagger(130, animations).start();
+  }, []);
 
   const getUserID = async () => {
     const userId = await AsyncStorage.getItem('username');
@@ -35,16 +54,19 @@ const Home = () => {
     {label: 'Vehicle', value: 'ShowVehicleDetails'},
     {label: 'Chalan', value: 'NewChalan'},
   ];
-  const [value, setValue] = useState(null);
-  const navigation = useNavigation();
+
+  const cardData = [
+    {text: 'Owner', image: require('../assets/woner.png'), screen: 'OwnerDetails'},
+    {text: 'Driver', image: require('../assets/truck-driver.png'), screen: 'Driver'},
+    {text: 'Vehicle', image: require('../assets/Truck.png'), screen: 'Vehicle'},
+    {text: 'Mines Loading', image: require('../assets/mine-loading.png'), screen: 'MinesLoading'},
+    {text: 'FG Loading', image: require('../assets/FG-loading.png'), screen: 'FGLoading'},
+    {text: 'Unloading', image: require('../assets/unloading.png'), screen: 'Unloading'},
+    {text: 'Print Challan', image: require('../assets/gg.png'), screen: 'PrintChallan'},
+  ];
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: '#f1f5ff',
-        marginBottom: 70,
-      }}>
+    <SafeAreaView style={styles.safeArea}>
       <Header />
       <ScrollView>
         <View style={{height: 180}}>
@@ -68,20 +90,13 @@ const Home = () => {
                 valueField="value"
                 placeholder={'Select'}
                 value={value}
-                onChange={item => {
-                  setValue(item.value);
-                }}
+                onChange={item => setValue(item.value)}
               />
             </View>
             <View style={{width: '50%'}}>
               <TextInput
                 placeholderTextColor={'#6c6f73'}
-                style={{
-                  marginLeft: 8,
-                  color: 'black',
-                  fontSize: 16,
-                  width: '90%',
-                }}
+                style={styles.textInput}
                 placeholder={'Search'}
                 autoCorrect={false}
               />
@@ -92,81 +107,36 @@ const Home = () => {
               }}
               style={{}}>
               <Image
-                style={{
-                  height: 28,
-                  width: 28,
-                  margin: 10,
-                }}
+                style={styles.searchIcon}
                 source={require('../assets/search.png')}
               />
             </TouchableOpacity>
           </View>
         </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-
-            marginTop: 20,
-            marginHorizontal: 15,
-          }}>
-          <Card
-            text={'Owner'}
-            imageSource={require('../assets/woner.png')}
-            color={['#ffffff', '#ffffff', '#ffffff']}
-            onPress={() => {
-              navigation.navigate('OwnerDetails');
-            }}
-          />
-          <Card
-            text={'Driver'}
-            imageSource={require('../assets/truck-driver.png')}
-            color={['#ffffff', '#ffffff', '#ffffff']}
-            onPress={() => {
-              navigation.navigate('Driver');
-            }}
-          />
-          <Card
-            text={'Vehicle'}
-            imageSource={require('../assets/Truck.png')}
-            color={['#ffffff', '#ffffff', '#ffffff']}
-            onPress={() => {
-              navigation.navigate('Vehicle');
-            }}
-          />
-          <Card
-            text={'Mines Loading'}
-            imageSource={require('../assets/mine-loading.png')}
-            color={['#ffffff', '#ffffff', '#ffffff']}
-            onPress={() => {
-              navigation.navigate('MinesLoading');
-            }}
-          />
-          <Card
-            text={'FG Loading'}
-            imageSource={require('../assets/FG-loading.png')}
-            color={['#ffffff', '#ffffff', '#ffffff']}
-            onPress={() => {
-              navigation.navigate('FGLoading');
-            }}
-          />
-          <Card
-            text={'Unloading'}
-            imageSource={require('../assets/unloading.png')}
-            color={['#ffffff', '#ffffff', '#ffffff']}
-            onPress={() => {
-              navigation.navigate('Unloading');
-            }}
-          />
-          <Card
-            text={'Print Challan'}
-            imageSource={require('../assets/gg.png')}
-            color={['#ffffff', '#ffffff', '#ffffff']}
-            onPress={() => {
-              navigation.navigate('PrintChallan');
-            }}
-          />
+        <View style={styles.cardContainer}>
+          {cardData.map((item, index) => (
+            <Animated.View
+              key={index}
+              style={{
+                opacity: cardAnimations[index],
+                transform: [
+                  {
+                    translateY: cardAnimations[index].interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [30, 0],
+                    }),
+                  },
+                ],
+              }}>
+              <Card
+                text={item.text}
+                imageSource={item.image}
+                color={['#ffffff', '#ffffff', '#ffffff']}
+                onPress={() => navigation.navigate(item.screen)}
+              />
+            </Animated.View>
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -174,6 +144,11 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f1f5ff',
+    marginBottom: 70,
+  },
   searchBar: {
     backgroundColor: 'white',
     width: '90%',
@@ -184,7 +159,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderColor: 'gray',
     flexDirection: 'row',
-    flex: 1,
     overflow: 'hidden',
     display: 'none',
   },
@@ -227,6 +201,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '700',
     textAlign: 'center',
+  },
+  textInput: {
+    marginLeft: 8,
+    color: 'black',
+    fontSize: 16,
+    width: '90%',
+  },
+  searchIcon: {
+    height: 28,
+    width: 28,
+    margin: 10,
+  },
+  cardContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 20,
+    marginHorizontal: 15,
   },
 });
 
