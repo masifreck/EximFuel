@@ -10,7 +10,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Linking,
-  Alert,
+  Alert,ImageBackground
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import CustomAlert from '../components/CustomAlert';
@@ -272,6 +272,11 @@ const RegisterDriver = () => {
 
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
+
+  const [adharFront,setAdharFront]=useState(null);
+  const [adharBack,setAdharBack]=useState(null);
+  const [panPhoto,setPanPhoto]=useState(null);
+  const [dlPhoto,setdlPhoto]=useState(null);
   const handleSaveImageData1 = image => {
     //console.log('Selected Image Data:', image);
     setCapturedPhoto1(image);
@@ -284,6 +289,20 @@ const RegisterDriver = () => {
     //console.log('Selected Image Data:', image);
     setCapturedPhoto3(image);
   };
+
+  const handleAdharFront = image => {
+    //console.log('Selected Image Data:', image);
+    setAdharFront(image);
+  };
+  const handleAdharBack=image=>{
+    setAdharBack(image)
+  }
+  const handlePan= image=>{
+    setPanPhoto(image)
+  }
+  const handleDL=image=>{
+    setDLPhoto(image)
+  }
   const openDialScreen = number => {
     console.log('phone', number);
     if (!primaryContact || !/^\d{10}$/.test(number)) {
@@ -477,6 +496,10 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                 </View>
                 </View>
           {currentPage === 1 && (
+            <>
+            
+            <DLCard/>
+          
           <View style={styles.levelContainer}>
             <Text
               style={{
@@ -534,13 +557,13 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                 />
               </TouchableOpacity>
             </View>
-            <CustomInput
+            {/* <CustomInput
               labelText="Name"
               placeholdername="Enter Driver Name"
               onChangeText={text => setName(text)}
               hasBorder={hasBorder}
               isMandatory={true}
-            />
+            /> */}
 
             <CustomInput
               labelText="Aadhar Number"
@@ -597,7 +620,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
               </TouchableOpacity>
             </View>
             {primaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit1} />}
-            <CustomCheckbox label="I Call and Verify the Primary No." onChange={(value) => setPCVerified(value ? true : false)} />
+            <CustomCheckbox label="I Call and Verify the Primary No." value={isPCVerified} onChange={(value) => setPCVerified(value ? true : false)} />
             <View
               style={{
                 flexDirection: 'row',
@@ -652,7 +675,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
             </View>
            
             {secondaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit2}  onResend={handleOTP2}/>}
-              <CustomCheckbox label="I Call and Verify the Secondary No." onChange={(value) => setSCVerified(value ? true : false)} />
+              <CustomCheckbox label="I Call and Verify the Secondary No." value={isSCVerified} onChange={(value) => setSCVerified(value ? true : false)} />
             <CustomInput
               labelText="Pan Number"
               placeholdername="Enter Pan Number"
@@ -664,15 +687,15 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
               placeholdername="Enter Email Id"
               onChangeText={text => setEmail(text)}
             />
-            <CustomInput
+            {/* <CustomInput
               labelText="Driver Address"
               placeholdername="Enter Driver Address"
               onChangeText={text => setdriverAddress(text)}
               isend="true"
               isaddress={true}
-            />
+            /> */}
             
-          <CustomCheckbox label="Same As Permanent Address" onChange={(value) => setIsSamePAdd(value ? true : false)} />
+          <CustomCheckbox label="Same As Permanent Address" value={isSamePAdd} onChange={(value) => setIsSamePAdd(value ? true : false)} />
             <CustomInput
             value={currentAdd}
               labelText="Current Address"
@@ -681,7 +704,9 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
               isend="true"
               isaddress={true}
             />
-          </View> )}
+          </View> 
+            </>
+          )}
             {currentPage === 2 && (
           <View style={[styles.levelContainer, {alignItems: 'center',paddingVertical:30,paddingHorizontal:20}]}>
             <Text
@@ -711,6 +736,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                 title="Driver Photo Left"
                 iconName="camera-enhance"
                 onImagePicked={handleSaveImageData1}
+                 imageData={capturedPhoto1}
               />
               <CustomImagePicker
                 width={80}
@@ -719,6 +745,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                 title="Driver Photo Front"
                 iconName="camera-enhance"
                 onImagePicked={handleSaveImageData2}
+                 imageData={capturedPhoto2}
               />
               <CustomImagePicker
                 width={80}
@@ -727,6 +754,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                 title="Driver Photo Right"
                 iconName="camera-enhance"
                 onImagePicked={handleSaveImageData3}
+                imageData={capturedPhoto3}
               />
             </ScrollView>
          
@@ -736,13 +764,15 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                 bgImage={require('../assets/aadhaar.png')}
                 title="Driver Adhar Front"
                 iconName="camera-enhance"
-                onImagePicked={handleSaveImageData3}
+                onImagePicked={handleAdharFront}
+                imageData={adharFront}
               />
               <CustomImagePicker
                 bgImage={require('../assets/aadhaar.png')}
                 title="Driver Adhar Back"
                 iconName="camera-enhance"
-                onImagePicked={handleSaveImageData3}
+                imageData={adharBack}
+                onImagePicked={handleAdharBack}
               />
             </View>
             
@@ -751,14 +781,16 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
               bgImage={require('../assets/dlpng.webp')}
               title="Driving Lincence Front"
               iconName="camera-enhance"
-              onImagePicked={handleSaveImageData3}
+              onImagePicked={handleDL}
+              imageData={DLPhoto}
             />
 
             <CustomImagePicker
               bgImage={require('../assets/pan-card.png')}
               title="Driver PAN Card Front"
               iconName="camera-enhance"
-              onImagePicked={handleSaveImageData3}
+              onImagePicked={handlePan}
+              imageData={panPhoto}
             />
             </View>
           </View>)}
@@ -836,7 +868,50 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
     </>
   );
 };
+const DLCard = ({driver}) => {
+    function convertDateFormat(inputDate) {
+    const [year, month, day] = inputDate.split('T')[0].split('-');
+    return `${day}-${month}-${year}`;
+  }
+  function convertDateFormat(inputDate) {
+    const [year, month, day] = inputDate.split('T')[0].split('-');
+    return `${day}-${month}-${year}`;
+  }
+  const dob = driver?.Dob?driver.Dob:'';
 
+  let formattedDate;
+  if (dob) {
+    formattedDate = convertDateFormat(dob);
+  } else {
+    formattedDate = ''; // Or any other appropriate message or action
+  }
+  return (
+    <ImageBackground
+  source={require('../assets/DL.png')} // replace with your background image
+  style={styles.dlCard}
+  imageStyle={{ borderRadius: 10, }} // optional: applies rounded corners to the background
+>
+    
+      <View style={styles.dlCardHeader}>
+       
+      </View>
+      <Text style={[styles.dlText,{position:'absolute',top:25,left:70,fontWeight:'bold'}]}>TEST 123456789</Text>
+     
+       
+        <View style={styles.dlDetails}>
+        
+          
+          <Text style={[styles.dlText,{position:'absolute',top:85,left:70,fontSize:10}]}> {formattedDate ? formattedDate : '-'}</Text>
+          {/* <Text style={styles.dlText}>{driver.PrimaryContactNo}</Text> */}
+            <Text style={[styles.dlText,{position:'absolute',bottom:22,left:10,fontSize:11}]}>Driver Name</Text>
+       
+        
+         <Image source={require('../assets/driver.png')} style={[styles.dlPhoto,{position:'absolute',right:-10,top:35}]} />
+      </View>
+   
+    </ImageBackground>
+  );
+};
 const styles = StyleSheet.create({
   dropdown: {
     height: 50,
@@ -863,7 +938,46 @@ const styles = StyleSheet.create({
     color: '#6c6f73',
     fontFamily: 'PoppinsMedium',
   },
-
+  dlCard: {
+height:200,
+width:320,
+backgroundColor:'red',
+  borderRadius: 10,
+  margin: 16,
+  padding: 12,
+  shadowColor: '#000',
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 5,
+},
+dlCardHeader: {
+  alignItems: 'center',
+  marginBottom: 8,
+},
+dlCardTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#1a237e',
+},
+dlCardBody: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+dlPhoto: {
+  height: 70,
+  width: 70,
+  borderRadius: 8,
+  marginRight: 10,
+},
+dlDetails: {
+  flex: 1,
+},
+dlText: {
+  fontSize: 14,
+  color: '#000',
+  marginBottom: 4,
+},
   container: {
     alignItems: 'center',
     flex: 1,

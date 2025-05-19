@@ -5,8 +5,8 @@ import { darkBlue, inputbgColor, textColor } from './constant';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const ScreenWidth=Dimensions.get('window').width
-const CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width}) => {
-    const [imageData, setImageData] = useState(null);
+const CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width,imageData}) => {
+
     const [isModalVisible, setModalVisible] = useState(false);
 
     const requestStoragePermission = async () => {
@@ -66,7 +66,7 @@ const CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,wi
             } else if (response.assets && response.assets.length > 0) {
                 const { uri, fileName, type, fileSize } = response.assets[0];
                 const imageData = { uri, fileName, type, fileSize };
-                setImageData(imageData);
+                
                 setModalVisible(false);
                 onImagePicked(imageData); // Callback to parent component with image data
             }
@@ -91,7 +91,7 @@ const CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,wi
             } else if (response.assets && response.assets.length > 0) {
                 const { uri, fileName, type, fileSize } = response.assets[0];
                 const imageData = { uri, fileName, type, fileSize };
-                setImageData(imageData);
+                
                 setModalVisible(false);
                 onImagePicked(imageData); // Callback to parent component with image data
             }

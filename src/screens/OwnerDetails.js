@@ -194,6 +194,10 @@ const OwnerDetails = () => {
           <Text style={styles.text}>Update Owner Details</Text>
         </TouchableOpacity>
 
+       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ManageOwner')}>
+          <Text style={styles.text}>Manage Owner Status</Text>
+        </TouchableOpacity>
+
         <View
           style={{
             flexDirection: 'column',

@@ -219,19 +219,19 @@ console.log('PanNumber is:', PanNumber);
                     <ScrollView horizontal={true} style={{flexDirection:'row'}}>
 <ImageBackground source={require('../assets/rcfront.png')} imageStyle={{borderRadius:10}}
 style={styles.dlCard}>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:73}}>123456789012</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:76}}>123456789012</Text>
 <Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:130}}>20-05-2023</Text>
 <Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:180}}>20-05-2038</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:63,left:73}}>P53AFDCB9CEA07330</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:85,left:73}}>M2SA0107ED3805</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:103,left:73}}>SURESWAR DASH</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:122,left:73}}>SURESWAR DASH SURESWAR DASH SURESWAR DASH</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:143,left:73}}>SURESWAR DASH</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:159,left:73,width:200}}>Address SURESWAR DASH
-  SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR 
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:63,left:76}}>P53AFDCB9CEA07330</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:85,left:76}}>M2SA0107ED3805</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:103,left:76}}>SURESWAR DASH</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:122,left:76}}>SURESWAR DASH SURESWAR DASH SURESWAR DASH</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:143,left:76}}>SURESWAR DASH</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:157,left:76,width:200}}>Address SURESWAR DASH
+  SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR  
 </Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',bottom:22,left:6}}>Fuel Type</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',width:65,top:165,left:6}}>Emissionfgjhlbnmtyuioghjklbnm</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',bottom:24,left:10}}>Fuel Type</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',width:65,top:165,left:10}}>Emissionfgj</Text>
 
 
 </ImageBackground>
@@ -330,6 +330,50 @@ style={styles.dlCard}>
     </ScrollView>
   );
 };
+const DLCard = ({driver}) => {
+    function convertDateFormat(inputDate) {
+    const [year, month, day] = inputDate.split('T')[0].split('-');
+    return `${day}-${month}-${year}`;
+  }
+  function convertDateFormat(inputDate) {
+    const [year, month, day] = inputDate.split('T')[0].split('-');
+    return `${day}-${month}-${year}`;
+  }
+  const dob = driver.Dob;
+
+  let formattedDate;
+  if (dob) {
+    formattedDate = convertDateFormat(dob);
+  } else {
+    formattedDate = ''; // Or any other appropriate message or action
+  }
+  return (
+    <ImageBackground
+  source={require('../assets/DL.png')} // replace with your background image
+  style={styles.dlCard}
+  imageStyle={{ borderRadius: 10, }} // optional: applies rounded corners to the background
+>
+    
+      <View style={styles.dlCardHeader}>
+       
+      </View>
+      <Text style={[styles.dlText,{position:'absolute',top:25,left:70,fontWeight:'bold'}]}>TEST 1234567890</Text>
+     
+       
+        <View style={styles.dlDetails}>
+        
+          
+          <Text style={[styles.dlText,{position:'absolute',top:85,left:70,fontSize:10}]}> {formattedDate ? formattedDate : '-'}</Text>
+          {/* <Text style={styles.dlText}>{driver.PrimaryContactNo}</Text> */}
+            <Text style={[styles.dlText,{position:'absolute',bottom:22,left:10,fontSize:11}]}>Driver Name</Text>
+       
+        
+         <Image source={require('../assets/driver.png')} style={[styles.dlPhoto,{position:'absolute',right:-10,top:35}]} />
+      </View>
+   
+    </ImageBackground>
+  );
+};
 
 const styles = StyleSheet.create({
   dropdown: {
@@ -355,7 +399,7 @@ const styles = StyleSheet.create({
     dlCard: {
 height:180,
 width:290,
-backgroundColor:'red',
+
   borderRadius: 10,
   margin: 16,
   padding: 12,

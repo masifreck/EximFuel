@@ -37,6 +37,7 @@ import ExternalScanner from './components/ExternalScanner';
 import EximLogisticsReceipt from './screens/DemoPrint';
 import DocumentScanner from './components/DocumentScanner';
 import { QRCodeGenerator } from './components/qrCodeGenerator';
+import ManageOwner from './screens/ManageOwner';
 
 const Stack = createNativeStackNavigator();
 
@@ -114,6 +115,11 @@ const AppNavigator = () => {
           component={RegisterOwner}
           options={getScreenOptions('Register Owner')}
         />
+        <Stack.Screen 
+        name='ManageOwner'
+        component={ManageOwner}
+        options={getScreenOptions('Manage Owner Status')}
+        />
         <Stack.Screen
           name="UpdateOwner"
           component={UpdateOwner}
@@ -125,7 +131,7 @@ const AppNavigator = () => {
           component={Driver}
           options={{
             ...getScreenOptions('Driver'),
-          animation:'slide_from_left',
+          // animation:'slide_from_left.',
           }}
         />
         <Stack.Screen
