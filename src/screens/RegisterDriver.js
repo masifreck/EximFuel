@@ -402,7 +402,7 @@ const [otp2,setOtp2]=useState(null);
     }
   };
 const [isOTP2loading,setIsOtp2Loading]=useState(false);
- const handleOTP2 = async () => {
+const handleOTP2 = async () => {
   if (!secondaryContact || !/^\d{10}$/.test(secondaryContact)) {
     setErrorMessage('Please enter a valid secondary contact (10 digits)');
     setShowAlert(true);
@@ -410,34 +410,18 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
   }
 
   try {
-    // 1. Generate 6-digit OTP
     setIsOtp2Loading(true);
     const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('generated otp 2',generatedOTP, secondaryContact)
-    setOtp2(generatedOTP); // Store in state
+    setOtp2(generatedOTP);
 
-    // 2. Prepare API URL
-    const baseUrl = 'https://bhashsms.com/api/sendmsg.php';
-    const params = new URLSearchParams({
-      user: 'Anil003',
-      pass: '123456',
-      sender: 'TRNZOL',
-      phone: secondaryContact,
-      text: `Your OTP is ${generatedOTP}`,
-      priority: 'ndnd',
-      stype: 'normal',
-    });
+    const message = `Your OTP is ${generatedOTP} - CIYA Technologies`;
+    const encodedMessage = encodeURIComponent(message); // Properly encoded
+    const apiUrl = `https://bhashsms.com/api/sendmsg.php?user=Anil003&pass=123456&sender=TRNZOL&phone=${secondaryContact}&text=${encodedMessage}&priority=ndnd&stype=normal`;
 
-    const apiUrl = `${baseUrl}?${params.toString()}`;
-
-    // 3. Call SMS API using fetch
     const response = await fetch(apiUrl);
-    const resultText = await response.text(); // BhashSMS returns plain text
-
-    // You can optionally log or check `resultText` to verify delivery
+    const resultText = await response.text();
     console.log('SMS API response:', resultText);
 
-    // 4. Show success toast
     setSecondaryOTPUI(true);
     Toast.show({
       type: 'success',
@@ -453,10 +437,11 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
       text1: 'Failed to send OTP',
       text2: 'Please try again later.',
     });
-  }finally{
+  } finally {
     setIsOtp2Loading(false);
   }
 };
+
 
 const [currentPage, setCurrentPage] = useState(1);
 const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
@@ -768,7 +753,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                 imageData={adharFront}
               />
               <CustomImagePicker
-                bgImage={require('../assets/aadhaar.png')}
+                bgImage={require('../assets/adhar_BACK.png')}
                 title="Driver Adhar Back"
                 iconName="camera-enhance"
                 imageData={adharBack}

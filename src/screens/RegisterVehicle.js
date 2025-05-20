@@ -6,7 +6,7 @@ import {
   TextInput,ScrollView,Image,
   ImageBackground
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect,useCallback} from 'react';
 // import {ScrollView} from 'react-native-gesture-handler';
 import {Dropdown} from 'react-native-element-dropdown';
 import CustomAlert from '../components/CustomAlert';
@@ -55,6 +55,14 @@ const RegisterVehicle = () => {
   const [PanNumber, setPanNumber] = useState('');
   const [OwnerData, setOwnerData] = useState([]);
   const [ownerNameSelected, setOwnerNameSelected] = useState('');
+
+  const [truckFront,setTruckFront]=useState(null);
+  const [truckBack,setTruckBack]=useState(null);
+  const [truckRight,setTruckRight]=useState(null);
+  const [truckLeft,setTruckLeft]=useState(null);
+
+  const [RCFrontPhoto,setRCFrontPhoto]=useState(null);
+  const [RCBackPhotot,setRCBackPhotot]=useState(null);
   // dummy=========
 
 useEffect(() => {
@@ -203,7 +211,24 @@ useEffect(() => {
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
 console.log('PanNumber is:', PanNumber);
-
+  const handleTrucBack = useCallback(image => {
+    setTruckBack(image);
+  }, []);
+    const handleTruckFront = useCallback(image => {
+      setTruckFront(image);
+    }, []);
+      const handleTruckRight = useCallback(image => {
+        setTruckRight(image);
+      }, []);
+        const handleTruckLeft = useCallback(image => {
+          setTruckLeft(image);
+        }, []);
+          const handleRCFront = useCallback(image => {
+            setRCFrontPhoto(image);
+          }, []);
+            const handleRCBack = useCallback(image => {
+              setRCBackPhotot(image);
+            }, []);
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       {IsLoading ? (
@@ -317,6 +342,67 @@ style={styles.dlCard}>
               isend={true}
             />
           </View>
+                  <View
+          style={[
+            styles.levelContainer,
+            {alignItems: 'center', paddingVertical: 30, paddingHorizontal: 20},
+          ]}>
+          <Text
+            style={{
+              color: '#453D98ff',
+              fontSize: 18,
+              marginBottom: 10,
+              marginTop: 20,
+              textAlign: 'center',
+              fontFamily: 'PoppinsBold',
+            }}>
+            Attachments
+          </Text>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <CustomImagePicker
+              bgImage={require('../assets/rcfront.png')}
+              title=" RC Front"
+              onImagePicked={handleRCFront}
+              imageData={RCFrontPhoto}
+            />
+            <CustomImagePicker
+              bgImage={require('../assets/rcbackwitout.png')}
+              title=" RC Back"
+              onImagePicked={handleRCBack}
+              imageData={RCBackPhotot}
+            />
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <CustomImagePicker
+              bgImage={require('../assets/truckfront.png')}
+              title="Truck Front"
+              onImagePicked={handleTruckFront}
+              imageData={truckFront}
+            />
+            <CustomImagePicker
+              bgImage={require('../assets/truckback.png')}
+              title=" Truck Back"
+              onImagePicked={handleTrucBack}
+              imageData={truckBack}
+            />
+          </View>
+             <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <CustomImagePicker
+              bgImage={require('../assets/truckright.png')}
+              title="Truck Right"
+              onImagePicked={handleTruckRight}
+              imageData={truckRight}
+            />
+            <CustomImagePicker
+              bgImage={require('../assets/truckleft.png')}
+              title=" Truck Left"
+              onImagePicked={handleTruckLeft}
+              imageData={truckLeft}
+            />
+          </View>
+        </View>
           <TouchableOpacity style={styles.button} onPress={registertheVehicle}>
             <Text style={styles.text}>Register</Text>
           </TouchableOpacity>
@@ -399,7 +485,6 @@ const styles = StyleSheet.create({
     dlCard: {
 height:180,
 width:290,
-
   borderRadius: 10,
   margin: 16,
   padding: 12,

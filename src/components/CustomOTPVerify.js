@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Keyboard } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Keyboard, ActivityIndicator } from 'react-native';
 
-const CustomOTPVerify = ({ onVerify ,onResend }) => {
-  const [otp, setOtp] = useState(new Array(6).fill(''));
+const CustomOTPVerify = ({ onVerify ,onResend ,isVloading}) => {
+  const [otp, setOtp] = useState(new Array(4).fill(''));
   const inputRefs = useRef([]);
   const [timer, setTimer] = useState(60);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
@@ -25,7 +25,7 @@ const CustomOTPVerify = ({ onVerify ,onResend }) => {
       const newOtp = [...otp];
       newOtp[index] = text;
       setOtp(newOtp);
-      if (index < 5) {
+      if (index < 3) {
         inputRefs.current[index + 1]?.focus();
       } else {
         Keyboard.dismiss();
@@ -39,7 +39,7 @@ const CustomOTPVerify = ({ onVerify ,onResend }) => {
 
   const handleVerify = () => {
     const finalOtp = otp.join('');
-    if (finalOtp.length === 6) {
+    if (finalOtp.length === 4) {
       onVerify(finalOtp); // send OTP to parent
     } else {
       alert('Please enter complete 6-digit OTP');
@@ -47,7 +47,7 @@ const CustomOTPVerify = ({ onVerify ,onResend }) => {
   };
 
 const handleResend = () => {
-  setOtp(new Array(6).fill(''));
+  setOtp(new Array(4).fill(''));
   inputRefs.current[0]?.focus();
   setTimer(60);
   setIsResendDisabled(true);
@@ -84,7 +84,11 @@ const handleResend = () => {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleVerify}>
+        {isVloading?(
+          <ActivityIndicator size="small" color="#fff"/>
+        ):(
         <Text style={styles.buttonText}>Verify OTP</Text>
+        )}
       </TouchableOpacity>
 
       <View style={styles.resendContainer}>
@@ -116,17 +120,17 @@ const styles = StyleSheet.create({
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 20,
     marginBottom: 20,
   },
   inputBox: {
-    width: 35,
-    height: 40,
+    width: 45,
+    height: 45,
     borderWidth: 1.5,
     borderColor: '#aaa',
     borderRadius: 6,
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: 16,
     backgroundColor: '#fff',
   },
   button: {

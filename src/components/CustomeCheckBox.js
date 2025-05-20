@@ -2,7 +2,7 @@
 import React from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { View } from 'react-native';
-import { darkBlue } from './constant';
+import { darkBlue, Width } from './constant';
 
 const CustomCheckbox = ({ label, value = 0, onChange }) => {
   const handlePress = (checked) => {
@@ -11,9 +11,9 @@ const CustomCheckbox = ({ label, value = 0, onChange }) => {
   };
 
   return (
-    <View style={{ padding: 5,marginLeft:10 }}>
+    <View style={{ padding: 10,marginLeft:10 ,marginVertical:10}}>
       <BouncyCheckbox
-        size={35}
+        size={30}
         fillColor="#ffb703"
         unfillColor="#FFFFFF"
         text={label}
@@ -23,6 +23,7 @@ const CustomCheckbox = ({ label, value = 0, onChange }) => {
           fontFamily: 'JosefinSans-Regular',
           color: darkBlue,
           fontSize: 14,
+          width:Width*0.65
         }}
         isChecked={value === true}
         onPress={handlePress}

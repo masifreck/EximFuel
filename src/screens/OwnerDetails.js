@@ -13,6 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import CustomAlert from '../components/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CustomRequestOptionsAdmin} from '../components/CustomRequestOptions';
+import { darkBlue } from '../components/constant';
 
 
 const OwnerDetails = () => {
@@ -122,7 +123,7 @@ const OwnerDetails = () => {
         style={{
           alignItems: 'center',
           justifyContent: 'center',
-          marginTop: '30%',
+          marginTop: '30%', 
           marginBottom: 20,
         }}>
         <View
@@ -195,7 +196,7 @@ const OwnerDetails = () => {
         </TouchableOpacity>
 
        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ManageOwner')}>
-          <Text style={styles.text}>Manage Owner Status</Text>
+          <Text style={styles.text}>Manage Owner </Text>
         </TouchableOpacity>
 
         <View
@@ -263,7 +264,7 @@ const styles = StyleSheet.create({
     tintColor: 'black',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     marginBottom: 20,
     height: 50,
     width: 300,
@@ -279,9 +280,9 @@ const styles = StyleSheet.create({
   },
   toastContainer: {
     borderRadius: 5,
-    position: 'absolute',
-    bottom: '26%', // Center vertically
-    left: '26%', // Center horizontally
+    //position: 'absolute',
+    // bottom: '26%', // Center vertically
+    // left: '26%', // Center horizontally
     transform: [{translateX: -50}, {translateY: -50}],
   },
   toastText: {
