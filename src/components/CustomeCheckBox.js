@@ -22,7 +22,7 @@ const CustomCheckbox = ({ label, value = 0, onChange }) => {
         textStyle={{
           fontFamily: 'JosefinSans-Regular',
           color: darkBlue,
-          fontSize: 14,
+          fontSize: 13,
           width:Width*0.65
         }}
         isChecked={value === true}

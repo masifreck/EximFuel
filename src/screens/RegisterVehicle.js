@@ -7,8 +7,6 @@ import {
   ImageBackground
 } from 'react-native';
 import React, {useState, useEffect,useCallback} from 'react';
-// import {ScrollView} from 'react-native-gesture-handler';
-import {Dropdown} from 'react-native-element-dropdown';
 import CustomAlert from '../components/CustomAlert';
 import {useNavigation} from '@react-navigation/native';
 import LoadingIndicator from '../components/LoadingIndicator';
@@ -16,10 +14,13 @@ import useApiToken from '../components/Token';
 import CustomInput from '../components/CustomInput';
 import CustomDropbox from '../components/CustomDropbox';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
+import { getCurrentCoordinates } from '../components/CutomeLocation';
 import {CustomRequestOptions} from '../components/CustomRequestOptions';
+import NetInfoWrapper from '../components/CheckNetInfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { darkBlue } from '../components/constant';
-const RegisterVehicle = () => {
+import CustomImagePicker from '../components/CustomeImagePicker';
+const RegisterVehicle = ({route}) => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
     .then(token => {
@@ -32,7 +33,13 @@ const RegisterVehicle = () => {
       console.log('Received token', apiTokenReceived);
       console.log('Error retrieving token:', error);
     });
+ const { vehicleNo } = route.params;
 
+ useEffect(()=>{
+if(route.params.vehicleNo){
+  setVehicleRegistrationNo(route.params.vehicleNo)
+}
+ },[route.params.vehicleNo])
   const navigation = useNavigation();
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -117,8 +124,19 @@ useEffect(() => {
   const [IsLoading, setIsLoading] = useState(true);
   const [is_everything_ok, setis_everything_ok] = useState(false);
 
-  const registertheVehicle = () => {
+  const registertheVehicle =async () => {
     setIsLoading(true);
+    let coordinates = null;
+
+  try {
+    coordinates = await getCurrentCoordinates();
+  } catch (error) {
+    setIsLoading(false);
+    setErrorMessage(error.message || 'Location access failed');
+    setShowAlert(true);
+    return;
+  }
+
     const postData = {
       OwnerId: ownerNameSelected,
       VehicleTyre: VehicleTyres,
@@ -176,7 +194,7 @@ useEffect(() => {
   };
   const closeAlert = () => {
     setShowAlert(false);
-    navigation.navigate('Vehicle');
+    //navigation.navigate('Vehicle');
   };
 
   useEffect(() => {
@@ -231,6 +249,9 @@ console.log('PanNumber is:', PanNumber);
             }, []);
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
+      <View style={{flex:1}}>
+      <NetInfoWrapper/>
+      </View>
       {IsLoading ? (
         <LoadingIndicator />
       ) : (
@@ -380,12 +401,14 @@ style={styles.dlCard}>
               title="Truck Front"
               onImagePicked={handleTruckFront}
               imageData={truckFront}
+              width={80}
             />
             <CustomImagePicker
               bgImage={require('../assets/truckback.png')}
               title=" Truck Back"
               onImagePicked={handleTrucBack}
               imageData={truckBack}
+              width={80}
             />
           </View>
              <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
@@ -395,6 +418,7 @@ style={styles.dlCard}>
               onImagePicked={handleTruckRight}
               imageData={truckRight}
             />
+            
             <CustomImagePicker
               bgImage={require('../assets/truckleft.png')}
               title=" Truck Left"

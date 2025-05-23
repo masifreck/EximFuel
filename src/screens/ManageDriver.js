@@ -13,17 +13,18 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ImageViewing from 'react-native-image-viewing';
-import CustomCheckbox from './CustomCheckbox'; // Ensure this exists or adjust
-import { darkBlue } from '../constants/theme'; // Update according to your theme/colors
-import dummyDrivers from '../data/dummyDrivers'; // Dummy data file
+import CustomCheckbox from '../components/CustomeCheckBox'; // Ensure this exists or adjust
+import { darkBlue } from '../components/constant'; // Update according to your theme/colors
+//import dummyDrivers from '../data/dummyDrivers'; // Dummy data file
 const driverList = [
   {
     Id: 64,
-    DLNumber: '00009',
+    DLNumber: '000091234DL',
     DriverName: 'new 64 test update',
     AdharNo: 'AdharNo',
-    Dob: '2024-02-01T00:00:00',
+    Dob: '2024-02-01',
     PanNo: 'PanNo',
+    Mobile:'1234567890',
     DriverEmail: 'DriverEmail',
     InserUserId: null,
     UpdateUserId: null,
@@ -35,14 +36,16 @@ const driverList = [
     Status: 'Pending',
     isPCVerified: false,
     isSCVerified: true,
+    Address:'7th floor esplande nexus mall bhubaneshwar',
     CreatedBy: 'admin',
   },
   {
     Id: 65,
-    DLNumber: '00010',
+    DLNumber: '00010987654DL',
     DriverName: 'Ravi Sharma',
     AdharNo: 'AADHAR456',
-    Dob: '1990-08-12T00:00:00',
+    Dob: '1990-08-12T',
+     Mobile:'1234567890',
     PanNo: 'PAN456',
     DriverEmail: 'ravi@example.com',
     InserUserId: null,
@@ -55,15 +58,17 @@ const driverList = [
     Status: 'Approved',
     isPCVerified: true,
     isSCVerified: true,
+     Address:'7th floor esplande nexus mall bhubaneshwar',
     CreatedBy: 'admin',
   },
   {
     Id: 66,
-    DLNumber: '00011',
+    DLNumber: '000113456789FG',
     DriverName: 'Sita Verma',
     AdharNo: 'AADHAR789',
-    Dob: '1985-02-20T00:00:00',
+    Dob: '1985-02-20',
     PanNo: 'PAN789',
+     Mobile:'1234567890',
     DriverEmail: 'sita@example.com',
     InserUserId: null,
     UpdateUserId: null,
@@ -74,21 +79,24 @@ const driverList = [
     DriverAddress: 'MG Road, Bangalore',
     Status: 'Rejected',
     isPCVerified: true,
+     Address:'7th floor esplande nexus mall bhubaneshwar',
     isSCVerified: false,
     CreatedBy: 'superadmin',
   },
   {
     Id: 67,
-    DLNumber: '00012',
+    DLNumber: '00012345778FG',
     DriverName: 'Karan Patel',
     AdharNo: 'AADHAR999',
-    Dob: '1993-11-03T00:00:00',
+     Mobile:'1234567890',
+    Dob: '1993-11-03',
     PanNo: 'PAN999',
     DriverEmail: 'karan@example.com',
     InserUserId: null,
     UpdateUserId: null,
     InsertDate: null,
     UpdateDate: null,
+     Address:'7th floor esplande nexus mall bhubaneshwar',
     PrimaryContactNo: '9876541230',
     SecondaryContactNo: '9123451234',
     DriverAddress: 'Ahmedabad, Gujarat',
@@ -108,15 +116,15 @@ const ManageDriver = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const imageList = [
-    require('../assets/license_front.png'),
-    require('../assets/license_back.png'),
-    require('../assets/driver_photo.png'),
+    require('../assets/dlpng.webp'),
+    require('../assets/aadhaar.png'),
+    require('../assets/driver.png'),
   ];
 
-  const filteredDrivers = dummyDrivers.filter(
+  const filteredDrivers = driverList.filter(
     item =>
-      item.Name.toLowerCase().includes(search.toLowerCase()) ||
-      item.LicenseNo.toLowerCase().includes(search.toLowerCase())
+      item.DriverName?item.DriverName.toLowerCase().includes(search.toLowerCase()) :'' ||
+      item.DLNumber?item.DLNumber.toLowerCase().includes(search.toLowerCase()) :''
   );
 
   const openDetails = item => {
@@ -141,6 +149,7 @@ const ManageDriver = () => {
             <Text style={[styles.cell, styles.headerCell]}>Name</Text>
             <Text style={[styles.cell, styles.headerCell]}>License No</Text>
             <Text style={[styles.cell, styles.headerCell]}>Status</Text>
+             <Text style={[styles.cell, styles.headerCell]}>Created By</Text>
           </View>
 
           <FlashList
@@ -155,8 +164,8 @@ const ManageDriver = () => {
                     { backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#fff' },
                   ]}
                 >
-                  <Text style={styles.cell}>{item.Name}</Text>
-                  <Text style={styles.cell}>{item.LicenseNo}</Text>
+                  <Text style={styles.cell}>{item.DriverName}</Text>
+                  <Text style={styles.cell}>{item.DLNumber}</Text>
                   <Text
                     style={[
                       styles.cell,
@@ -165,6 +174,7 @@ const ManageDriver = () => {
                   >
                     {item.Status}
                   </Text>
+                   <Text style={styles.cell}>{item.CreatedBy}</Text>
                 </View>
               </Pressable>
             )}
@@ -190,20 +200,46 @@ const ManageDriver = () => {
                 <>
                   {[
                     ['Id', selectedDriver.Id],
-                    ['Name', selectedDriver.Name],
-                    ['License No', selectedDriver.LicenseNo],
-                    ['DOB', selectedDriver.DOB],
+                    ['Name', selectedDriver.DriverName],
+                    ['License No', selectedDriver.DLNumber],
+                    ['DOB', selectedDriver.Dob],
                     ['Mobile', selectedDriver.Mobile],
                     ['Email', selectedDriver.Email],
+                    ['Adhar No',selectedDriver.AdharNo],
+                    ['PAN No', selectedDriver.PanNo],
+
                     ['Address', selectedDriver.Address],
                     ['Status', selectedDriver.Status],
+                    ['Created By',selectedDriver.CreatedBy]
                   ].map(([label, value]) => (
                     <View key={label} style={styles.detailRow}>
                       <Text style={styles.detailKey}>{label}</Text>
                       <Text style={styles.detailValue}>{value}</Text>
                     </View>
-                  ))}
 
+                  ))}
+                   <View style={styles.detailRow}>
+                        <Text style={styles.detailKey}>P. Mobile No</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' ,flex:2}}>
+                          <Text style={styles.detailValue}>{selectedDriver.PMobileNo} </Text>
+                          <Icon
+                            name={selectedDriver.isPCVerified ? 'check-circle' : 'times-circle'}
+                            size={18}
+                            color={selectedDriver.isPCVerified ? 'green' : 'red'}
+                          />
+                        </View>
+                      </View>
+ <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>S.Mobile No</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center' ,flex:2}}>
+        <Text style={styles.detailValue}>{selectedDriver.SMobileNo} </Text>
+        <Icon
+          name={selectedDriver.isSCVerified ? 'check-circle' : 'times-circle'}
+          size={18}
+          color={selectedDriver.isSCVerified ? 'green' : 'red'}
+        />
+      </View>
+    </View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
                     {imageList.map((img, idx) => (
                       <TouchableOpacity
@@ -227,7 +263,7 @@ const ManageDriver = () => {
 
                     <View style={{ marginBottom: 10 }}>
                       <CustomCheckbox
-                        label="I confirm the driver documents are verified."
+                        label="I hereby confirm that all required documents have been properly verified and the appropriate options have been duly selected."
                         value={declare}
                         onChange={(val) => setDeclare(val)}
                       />
@@ -294,6 +330,7 @@ const styles = StyleSheet.create({
     width: 120,
     paddingHorizontal: 10,
     color: '#023047',
+    fontSize:12 
   },
   headerCell: {
     fontWeight: 'bold',

@@ -63,57 +63,59 @@ const Vehicle = () => {
     setShowToast(false);
   };
 
-  const handleShowDetails = async redirectpage => {
-    if (vehicleNo.length !== 0) {
-      if (vehicleNo.length > 8 && vehicleNo.length < 13) {
-        try {
-          const {url,requestOptions}=CustomRequestOptionsAdmin(`https://Exim.Tranzol.com/api/VehicleApi/GetVehicleByNo?vehicleNo=${vehicleNo}`,apiTokenReceived)
-      
-          const response = await fetch(url, requestOptions);
-          if (response.ok) {
-            const data = await response.json();
-            console.log('API Response:', data);
-            if (data.error) {
-              console.log('API Response Error:', errorMessage);
-              setErrorMessage(data.error);
-              setShowAlert(true);
-            } else {
-              if (data.apiResult.Result === null) {
-                const errorMessage = 'Vehicle Number Not Found!';
-                setErrorMessage(errorMessage);
-                handleShowToast();
-              } else if (data.apiResult.Result.VehicleNo === null) {
-                const errorMessage = 'Vehicle Number Not Found!';
-                setErrorMessage(errorMessage);
-                handleShowToast();
-              } else {
-                navigation.navigate(redirectpage, {
-                  vehicleDetails: data,
-                });
-              }
-            }
-          } else {
-            // Handle the error
-            console.log('Error fetching vehicle details');
-            const errorMessage = 'Error fetching vehicle details';
-            setErrorMessage(errorMessage);
+ const handleShowDetails = async redirectpage => {
+  if (vehicleNo.length !== 0) {
+    if (vehicleNo.length > 8 && vehicleNo.length < 13) {
+      try {
+        const { url, requestOptions } = CustomRequestOptionsAdmin(
+          `https://Exim.Tranzol.com/api/VehicleApi/GetVehicleByNo?vehicleNo=${vehicleNo}`,
+          apiTokenReceived
+        );
+
+        const response = await fetch(url, requestOptions);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('API Response:', data);
+
+          if (data.error) {
+            setErrorMessage(data.error);
             setShowAlert(true);
+          } else {
+            const result = data.apiResult?.Result;
+
+            if (result === null || result?.VehicleNo === null) {
+              // Navigate to RegisterVehicle if vehicle not found
+              navigation.navigate('RegisterVehicle', {
+                vehicleNo: vehicleNo,
+              });
+            } else {
+              // Vehicle found, navigate to the given redirect page
+              navigation.navigate(redirectpage, {
+                vehicleDetails: data,
+              });
+            }
           }
-        } catch (error) {
-          console.log('An error occurred:', error);
-          setErrorMessage('An error occurred:');
+        } else {
+          console.log('Error fetching vehicle details');
+          setErrorMessage('Error fetching vehicle details');
           setShowAlert(true);
         }
-      } else {
-        setErrorMessage('Enter Min 9 charecters ');
-        handleShowToast();
+      } catch (error) {
+        console.log('An error occurred:', error);
+        setErrorMessage('An error occurred');
+        setShowAlert(true);
       }
     } else {
-      setErrorMessage('Enter Vehicle Number');
+      setErrorMessage('Enter Min 9 characters');
       handleShowToast();
     }
-    setVehicleNo('');
-  };
+  } else {
+    setErrorMessage('Enter Vehicle Number');
+    handleShowToast();
+  }
+  setVehicleNo('');
+};
+
   const closeAlert = () => {
     // Function to close the alert
     setShowAlert(false);
@@ -174,7 +176,11 @@ const Vehicle = () => {
           onPress={() => handleShowDetails('UpdateVehicle')}>
           <Text style={styles.buttonText}>Update Vehicle Details</Text>
         </TouchableOpacity>
-
+  <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('ManageVehicle')}>
+          <Text style={styles.buttonText}>Manage Vehicle</Text>
+        </TouchableOpacity>
         <View style={styles.registerTextContainer}>
           <Text style={styles.blackText}>If Not Registered! </Text>
           <TouchableOpacity

@@ -189,6 +189,11 @@ const OwnerDetails = () => {
           onPress={() => handleShowDriverDetails('UpdateDriver')}>
           <Text style={styles.buttonText}>Update Driver Details</Text>
         </TouchableOpacity>
+             <TouchableOpacity
+          style={styles.button1}
+          onPress={() => navigation.navigate('ManageDriver')}>
+          <Text style={styles.buttonText}>Manage Driver</Text>
+        </TouchableOpacity>
         <View style={styles.registerTextContainer}>
           <Text style={styles.blackText}>If Not Registered! </Text>
           <TouchableOpacity

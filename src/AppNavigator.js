@@ -38,7 +38,8 @@ import EximLogisticsReceipt from './screens/DemoPrint';
 import DocumentScanner from './components/DocumentScanner';
 import { QRCodeGenerator } from './components/qrCodeGenerator';
 import ManageOwner from './screens/ManageOwner';
-
+import ManageDriver from './screens/ManageDriver';
+import ManageVehicle from './screens/ManageVehicle'
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -149,6 +150,11 @@ const AppNavigator = () => {
           component={UpdateDriver}
           options={getScreenOptions('Update Driver')}
         />
+           <Stack.Screen 
+        name='ManageDriver'
+        component={ManageDriver}
+        options={getScreenOptions('Manage Driver Status')}
+        />
         {/* Vehicledata=============== */}
         <Stack.Screen
           name="Vehicle"
@@ -169,6 +175,11 @@ const AppNavigator = () => {
           name="UpdateVehicle"
           component={UpdateVehicle}
           options={getScreenOptions('Update Vehicle Details')}
+        />
+               <Stack.Screen 
+        name='ManageVehicle'
+        component={ManageVehicle}
+        options={getScreenOptions('Manage Vehicle Status')}
         />
         {/* mines component================= */}
         <Stack.Screen

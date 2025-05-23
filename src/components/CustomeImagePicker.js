@@ -194,7 +194,7 @@ height:50,margin:10,paddingHorizontal:20
         fontSize:12,
         fontWeight:'bold',
         textAlign:'left',
-        marginLeft:10,marginBottom:10
+        marginLeft:10,marginBottom:0
     },
     buttons: {
         backgroundColor: 'white',
