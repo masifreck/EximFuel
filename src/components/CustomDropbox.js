@@ -13,10 +13,12 @@ const CustomDropbox = ({
   onChangeText,
   showSearch = true,
   isend = false,
-  dropposition='auto'
+  dropposition='auto',
+  isIcon
 }) => {
   return (
     <>
+    <View style={{flexDirection:'column',  width:isIcon?'75%':'90%',marginLeft:18}}>
       <Text
         style={{
           alignItems: 'flex-start',
@@ -35,6 +37,7 @@ const CustomDropbox = ({
             borderWidth: hasBorder ? 0.9 : 0,
             borderColor: hasBorder ? 'red' : 'transparent',
             marginBottom: isend ? 20 : 0,
+          
           },
         ]}
         placeholderStyle={{fontSize: 15, color: '#6c6f73'}}
@@ -58,18 +61,19 @@ const CustomDropbox = ({
         onChangeText={onChangeText}
         dropdownPosition={dropposition}
       />
+      </View>
     </>
   );
 };
 const styles = StyleSheet.create({
   dropdown: {
     height: 50,
-    width: '90%',
+    width: '100%',
     borderColor: 'black',
     borderRadius: 8,
     paddingHorizontal: 8,
     alignSelf: 'center',
-    backgroundColor: '#cedff0',
+    backgroundColor: '#caf0f8',
     paddingHorizontal: 15,
   },
 });

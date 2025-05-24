@@ -13,6 +13,7 @@ import LoadingIndicator from '../components/LoadingIndicator';
 import useApiToken from '../components/Token';
 import CustomInput from '../components/CustomInput';
 import CustomDropbox from '../components/CustomDropbox';
+import { Dialog, ALERT_TYPE } from 'react-native-alert-notification';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
 import { getCurrentCoordinates } from '../components/CutomeLocation';
 import {CustomRequestOptions} from '../components/CustomRequestOptions';
@@ -20,12 +21,13 @@ import NetInfoWrapper from '../components/CheckNetInfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { darkBlue } from '../components/constant';
 import CustomImagePicker from '../components/CustomeImagePicker';
+import { AlertNotificationRoot } from 'react-native-alert-notification';
 const RegisterVehicle = ({route}) => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      console.log('Retrieved token:', token);
+     // console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
@@ -33,13 +35,9 @@ const RegisterVehicle = ({route}) => {
       console.log('Received token', apiTokenReceived);
       console.log('Error retrieving token:', error);
     });
- const { vehicleNo } = route.params;
+ const { vehicleNo } = route?.params?route.params:'';
+console.log(vehicleNo)
 
- useEffect(()=>{
-if(route.params.vehicleNo){
-  setVehicleRegistrationNo(route.params.vehicleNo)
-}
- },[route.params.vehicleNo])
   const navigation = useNavigation();
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -49,8 +47,18 @@ if(route.params.vehicleNo){
   const [chassisNumber, setChassisNumber] = useState('');
   const [engineNumber, setEngineNumber] = useState('');
   const [pollution, setPollution] = useState('');
+  const [VPUCCExpiry,setVPUCCExpiry]=useState('');
+
   const [fitness, setFitness] = useState('');
+  const [VFitnessExpiry,setVFitnessExpiry]=useState('');
+
   const [permit, setPermit] = useState('');
+  const [VPermitExpiry,setVPermitExpiry]=useState('');
+
+  const [VNationalPermitExpiry,setVNationalPermitExpiry]=useState('');
+const [VInsuranceNo,setVInsuranceNo]=useState('');
+const [VInsuranceExpiry,setVInsuranceExpiry]=useState('');
+const [VOwnerName,setVOwnerName]=useState('')
   const [VehicleTyres, setVehicleTyres] = useState('');
   const [roadTax, setRoadTax] = useState('');
 
@@ -70,8 +78,12 @@ if(route.params.vehicleNo){
 
   const [RCFrontPhoto,setRCFrontPhoto]=useState(null);
   const [RCBackPhotot,setRCBackPhotot]=useState(null);
-  // dummy=========
-
+  // dummy=========  
+ useEffect(()=>{
+if(vehicleNo){
+  setVehicleRegistrationNo(vehicleNo)
+}
+ },[vehicleNo])
 useEffect(() => {
   const delayDebounce = setTimeout(() => {
     if (PanNumber && PanNumber.length >= 3) {
@@ -118,7 +130,40 @@ useEffect(() => {
   return () => clearTimeout(delayDebounce); // cleanup on input change
 }, [PanNumber]);
 
+ const [vehicleDetails, setVehicleDetails] = useState(null);
 
+  useEffect(() => {
+    if (vehicleNo) {
+      const fetchVehicle = async () => {
+        try {
+          const response = await fetch(
+            `https://exim.tranzol.com/api/VehicleApi/GetVerifyVehicleNo?vehicleno=${vehicleNo}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${apiTokenReceived}`,
+              },
+            }
+          );
+
+          const data = await response.json();
+console.log(data)
+          if (data?.apiResult?.Result) {
+            setVehicleDetails(data.apiResult.Result);
+          } else {
+            console.warn('Vehicle not verified or invalid data', data);
+            setVehicleDetails(null);
+          }
+        } catch (error) {
+          console.error('Error fetching vehicle details:', error);
+          setVehicleDetails(null);
+        }
+      };
+
+      fetchVehicle();
+    }
+  }, [vehicleNo, apiTokenReceived]);
 
   // ========================
   const [IsLoading, setIsLoading] = useState(true);
@@ -228,7 +273,7 @@ useEffect(() => {
 
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
-console.log('PanNumber is:', PanNumber);
+//console.log('PanNumber is:', PanNumber);
   const handleTrucBack = useCallback(image => {
     setTruckBack(image);
   }, []);
@@ -247,7 +292,24 @@ console.log('PanNumber is:', PanNumber);
             const handleRCBack = useCallback(image => {
               setRCBackPhotot(image);
             }, []);
+             const showConfirmDialog = () => {
+    Dialog.show({
+      type: ALERT_TYPE.WARNING,
+      title: 'Are you sure?',
+      textBody: 'Do you really want to go to the Owner page?',
+      button: 'Yes',
+      cancelButton: 'No',
+      onPressButton: () => {
+        Dialog.hide();
+        navigation.navigate('OwnerDetails');
+      },
+      onPressCancelButton: () => {
+        Dialog.hide();
+      },
+    });
+  };
   return (
+       <AlertNotificationRoot>
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       <View style={{flex:1}}>
       <NetInfoWrapper/>
@@ -265,19 +327,19 @@ console.log('PanNumber is:', PanNumber);
                     <ScrollView horizontal={true} style={{flexDirection:'row'}}>
 <ImageBackground source={require('../assets/rcfront.png')} imageStyle={{borderRadius:10}}
 style={styles.dlCard}>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:76}}>123456789012</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:130}}>20-05-2023</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:46,left:180}}>20-05-2038</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:63,left:76}}>P53AFDCB9CEA07330</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:85,left:76}}>M2SA0107ED3805</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:103,left:76}}>SURESWAR DASH</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:122,left:76}}>SURESWAR DASH SURESWAR DASH SURESWAR DASH</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:143,left:76}}>SURESWAR DASH</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',top:157,left:76,width:200}}>Address SURESWAR DASH
-  SURESWAR DASH SURESWAR DASH SURESWAR DASH SURESWAR  
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:85,left:140,fontWeight:'bold'}}>{vehicleRegistrationNo?vehicleRegistrationNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:85,left:245}}></Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:88,left:345}}></Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:121,left:140}}>{vehicleDetails?.ChasisNo? vehicleDetails.ChasisNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:167,left:140}}>{vehicleDetails?.EngineNo? vehicleDetails.EngineNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:202,left:140}}>{vehicleDetails?.OwnerName?vehicleDetails.OwnerName:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:240,left:140}}></Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:275,left:140}}></Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',top:307,left:140,width:390}}>
 </Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',bottom:24,left:10}}>Fuel Type</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:7,position:'absolute',width:65,top:165,left:10}}>Emissionfgj</Text>
+{/* fuel type */}
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',bottom:53,left:16}}></Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',width:110,top:320,left:16}}></Text>
 
 
 </ImageBackground>
@@ -301,7 +363,7 @@ style={styles.dlCard}>
             <Text style={styles.MandatoryText}>
               Mandatory Fields<Text style={{color: 'red'}}>*</Text>
             </Text>
-            <CustomInput
+            {/* <CustomInput
               labelText=" Vehicle Registration No"
               placeholdername="Enter Vehicle Registration No"
               onChangeText={text => setVehicleRegistrationNo(text)}
@@ -309,7 +371,8 @@ style={styles.dlCard}>
               width="85%"
               isVerified={isVerified}
               isMandatory={true}
-            />
+            /> */}
+            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
             <CustomDropbox
               hasBorder={hasBorder}
               labelText="Owner Name"
@@ -321,8 +384,13 @@ style={styles.dlCard}>
                 setOwnerNameSelected(item.value);
               }}
               onChangeText={text => setPanNumber(text)}
+                isIcon={true}
             />
-
+            <TouchableOpacity onPress={showConfirmDialog}>
+              <Image source={require('../assets/adduser.png')} style={{width:50,height:50,marginTop:30,marginRight:10}}/>
+            </TouchableOpacity>
+            
+</View>
             <CustomInput
               labelText="Vehicle Tyres"
               placeholdername="Vehicle Tyres"
@@ -330,8 +398,9 @@ style={styles.dlCard}>
               hasBorder={hasBorder}
               keyboardTypename="numeric"
               isMandatory={true}
+              isend={true}
             />
-            <CustomInput
+            {/* <CustomInput
               labelText="Chassis Number"
               placeholdername="Enter Chassis Number"
               onChangeText={text => setChassisNumber(text)}
@@ -361,7 +430,7 @@ style={styles.dlCard}>
               placeholdername="Enter Road Tax Number"
               onChangeText={text => setRoadTax(text)}
               isend={true}
-            />
+            /> */}
           </View>
                   <View
           style={[
@@ -438,6 +507,7 @@ style={styles.dlCard}>
         onClose={closeAlert}
       />
     </ScrollView>
+    </AlertNotificationRoot>
   );
 };
 const DLCard = ({driver}) => {
@@ -507,8 +577,8 @@ const styles = StyleSheet.create({
     color: '#6c6f73',
   },
     dlCard: {
-height:180,
-width:290,
+height:350,
+width:550,
   borderRadius: 10,
   margin: 16,
   padding: 12,

@@ -183,12 +183,15 @@ const Unloading = () => {
             />
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleShowDetails}>
+          <TouchableOpacity style={styles.button}  onPress={()=>  navigation.navigate('UnloadingEntry', {
+                Unloading: '',
+              })}>
             <Text style={styles.text}>View Details</Text>
           </TouchableOpacity>
           {/* // onPress={() => {
           //   navigation.navigate('ShowUnloadingDetails');
           // }}> */}
+         
         </View>
       )}
       <CustomAlert

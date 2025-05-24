@@ -17,6 +17,8 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import CalendarPicker from 'react-native-calendar-picker';
 import useApiToken from '../components/Token';
 import LoadingIndicator from '../components/LoadingIndicator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Unloading from './Unloading';
 const RegisterOwner = () => {
   // calander==================
   const [selectedStartDate, setSelectedStartDate] = useState('');
@@ -43,28 +45,39 @@ const RegisterOwner = () => {
   }, [selectedStartDate]);
   //calander===================
   const navigation = useNavigation();
-  const apiTokenReceived = useApiToken();
-  console.log('Received token', apiTokenReceived);
+    const [apiTokenReceived, setapiTokenReceived] = useState();
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+     // console.log('Retrieved token:', token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+      console.log('Received token', apiTokenReceived);
+      console.log('Error retrieving token:', error);
+    });
   const route = useRoute();
-  const {Unloading} = route.params;
-  const FetchminesDetails = Unloading.apiResult.Result;
-  //
-  const [isFocus, setIsFocus] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
-  //
-  const [ChallanNo, setChallanNo] = useState(FetchminesDetails.ChallanNo);
-  const [VehicleNo, setVehicleNo] = useState(FetchminesDetails.VehicleNo);
-  const [WayBillNo, setWayBillNo] = useState(FetchminesDetails.WayBillNo);
-  const [GSPNo, setGSPNo] = useState(FetchminesDetails.GSPNo);
-  const [GrossWt, setGrossWt] = useState(FetchminesDetails.GrossWt);
-  const [TareWt, setTareWt] = useState(FetchminesDetails.TareWt);
-  const [NetWt, setNetWt] = useState(FetchminesDetails.NetWt);
-  const [Moisture, setMoisture] = useState(FetchminesDetails.Moisture);
-  const [LoadDate, setLoadDate] = useState(FetchminesDetails.LoadDate);
-  const [LoadType, setLoadType] = useState(FetchminesDetails.LoadType);
+ // const {Unloading} = route.params;
+  const FetchminesDetails = Unloading?.apiResult?.Result? Unloading : {};
 
-  const [Id, setId] = useState(FetchminesDetails.Id);
+// States with safe default values
+const [isFocus, setIsFocus] = useState(false);
+const [errorMessage, setErrorMessage] = useState('');
+const [showAlert, setShowAlert] = useState(false);
+
+const [ChallanNo, setChallanNo] = useState(FetchminesDetails.ChallanNo || '');
+const [VehicleNo, setVehicleNo] = useState(FetchminesDetails.VehicleNo || '');
+const [WayBillNo, setWayBillNo] = useState(FetchminesDetails.WayBillNo || '');
+const [GSPNo, setGSPNo] = useState(FetchminesDetails.GSPNo || '');
+const [GrossWt, setGrossWt] = useState(FetchminesDetails.GrossWt || '');
+const [TareWt, setTareWt] = useState(FetchminesDetails.TareWt || '');
+const [NetWt, setNetWt] = useState(FetchminesDetails.NetWt || '');
+const [Moisture, setMoisture] = useState(FetchminesDetails.Moisture || '');
+const [LoadDate, setLoadDate] = useState(FetchminesDetails.LoadDate || '');
+const [LoadType, setLoadType] = useState(FetchminesDetails.LoadType || '');
+const [Id, setId] = useState(FetchminesDetails.Id || '');
+
   const [UnloadDate, setUnloadDate] = useState('');
   const [UnloadGrossWt, setUnloadGrossWt] = useState('0.00');
   const [UnloadTareWt, setUnloadTareWt] = useState('0.00');

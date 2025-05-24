@@ -1,5 +1,6 @@
 import {View, Text, TextInput, StyleSheet, Image} from 'react-native';
 import React from 'react';
+import { textColor } from './constant';
 
 const CustomInput = ({
   labelText,
@@ -80,14 +81,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     padding: 5,
     marginLeft: '5%',
-    color: 'black',
+    color: textColor,
     fontSize: 13,
     fontFamily: 'PoppinsMedium',
   },
 
   inputContainer: {
     width: '90%',
-    backgroundColor: '#cedff0',
+    backgroundColor: '#caf0f8',
     flexDirection: 'row',
     paddingHorizontal: 15,
     borderRadius: 10,
