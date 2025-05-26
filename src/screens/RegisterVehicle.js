@@ -54,11 +54,12 @@ console.log(vehicleNo)
 
   const [permit, setPermit] = useState('');
   const [VPermitExpiry,setVPermitExpiry]=useState('');
-
+const [VCode,setVCode]=useState('');
   const [VNationalPermitExpiry,setVNationalPermitExpiry]=useState('');
 const [VInsuranceNo,setVInsuranceNo]=useState('');
 const [VInsuranceExpiry,setVInsuranceExpiry]=useState('');
 const [VOwnerName,setVOwnerName]=useState('')
+const [TaxExpiry,setTaxExpiry]=useState('' )
   const [VehicleTyres, setVehicleTyres] = useState('');
   const [roadTax, setRoadTax] = useState('');
 
@@ -150,7 +151,25 @@ useEffect(() => {
           const data = await response.json();
 console.log(data)
           if (data?.apiResult?.Result) {
+            const details=data.apiResult.Result;
             setVehicleDetails(data.apiResult.Result);
+
+            setVehicleRegistrationNo(details.VehicleNo)
+            setChassisNumber(details.ChasisNo);
+           setEngineNumber(details.EngineNo);
+            setPollution(details.PUCCNo);
+            setVPUCCExpiry(details.PUCCExpiry);
+            setFitness(details.FitnessNo);
+            setVFitnessExpiry(details.FitnessExpiry);
+            setPermit(details.PermitNo);
+            setVPermitExpiry(details.PermitExpiry);
+            setVNationalPermitExpiry(details.NationalPermitExpiry)
+setVInsuranceNo(details.InsuranceNo)
+setVInsuranceExpiry(details.InsuranceExpiry);
+setVOwnerName(details.OwnerName);
+setRoadTax(details.TaxNo)
+setVCode(details.Code)
+setTaxExpiry(details.TaxExpiry)
           } else {
             console.warn('Vehicle not verified or invalid data', data);
             setVehicleDetails(null);
@@ -192,6 +211,24 @@ console.log(data)
       FitnessNo: fitness,
       StatePermitNo: permit,
       RoadTaxNo: roadTax,
+      StatePermitNo:permit,
+      FitnessNo:fitness,
+      VOwnerName:VOwnerName,
+      VCode:VCode,
+      VPUCCNo:pollution,
+      VPUCCExpiry:VPUCCExpiry,
+      VFitnessNo:fitness,
+      VFitnessExpiry:VFitnessExpiry,
+      VPermitNo:permit,
+      VPermitExpiry:VPermitExpiry,
+      VNationalPermitExpiry:VNationalPermitExpiry,
+      VInsuranceNo:VInsuranceNo,
+      VInsuranceExpiry:VInsuranceExpiry,
+      VTaxNo:roadTax,
+      VTaxExpiry:TaxExpiry,
+      VEngineNo:engineNumber,
+      VChasisNo:chassisNumber,
+
     };
     console.log(postData);
     const {url, requestOptions} = CustomRequestOptions(
@@ -325,27 +362,41 @@ console.log(data)
                       />
                     </View>
                     <ScrollView horizontal={true} style={{flexDirection:'row'}}>
-<ImageBackground source={require('../assets/rcfront.png')} imageStyle={{borderRadius:10}}
+<ImageBackground source={require('../assets/rcfrontnew.jpg')} imageStyle={{borderRadius:10}}
 style={styles.dlCard}>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:85,left:140,fontWeight:'bold'}}>{vehicleRegistrationNo?vehicleRegistrationNo:''}</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:85,left:245}}></Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:88,left:345}}></Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:121,left:140}}>{vehicleDetails?.ChasisNo? vehicleDetails.ChasisNo:''}</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:167,left:140}}>{vehicleDetails?.EngineNo? vehicleDetails.EngineNo:''}</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:202,left:140}}>{vehicleDetails?.OwnerName?vehicleDetails.OwnerName:''}</Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:240,left:140}}></Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:275,left:140}}></Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',top:307,left:140,width:390}}>
+<Text
+  style={{
+    position: 'absolute',
+    top: 160,
+    left: 40,
+    color: vehicleDetails?.Code === 'VERIFIED' ? 'green' : 'red',
+    fontWeight:'bold'
+  }}
+>
+  {vehicleDetails?.Code ? vehicleDetails.Code : ''}
+</Text>
+
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:85,left:150,fontWeight:'bold'}}>{vehicleRegistrationNo?vehicleRegistrationNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:12,position:'absolute',top:90,left:260}}>{vehicleDetails?.PermitNo?vehicleDetails.PermitNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:88,left:373}}>{vehicleDetails?.PermitExpiry?vehicleDetails.PermitExpiry:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:125,left:148}}>{vehicleDetails?.ChasisNo? vehicleDetails.ChasisNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:167,left:148}}>{vehicleDetails?.EngineNo? vehicleDetails.EngineNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:205,left:148}}>{vehicleDetails?.OwnerName?vehicleDetails.OwnerName:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:242,left:148}}>{vehicleDetails?.PUCCNo?vehicleDetails.PUCCNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:285,left:148}}>{vehicleDetails?.PUCCExpiry?vehicleDetails.PUCCExpiry:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:326,left:148,}}>{vehicleDetails?.NationalPermitExpiry?vehicleDetails.NationalPermitExpiry:''}
 </Text>
 {/* fuel type */}
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',bottom:53,left:16}}></Text>
-<Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',width:110,top:320,left:16}}></Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:10,position:'absolute',bottom:46,left:20}}>{vehicleDetails?.InsuranceNo?vehicleDetails.InsuranceNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',width:110,top:322,left:20}}>{vehicleDetails?.InsuranceExpiry?vehicleDetails.InsuranceExpiry:''}</Text>
 
 
 </ImageBackground>
-<ImageBackground source={require('../assets/rcbackwitout.png')} imageStyle={{borderRadius:10}}
+<ImageBackground source={require('../assets/rcnewback.png')} imageStyle={{borderRadius:10}}
 style={styles.dlCard}>
-
+  <Text style={{color:'#020202',fontWeight:'bold',fontSize:18,position:'absolute',top:88,left:18,fontWeight:'bold'}}>{vehicleRegistrationNo?vehicleRegistrationNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',bottom:50,left:200}}>{vehicleDetails?.FitnessNo?vehicleDetails.FitnessNo:''}</Text>
+<Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',width:110,bottom:50,left:325}}>{vehicleDetails?.FitnessExpiry?vehicleDetails.FitnessExpiry:''}</Text>
 </ImageBackground>
                     </ScrollView>
           <View style={styles.levelContainer}>
@@ -451,13 +502,13 @@ style={styles.dlCard}>
 
           <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
             <CustomImagePicker
-              bgImage={require('../assets/rcfront.png')}
+              bgImage={require('../assets/rcfrontnew.jpg')}
               title=" RC Front"
               onImagePicked={handleRCFront}
               imageData={RCFrontPhoto}
             />
             <CustomImagePicker
-              bgImage={require('../assets/rcbackwitout.png')}
+              bgImage={require('../assets/rcnewback.png')}
               title=" RC Back"
               onImagePicked={handleRCBack}
               imageData={RCBackPhotot}
@@ -578,7 +629,7 @@ const styles = StyleSheet.create({
   },
     dlCard: {
 height:350,
-width:550,
+width:570,
   borderRadius: 10,
   margin: 16,
   padding: 12,

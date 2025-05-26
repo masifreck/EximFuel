@@ -13,6 +13,9 @@ import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import CustomAlert from '../components/CustomAlert';
 import useApiToken from '../components/Token';
+import LottieView from 'lottie-react-native';
+import Loading from '../components/Loading';
+import { inputbgColor } from '../components/constant';
 const Unloading = () => {
   const navigation = useNavigation();
   const apiTokenReceived = useApiToken();
@@ -117,7 +120,7 @@ const Unloading = () => {
   return (
     <ScrollView>
       {isLoading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <Loading/>
       ) : (
         <View
           style={{
@@ -149,7 +152,7 @@ const Unloading = () => {
               resizeMode="cover"
             />
           </View>
-
+<View style={{flexDirection:'row',justifyContent:'space-evenly',justifyContent:'center',gap:10}}>
           <View
             style={[
               styles.inputContainer,
@@ -171,7 +174,7 @@ const Unloading = () => {
                 letterSpacing: 0.5,
                 color: 'black',
                 fontSize: 15,
-                width: 250,
+                width: '80%',
                 fontFamily: 'PoppinsSemiBold',
               }}
               placeholder={'Enter Challan Number'}
@@ -181,16 +184,23 @@ const Unloading = () => {
               // value={userId}
               // onChangeText={handleUserIdChange}
             />
+          
           </View>
-
+          <TouchableOpacity onPress={()=>navigation.navigate('QRScanner',{field:7})} style={{marginTop:30,backgroundColor:'#f4d58d',elevation:4,borderRadius:10,padding:2}}>
+  <LottieView
+            source={require('../assets/scanning.json')}
+            loop
+            autoPlay
+            style={{width:60,height:50}}
+            />
+            </TouchableOpacity>
+            </View>
           <TouchableOpacity style={styles.button}  onPress={()=>  navigation.navigate('UnloadingEntry', {
                 Unloading: '',
               })}>
             <Text style={styles.text}>View Details</Text>
           </TouchableOpacity>
-          {/* // onPress={() => {
-          //   navigation.navigate('ShowUnloadingDetails');
-          // }}> */}
+         
          
         </View>
       )}
@@ -212,7 +222,7 @@ const Unloading = () => {
 const styles = StyleSheet.create({
   inputContainer: {
     height: 55,
-    width: 300,
+    width: 220,
     backgroundColor: '#9894e6',
     // backgroundColor:"black",
     flexDirection: 'row',

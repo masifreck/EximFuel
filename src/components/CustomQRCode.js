@@ -26,6 +26,7 @@ import {
 import RNRestart from 'react-native-restart';
 const wW = Dimensions.get('screen').width;
 const wH = Dimensions.get('screen').height;
+import LottieView from 'lottie-react-native';
 const isFine = wW < 400;
 
 const CustomQRCode = ({route}) => {
@@ -141,6 +142,10 @@ const CustomQRCode = ({route}) => {
           case 6:
           params = { scannedEwayBillNo3: scannedValue };
           break;
+          case 7:
+            params = {scannedValue:scannedValue}
+            navigation.navigate('Unloading',params);
+            break;
         default:
           console.log('Invalid field value');
           break;
@@ -183,10 +188,8 @@ const CustomQRCode = ({route}) => {
   }
 
   return ( 
-    <KeyboardAvoidingView
-    style={{flex: 1, backgroundColor: 'white'}}
-    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    keyboardVerticalOffset={keyboardHeight}>
+
+      <View style={{flex:1}}> 
   <Camera
               style={[StyleSheet.absoluteFill,{flex:1,width:wW,
                 height:wH,zIndex:10
@@ -195,11 +198,27 @@ const CustomQRCode = ({route}) => {
               isActive={cameraActive}
               codeScanner={codeScanner}
             /> 
-      </KeyboardAvoidingView>
+              <LottieView
+        source={require('../assets/scanning.json')} // your Lottie file
+        autoPlay
+        loop
+        style={styles.lottieOverlay}
+      />
+      </View>
+     
 
   );
 };
-
+const styles=StyleSheet.create({
+    lottieOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: wW,
+    height: wH,
+    zIndex: 20, // ensure it's above the camera
+  },
+})
 
 
 export default CustomQRCode;

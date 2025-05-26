@@ -18,7 +18,7 @@ const Splash = ({navigation}) => {
     if (userId && password) {
       globalusername = userId;
       globalpassword = password;
-      console.log("i got admin password logging directly", userId, password);
+      //console.log("i got admin password logging directly", userId, password);
       navigation.replace('DrawerNavigation', {userId});
     } else {
       navigation.replace('Login');
@@ -30,10 +30,11 @@ const Splash = ({navigation}) => {
       {/* Lottie background animation */}
       
       <LottieView
-        source={require('../assets/splashanimation.json')}
+        source={require('../assets/truckanimation.json')}
         autoPlay
         loop
         style={StyleSheet.absoluteFillObject}
+        
       />
 
       {/* Overlay Texts */}

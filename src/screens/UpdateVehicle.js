@@ -5,7 +5,7 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  Animated,ScrollView
+  Animated,ScrollView,ImageBackground
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 // import {ScrollView} from 'react-native-gesture-handler';
@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import LoadingIndicator from '../components/LoadingIndicator';
 import useApiToken from '../components/Token';
+import { Dialog, ALERT_TYPE } from 'react-native-alert-notification';
 
 const UpdateVehicle = () => {
   const route = useRoute();
@@ -205,7 +206,22 @@ const UpdateVehicle = () => {
 
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
-
+          const showConfirmDialog = () => {
+    Dialog.show({
+      type: ALERT_TYPE.WARNING,
+      title: 'Are you sure?',
+      textBody: 'Do you really want to go to the Owner page?',
+      button: 'Yes',
+      cancelButton: 'No',
+      onPressButton: () => {
+        Dialog.hide();
+        navigation.navigate('OwnerDetails');
+      },
+      onPressCancelButton: () => {
+        Dialog.hide();
+      },
+    });
+  };
   return (
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       {IsLoading ? (
@@ -224,12 +240,49 @@ const UpdateVehicle = () => {
               }}>
               Vehicle Details
             </Text>
-
+  <ScrollView horizontal={true} style={{flexDirection:'row'}}>
+      <ImageBackground source={require('../assets/rcfrontnew.png')} imageStyle={{borderRadius:10}}
+      style={styles.dlCard}>
+      <Text
+        style={{
+          position: 'absolute',
+          top: 160,
+          left: 40,
+          color: vehicleDetails?.Code === 'VERIFIED' ? 'green' : 'red',
+          fontWeight:'bold'
+        }}
+      >
+        {vehicleDetails?.Code ? vehicleDetails.Code : ''}
+      </Text>
+      
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:85,left:150,fontWeight:'bold'}}>{FetchVehicleDetails?.VehicleNo?FetchVehicleDetails.VehicleNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:12,position:'absolute',top:90,left:260}}>{FetchVehicleDetails?.PermitNo?FetchVehicleDetails.PermitNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:88,left:373}}>{FetchVehicleDetails?.PermitExpiry?FetchVehicleDetails.PermitExpiry:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:125,left:148}}>{FetchVehicleDetails?.ChasisNo? FetchVehicleDetails.ChasisNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:167,left:148}}>{FetchVehicleDetails?.EngineNo? FetchVehicleDetails.EngineNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',top:205,left:148}}>{FetchVehicleDetails?.OwnerName?FetchVehicleDetails.OwnerName:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:242,left:148}}>{FetchVehicleDetails?.PUCCNo?FetchVehicleDetails.PUCCNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:285,left:148}}>{FetchVehicleDetails?.PUCCExpiry?FetchVehicleDetails.PUCCExpiry:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',top:326,left:148,}}>{FetchVehicleDetails?.NationalPermitExpiry?FetchVehicleDetails.NationalPermitExpiry:''}
+      </Text>
+      {/* fuel type */}
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:10,position:'absolute',bottom:46,left:20}}>{FetchVehicleDetails?.InsuranceNo?FetchVehicleDetails.InsuranceNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:13,position:'absolute',width:110,top:322,left:20}}>{FetchVehicleDetails?.InsuranceExpiry?FetchVehicleDetails.InsuranceExpiry:''}</Text>
+      
+      
+      </ImageBackground>
+      <ImageBackground source={require('../assets/rcnewback.png')} imageStyle={{borderRadius:10}}
+      style={styles.dlCard}>
+        <Text style={{color:'#020202',fontWeight:'bold',fontSize:18,position:'absolute',top:88,left:18,fontWeight:'bold'}}>{FetchVehicleDetails?.VehicleNo?FetchVehicleDetails.VehicleNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',bottom:50,left:200}}>{FetchVehicleDetails?.FitnessNo?FetchVehicleDetails.FitnessNo:''}</Text>
+      <Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',width:110,bottom:50,left:325}}>{FetchVehicleDetails?.FitnessExpiry?FetchVehicleDetails.FitnessExpiry:''}</Text>
+      </ImageBackground>
+                          </ScrollView>
             <Text style={styles.MandatoryText}>
               Mandatory Fields<Text style={{color: 'red'}}>*</Text>
             </Text>
 
-            <Text style={styles.levelText}>
+            {/* <Text style={styles.levelText}>
               Vehicle Registration No <Text style={{color: 'red'}}>*</Text>
             </Text>
             <View style={styles.inputContainer}>
@@ -247,11 +300,12 @@ const UpdateVehicle = () => {
                 editable={false}
                 onChangeText={text => setVehicleRegistrationNo(text)}
               />
-            </View>
+            </View> */}
 
             <Text style={styles.levelText}>
               Owner Name <Text style={{color: 'red'}}>*</Text>
             </Text>
+            <View style={{flexDirection:'row',gap:10,justifyContent:'center'}}>
             <Dropdown
               style={[styles.dropdown]}
               placeholderStyle={styles.placeholderStyle}
@@ -271,10 +325,14 @@ const UpdateVehicle = () => {
               }}
               onChangeText={text => setPanNumber(text)}
             />
+                <TouchableOpacity onPress={showConfirmDialog}>
+                          <Image source={require('../assets/adduser.png')} style={{width:50,height:50,marginRight:10}}/>
+                        </TouchableOpacity>
+                        </View>
             <Text style={styles.levelText}>
               VehicleTyres <Text style={{color: 'red'}}>*</Text>
             </Text>
-            <View style={styles.inputContainer}>
+         <View style={[styles.inputContainer, {marginBottom: 20}]}>
               <TextInput
                 placeholderTextColor={'#6c6f73'}
                 style={{
@@ -289,7 +347,7 @@ const UpdateVehicle = () => {
               />
             </View>
 
-            <Text style={styles.levelText}>Chassis Number</Text>
+            {/* <Text style={styles.levelText}>Chassis Number</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 placeholderTextColor={'#6c6f73'}
@@ -380,7 +438,7 @@ const UpdateVehicle = () => {
                 value={roadTax}
                 onChangeText={text => setRoadTax(text)}
               />
-            </View>
+            </View> */}
           </View>
           <TouchableOpacity style={styles.button} onPress={registertheVehicle}>
             <Text style={styles.text}>Update</Text>
@@ -399,7 +457,7 @@ const UpdateVehicle = () => {
 const styles = StyleSheet.create({
   dropdown: {
     height: 50,
-    width: '90%',
+    width: '72%',
     borderColor: 'black',
     // borderWidth: 0.5,
     borderRadius: 8,
@@ -407,6 +465,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#cedff0',
     paddingHorizontal: 15,
+    marginLeft:15
   },
   placeholderStyle: {
     fontSize: 15,
@@ -417,6 +476,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#6c6f73',
   },
+        dlCard: {
+height:350,
+width:570,
+  borderRadius: 10,
+  margin: 16,
+  padding: 12,
+  shadowColor: '#000',
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 5,
+},
   inputSearchStyle: {
     height: 40,
     fontSize: 15,

@@ -16,6 +16,7 @@ import CustomAlert from '../components/CustomAlert';
 import { CustomRequestOptionsAdmin } from '../components/CustomRequestOptions';
 import useApiToken from '../components/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Searching from '../components/Searching';
 
 const Vehicle = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState(null);
@@ -37,6 +38,7 @@ const Vehicle = () => {
   const [showToast, setShowToast] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [hasBorder, setHasBorder] = useState(false); // State for border
+  const [IsSearching,setIsSearching]=useState(false)
   const handleShowToast = () => {
     setShowToast(true);
 
@@ -66,6 +68,7 @@ const Vehicle = () => {
  const handleShowDetails = async redirectpage => {
   if (vehicleNo.length !== 0) {
     if (vehicleNo.length > 8 && vehicleNo.length < 13) {
+      setIsSearching(true);
       try {
         const { url, requestOptions } = CustomRequestOptionsAdmin(
           `https://Exim.Tranzol.com/api/VehicleApi/GetVehicleByNo?vehicleNo=${vehicleNo}`,
@@ -83,11 +86,27 @@ const Vehicle = () => {
           } else {
             const result = data.apiResult?.Result;
 
-            if (result === null || result?.VehicleNo === null) {
-              // Navigate to RegisterVehicle if vehicle not found
-              navigation.navigate('RegisterVehicle', {
-                vehicleNo: vehicleNo,
-              });
+        if (result === null || result?.VehicleNo === null) {
+  Alert.alert(
+    'Vehicle Not Registered',
+    'This vehicle is not registered. Do you want to register it?',
+    [
+      {
+        text: 'No',
+        style: 'cancel',
+      },
+      {
+        text: 'Yes',
+        onPress: () => {
+          navigation.navigate('RegisterVehicle', {
+            vehicleNo: vehicleNo,
+          });
+        },
+      },
+    ],
+    { cancelable: false }
+  );
+
             } else {
               // Vehicle found, navigate to the given redirect page
               navigation.navigate(redirectpage, {
@@ -104,6 +123,8 @@ const Vehicle = () => {
         console.log('An error occurred:', error);
         setErrorMessage('An error occurred');
         setShowAlert(true);
+      }finally{
+        setIsSearching(false)
       }
     } else {
       setErrorMessage('Enter Min 9 characters');
@@ -122,7 +143,13 @@ const Vehicle = () => {
   };
 
   return (
+    <>
+        {IsSearching?
+      (
+      <Searching/>):(
+   
     <ScrollView>
+  
       <View style={styles.container}>
         <View
           style={{
@@ -171,17 +198,17 @@ const Vehicle = () => {
           onPress={() => handleShowDetails('ShowVehicleDetails')}>
           <Text style={styles.buttonText}>Show Vehicle Details</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.button}
           onPress={() => handleShowDetails('UpdateVehicle')}>
           <Text style={styles.buttonText}>Update Vehicle Details</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
   <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('ManageVehicle')}>
           <Text style={styles.buttonText}>Manage Vehicle</Text>
         </TouchableOpacity>
-        <View style={styles.registerTextContainer}>
+        {/* <View style={styles.registerTextContainer}>
           <Text style={styles.blackText}>If Not Registered! </Text>
           <TouchableOpacity
             onPress={() => {
@@ -189,8 +216,9 @@ const Vehicle = () => {
             }}>
             <Text style={styles.blueText}>Click Here to Register.</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
+   
 
       <CustomAlert
         visible={showAlert}
@@ -203,7 +231,8 @@ const Vehicle = () => {
           <Text style={styles.toastText}>{errorMessage}</Text>
         </Animated.View>
       )}
-    </ScrollView>
+    </ScrollView> )}
+     </>
   );
 };
 

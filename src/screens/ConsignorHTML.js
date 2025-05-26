@@ -1,8 +1,8 @@
-import { ElBase64 } from "../components/Elbase";
+import {ElBase64} from '../components/Elbase';
 
-export const ConsignorHTML = (data, qrData)=>{
-console.log('qr data ON consignee html',qrData)
-  return`
+export const ConsignorHTML = (data, qrData) => {
+  console.log('qr data ON consignee html', qrData);
+  return `
       <!DOCTYPE html>
       <html>
       <head>
@@ -51,15 +51,15 @@ console.log('qr data ON consignee html',qrData)
     p {
       text-align: center;
       margin-top: -6px;
-      font-size: 10px;
+      font-size: 9px;
       margin-block-end: 0.5em;
     }
     h6 {
       align-self: center;
       margin-top: -8px;
       margin-left: 30px;
-      font-size: 14px;
-      margin-bottom: 4px;
+      font-size: 12px;
+      margin-bottom: 2px;
     }
     .caution
 {
@@ -70,14 +70,14 @@ console.log('qr data ON consignee html',qrData)
 }  
 h5 {
       text-align: left;
-      font-size: 11px;
+      font-size: 10px;
       width: 100%;
       margin-top: -10px;
     }  
 h4  {
       text-align: left;
       margin-top: -10px;
-      font-size: 11px;
+      font-size: 10px;
       width: 100%;
       margin-block-end: 0.9em;
       font-weight: lighter;
@@ -92,7 +92,7 @@ h4  {
     .center {
       text-align: left;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 10px;
       border-bottom: 1px solid #000;
       margin-top: 0px;
     }
@@ -147,13 +147,13 @@ border-bottom: 1px solid #000;
     td{
       margin-top: -10px;
       border: 1px solid #000;
-      padding: 5px;
-      font-size: 10px;
+      padding: 2px;
+      font-size: 9px;
     }
     th {
       border: 1px solid #000;
-      padding: 5px;
-      font-size: 10px;
+      padding: 2px;
+      font-size: 9px;
     } 
     .tbbg {
       background-color: #a09e9e;
@@ -177,7 +177,7 @@ border-bottom: 1px solid #000;
     }
     .sign{
       width: 20%;
-      margin-top: 40px;
+      margin-top: 20px;
     }
     .signtext{
       font-weight: bold;
@@ -187,10 +187,10 @@ border-bottom: 1px solid #000;
       margin-top: 20px;
     }
     .systemgen{
-      font-size: 12px;
+      font-size: 10px;
       font-weight: bolder;
       text-align: center;
-      margin-top: 10px;
+      margin-top: 1px;
     }
     .insuranceblockdiv{
       display: flex;
@@ -222,9 +222,9 @@ font-size: 12px;
 font-weight: bold;
     }
 .challan {
- font-size: 12px;
+ font-size: 10px;
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 10px;
   margin-left: 10px;
   width:150px;
 }
@@ -253,7 +253,7 @@ padding-left: 10px;
   align-items: flex-start;
 }
 .gstheading{
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
   margin-left: 20px;
   text-align: left;
@@ -280,7 +280,7 @@ padding-left: 10px;
   font-size: 16px;
   font-weight: bold;
   margin:auto;
-  margin-top:20px;
+  margin-top:2px;
   width:150px;
 }
 @media print {
@@ -296,7 +296,7 @@ padding-left: 10px;
     <div class="topsection">
       <div>
      
-  <img src="${ElBase64}" alt="Flowers in Chania" width="100" height="100">
+  <img src="${ElBase64}" alt="Flowers in Chania" width="70" height="70" margin-left="20">
   
    <p class="challan">Challan No.:${data.ChallanNo}</p>
 </div>
@@ -310,7 +310,7 @@ padding-left: 10px;
    <p class="challantype">CONSIGNOR COPY</p>
 </div>
 <div class="qr">
-<img src="data:image/png;base64,${qrData}" alt="QR Code" width="150" height="150" >
+<img src="data:image/png;base64,${qrData}" alt="QR Code" width="90" height="90" >
 </div>
 </div>
 <div class="secondblock" >
@@ -472,33 +472,33 @@ padding-left: 10px;
 
       <!-- Table Content with Bottom Lines -->
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000;">
-          <h4 style="font-weight: bold; margin: 2px 0; padding-left: 5px;">NO. of Bags:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">NO. of Bags:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;"></h4>
       </div>
 
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000;">
-          <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;">Receiving Wt:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Receiving Wt:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;"></h4>
       </div>
 
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000;">
-          <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;">Receiving Dt.:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Receiving Dt.:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;"></h4>
       </div>
 
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000;">
-          <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;">Remarks:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Remarks:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;"></h4>
       </div>
 
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000;">
-          <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;">Name of Receiving Person:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Name of Receiving Person:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;"></h4>
       </div>
 
       <div style="display: flex; justify-content: space-between;">
-          <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;">GRN No.:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">GRN No.:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;"></h4>
       </div>
 
     
@@ -515,8 +515,8 @@ padding-left: 10px;
           <h4 style="margin: 5px 0; padding-left: 5px;">${data.EwayBillNo1} ${data.EwayBillNo2} ${data.EwayBillNo3}</h4>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"GPS No.></h4>
-        <h4 style="margin: 5px 0; padding-left: 5px;">${data.GPSNo}</h4>
+        <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">GPS No.</h4>
+        <h4 style="margin: 1px 0; padding-left: 5px;">${data.GPSNo}</h4>
     </div>
     <div style="display: flex; justify-content: space-between;">
       <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
@@ -526,29 +526,15 @@ padding-left: 10px;
     <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
     <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
 </div>
-<div style="display: flex; justify-content: space-between;">
-  <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
-  <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
-</div>
-<div style="display: flex; justify-content: space-between;">
-  <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
-  <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
-</div>
-<div style="display: flex; justify-content: space-between;">
-  <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
-  <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
-</div>
-<div style="display: flex; justify-content: space-between;">
-  <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
-  <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
-</div>
+
+
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000; margin-top: 2px;">
         <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px ;">Signature & Seal:</h4>
         <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
     </div>
       <div style="display: flex; justify-content: space-between;">
-          <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;">Remarks:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;">${data.Remarks}</</h4>
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Remarks:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;">${data.Remarks}</</h4>
       </div>
   </div>
 </div>
@@ -596,8 +582,69 @@ padding-left: 10px;
     
     </div>
     <p class="systemgen">**SYSTEM GENERATED**</p>
+    <div style="display:flex; flex-drirection:row; justify-content:center; gap:10px;padding:5px">
+    <div style="text-align: justify;">
+    <p style="font-size:8px;text-align: justify;">TERMS AND CONDITIONS
+
+Goods are accepted and carried under the terms and conditions.</p>
+  <p style="font-size:8px;text-align: justify;">
+01. Subject to order of the company's proper business policy and good will of the company. Anybody carrying, selling, or purchasing if in the name of company, in any form, for the purpose of making profit, without the written consent of the company's board would attract criminal proceedings as per Law of the Country.
+</p>
+  <p style="font-size:8px;text-align: justify;">
+02. The freight is for the whole consignment. No part load or part payment will be considered for payment and the Balance Payment would be forfeited by the company.
+</p>
+  <p style="font-size:8px;text-align: justify;">
+03. The freight is accepted for the transport by air, road and rail entirely at the risk and responsibilities of the Consignor.
+</p>
+  <p style="font-size:8px;text-align: justify;">
+04. The company will not receive or carry goods banned by Law. Transportation of Explosives, inflammable and chemical hazardous items should have proper Permission / Licence from the Government and Way Bill. This type of goods should be properly packed and loaded by proper persons with proper instruments. Weight / measurements of all goods / parcels of goods should be intimated to the company beforehand, so that proper vehicle with necessary carrying licence could be arranged by the company. And if due to any wrong information and concealment of facts by the Consignor, the company suffers from any penalty, loss, damage or confiscation of goods from the State as per the demand of the company, the decision of the Company in this regard is final and binding on the Consignor.
+</p>
+  <p style="font-size:8px;text-align: justify;">
+05. The company will not be responsible for any loss or damage to the goods arising out of the Act of God, unexpected and unforeseen circumstances, riots, emergencies, riot and civil commotion, theft, robbery, fire, accident and any kind of accident whatsoever.
+</p>
+  <p style="font-size:8px;text-align: justify;">
+06. All the material loading by the transporter company is always being done in the presence of the owner / driver owner's representative(s) / company's employee(s) appointed by the owner / driver (owner's representative), unanimously certified by the owner / driver (owners representative). In case the said materials found damaged / contaminated / pilferage / mixed with other goods / less amount of materials / less weight of goods / less quantity of goods as per laboratory report / manual comparison to the loading point weight mineral, found with more moisture than the loading point analyzed moisture,
+ then the entire loading of the losses including fine, penalty with statutory levy / taxes / GST over the losses as applicable by different central / state govt. agencies / bodies / department and offices from the driver / owner will have to be compensated by the driver / owner from his own account during the period, such losses / damages will be finalized with the appointment of 3rd party surveyor (if satisfied by the owner / driver) and till the period such losses / damages to be paid / compensated by the owner / driver owner's representative(s) in full with the Company's Headquarter (Company) / Branch office (Company) / Sub-Branch office (Company) or 3rd party, the company can take any legal action against the owner / driver (owner's representative) of the vehicle as deemed
+  fit in that case to recover the loss. Delay payment of losses includes legal/bank interest.
+ </p>
+    </div>
+
+    <div>
+<p style="font-size:8px;text-align: justify;">
+     then the entire loading of the losses including fine, penalty with statutory levy / taxes / GST over the losses as applicable by different central / state govt. agencies / bodies / department and offices from the driver / owner will have to be compensated by the driver / owner from his own account during the period, such losses / damages will be finalized with the appointment of 3rd party surveyor (if satisfied by the owner / driver) and till the period such losses / damages to be paid / compensated by the owner / driver owner's representative(s) in full with the Company's Headquarter (Company) / Branch office (Company) / Sub-Branch office (Company) or 3rd party, the company can take any legal action against the owner / driver (owner's representative) of the vehicle as deemed
+  fit in that case to recover the loss. Delay payment of losses includes legal/bank interest.</p>
+    <p style="font-size:8px;text-align: justify;">07. During and on timely required E-Way Bill of the loaded materials shall exclusively done by the driver of the vehicle failing which if the vehicle enters into any kind of violations regarding E-Way Bill, the loss caused out of the same reason shall be borne by the driver.
+</p>
+<p style="font-size:8px;text-align: justify;">
+08. The company reserve the right to itself for cancellation of transport, detention and delay delivery at the destination.
+</p>
+<p style="font-size:8px;text-align: justify;">
+09. All cases regarding the consignment would be settled only at Bhubaneswar, subject to the company rules, regulations and that is final and binding on the consignor.
+</p>
+<p style="font-size:8px;text-align: justify;">
+10. Perishable goods are accepted at Consignor's risk.
+</p>
+<p style="font-size:8px;text-align: justify;">
+11. The employees and the agents of the company are not authorised to alter the above Terms and Conditions in any case.
+</p>
+<p style="font-size:8px;text-align: justify;">
+12. All the charges applicable / collected by the agencies of the Government, on the way should be paid by the consignee.
+</p>
+<p style="font-size:8px;text-align: justify;">
+13. The company is not responsible for any leakage and breakage of the goods, whatever the cause may be.
+</p>
+<p style="font-size:8px;text-align: justify;">
+DECLARATION
+
+I................................................................................................................................................................ driver of the Vehicle No........................................ vide valid DL No..................................................... do here by declare that I have read and understood the above mentioned Terms and Condition properly and again hereby promising to be abided myself with all the terms and condition.
+
+Signature
+
+DRIVER </p>
+    </div>
+    </div>
   </div>
 </body>
       </html>
-    `};
-  
+    `;
+};
