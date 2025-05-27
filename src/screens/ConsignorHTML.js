@@ -298,7 +298,7 @@ padding-left: 10px;
      
   <img src="${ElBase64}" alt="Flowers in Chania" width="70" height="70" margin-left="20">
   
-   <p class="challan">Challan No.:${data.ChallanNo}</p>
+   
 </div>
   <div class="exim">
   <h1>EXIM LOGISTICS PVT. LTD.</h1>
@@ -307,10 +307,12 @@ padding-left: 10px;
   <p>Bhubaneswar-751024, Odisha, India, Phone: (0674) 7107777 to 7887 (110 Lines)</p>
   <p>E-mail:info@eximlogistics.in, Website: www.eximlogistics.com</p>
   <p>CIN NO.: U630120R2006PTC06039</p>
-   <p class="challantype">CONSIGNOR COPY</p>
+  
 </div>
 <div class="qr">
-<img src="data:image/png;base64,${qrData}" alt="QR Code" width="90" height="90" >
+<img src="data:image/png;base64,${qrData}" alt="QR Code" width="30" height="30" >
+ <p class="challantype">CONSIGNOR COPY</p>
+ <p class="challan">Challan No.:${data.ChallanNo}</p>
 </div>
 </div>
 <div class="secondblock" >

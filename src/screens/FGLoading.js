@@ -7,7 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Animated,
-  TextInput
+  TextInput,KeyboardAvoidingView      
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 // import {TextInput} from 'react-native-gesture-handler';
@@ -15,6 +15,11 @@ import {useNavigation} from '@react-navigation/native';
 import CustomAlert from '../components/CustomAlert';
 import useApiToken from '../components/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from '../components/Loading';
+import { Dropdown } from 'react-native-element-dropdown';
+import {  Dimensions } from "react-native";
+import { textColor } from '../components/constant';
+const ScreenWidth = Dimensions.get('window').width;
 const OwnerDetails = () => {
   const navigation = useNavigation();
   const [challanNumber, setchallanNumber] = useState('');
@@ -37,6 +42,23 @@ const OwnerDetails = () => {
   const [showToast, setShowToast] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [hasBorder, setHasBorder] = useState(false); // State for border
+ const [isFocus, setIsFocus] = useState(false);
+   const [jobId,setJobId]=useState('')
+
+    const [jobData,setJobData]=useState([])
+    const [vehicleData,setVehicleData]=useState([])
+    const [driverData,setDriverData]=useState([])  
+
+      const [searchTerm, setSearchTerm] = useState('');
+      const [searchVehicle,setSearchVehicle]=useState('')
+      const [searchDriver,setSearchDriver]=useState('')
+  const [selectedJobNo,setSelectedJobNo]=useState('')
+  const [selectedVehicleNo,setSelectedVehicleNo]=useState('');
+   const [vehicleId, setVehicleId] = useState('');
+    const [driverId, setDriverId] = useState('');
+    const [jobNo,setJobNo]=useState('');
+      const [vehicleNo,setVehicleNo]=useState('');
+      const [driverName,setDriverName]=useState('')
   const handleShowToast = () => {
     setShowToast(true);
 
@@ -121,12 +143,232 @@ const OwnerDetails = () => {
       }
     }
   };
+  useEffect(() => {
+    if (searchDriver) {
+      fetchDriver(searchDriver);
+    }
+  }, [searchDriver]);
+  const fetchDriver = async (search) => {
+    try {
+      console.log('Fetching vehicle with search:', search);
+      const encodedSearch = encodeURIComponent(search);
+      const url = `https://exim.tranzol.com/api/DropDown/Driver?search=${encodedSearch}`;
+      console.log('Request URL:', url);
   
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+  
+        if (data.DriverList) {
+          // Corrected to use VehicleNoList
+          const driverData = data.DriverList.map((Driver) => ({
+            label: Driver.PartyName,
+            value: Driver.Id,
+          }));
+          setDriverData(driverData);
+        } else {
+          console.log('DriverList missing in the response');
+        }
+      } else {
+        console.log('Error in fetching DriverList no:', response.status);
+      }
+    } catch (error) {
+      console.log('Error in fetching DriverList no:', error);
+    }
+  };
+  useEffect(() => {
+    if (searchVehicle) {
+      fetchVehicle(searchVehicle);
+    }
+  }, [searchVehicle]);
+  const fetchVehicle = async (search) => {
+    try {
+      console.log('Fetching vehicle with search:', search);
+      const encodedSearch = encodeURIComponent(search);
+      const url = `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${encodedSearch}`;
+      console.log('Request URL:', url);
+  
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+  
+        if (data.VehicleNoList) {
+          // Corrected to use VehicleNoList
+          const vehicleData = data.VehicleNoList.map((vehicle) => ({
+            label: vehicle.VehicleNo,
+            value: vehicle.VehicleId,
+          }));
+          setVehicleData(vehicleData);
+        } else {
+          console.log('VehicleNoList is missing in the response');
+        }
+      } else {
+        console.log('Error in fetching vehicle no:', response.status);
+      }
+    } catch (error) {
+      console.log('Error in fetching vehicle no:', error);
+    }
+  };
+  
+  useEffect(() => {
+    if (selectedVehicleNo) {
+      console.log('in useEffect', jobNo, selectedVehicleNo);
+  
+      const fetchOwnerName = async () => {
+        try {
+          console.log('Fetching JobOther:', selectedVehicleNo);
+          const encodedSearch = encodeURIComponent(selectedVehicleNo);
+          const url = `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${encodedSearch}`;
+          console.log('Request URL:', url);
+  
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+            },
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            console.log('API Response:', data);
+  
+            if (data.VehicleNoList && data.VehicleNoList.length > 0) {
+              
+            setOwnerName(data.VehicleNoList[0].OwnerName)
+            setOwnerId(data.VehicleNoList[0].OwnerId)
+              console.log('ownerId:', data.VehicleNoList[0].OwnerId);
+            } else {
+              console.log('vehicle ownerlist is empty or missing in the response');
+            }
+          } else {
+            console.log('Error in fetching owner name no:', response.status);
+          }
+        } catch (error) {
+          console.log('Error in fetching owner name no:', error);
+        }
+      };
+  
+      fetchOwnerName(); // Call the function to fetch job details
+    }
+  }, [selectedVehicleNo]);
+  
+  // Function to fetch job numbers based on search input
+  const fetchJob = async (search) => {
+    try {
+      console.log('Fetching jobs with search:', search);
+      const encodedSearch = encodeURIComponent(search);
+      const url = `https://exim.tranzol.com/api/DropDown/Jobno?search=${encodedSearch}`;
+      console.log('Request URL:', url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        
+        if (data.JobList) {
+          const jobData = data.JobList.map((job) => ({
+            label: job.JobNo,
+            value: job.JobId,
+          }));
+          setJobData(jobData);
+           
+        } else {
+          console.log('JobList is missing in the response');
+        }
+      } else {
+        console.log('Error in fetching Job no:', response.status);
+      }
+    } catch (error) {
+      console.log('Error in fetching job no:', error);
+    }
+  };
+  useEffect(() => {
+    if (searchTerm) {
+      fetchJob(searchTerm);
+    }
+  }, [searchTerm]);
+  useEffect(() => {
+    if (selectedJobNo) {
+      console.log('in useEffect', jobNo, selectedJobNo);
+  
+      const fetchJobOthers = async () => {
+        try {
+          console.log('Fetching JobOther:', selectedJobNo);
+          const encodedSearch = encodeURIComponent(selectedJobNo);
+          const url = `https://exim.tranzol.com/api/DropDown/Jobno?search=${encodedSearch}`;
+          console.log('Request URL:', url);
+  
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+            },
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            console.log('API Response:', data);
+  
+            if (data.JobList && data.JobList.length > 0) {
+              const { LoadingPoint } = data.JobList[0]; // Get the first job's LoadingPoint
+              // setLoadingPoint(LoadingPoint);
+              // setUnLoadingPoint(data.JobList[0].UnloadingPoint)
+              // setMaterialType(data.JobList[0].MaterialName)
+              // setConsigneeType(data.JobList[0].ConsigneeName)
+              // setConsignorType(data.JobList[0].ConsignorName)
+              // setLoadingPointId(data.JobList[0].LoadingPointId)
+              // setUnLoadingPointId(data.JobList[0].UnloadingPointId)
+              // setConsignorId(data.JobList[0].ConsignorId)
+              // setConsigneeId(data.JobList[0].ConsigneeId)
+              // setMaterialId(data.JobList[0].MaterialId)
+              // console.log('Loading Point:', LoadingPoint);
+              // console.log('loading id',loadingPointId);
+              // console.log('unloading id',unloadingPointId)
+              // console.log('consignor id',consignorId)
+              // console.log('consignee id',consigneeId)
+              // console.log('material id',materialId)
+            } else {
+              console.log('JobList is empty or missing in the response');
+            }
+          } else {
+            console.log('Error in fetching Job no:', response.status);
+          }
+        } catch (error) {
+          console.log('Error in fetching job no:', error);
+        }
+      };
+  
+      fetchJobOthers(); // Call the function to fetch job details
+    }
+  }, [selectedJobNo]);
 
   return (
+        <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
     <ScrollView>
       {isLoading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <Loading />
       ) : (
         <View
           style={{
@@ -158,7 +400,103 @@ const OwnerDetails = () => {
               resizeMode="contain"
             />
           </View>
+           <View>
+   <Text style={styles.levelText}>
+          Job No 
+        </Text>
+       
+        
+        <Dropdown
+  style={styles.dropdown}
+  placeholderStyle={styles.placeholderStyle}
+  selectedTextStyle={styles.selectedTextStyle}
+  inputSearchStyle={styles.inputSearchStyle}
+  itemTextStyle={{color: 'black'}}
+  data={jobData}  // Updated job data from API
+  search
+  maxHeight={300}
+  labelField="label"
+  valueField="value"
+  placeholder={'Select Job No'}
+  value={jobNo}
+  onFocus={() => setIsFocus(true)}
+  onBlur={() => setIsFocus(false)}
+  onChange={item => {
+    setJobNo(item.value);  // Set selected job number
+    setSelectedJobNo(item.label)
+    setJobId(item.value)
+    
+    console.log('Selected Job ID:', item.value,selectedJobNo,item.label);  // Log the selected job ID
+    setIsFocus(false);
+  }}
+  onChangeText={text => {
+    setSearchTerm(text);  // Update searchTerm as user types
+  }}
+/>
+         </View>
 
+<View>
+             <Text style={styles.levelText}>
+                Vehicle No <Text style={{color: 'red'}}>*</Text>
+              </Text>
+        <Dropdown
+  style={styles.dropdown}
+  placeholderStyle={styles.placeholderStyle}
+  selectedTextStyle={styles.selectedTextStyle}
+  inputSearchStyle={styles.inputSearchStyle}
+  itemTextStyle={{color: 'black'}}
+  data={vehicleData}  // Updated job data from API
+  search
+  maxHeight={300}
+  labelField="label"
+  valueField="value"
+  placeholder={'Select Vehicle No'}
+  value={vehicleNo}
+  onFocus={() => setIsFocus(true)}
+  onBlur={() => setIsFocus(false)}
+  onChange={item => {
+    setVehicleNo(item.value);  // Set selected job number
+    setSelectedVehicleNo(item.label)
+    setVehicleId(item.value)
+    console.log('Selected Vehicle ID:', item.value,selectedVehicleNo,);  // Log the selected job ID
+    setIsFocus(false);
+  }}
+  onChangeText={text => {
+    setSearchVehicle(text);
+  }}
+/>
+</View>
+<View>
+   <Text style={styles.levelText}>
+          Driver<Text style={{color: 'red'}}>*</Text>
+        </Text>
+       
+        
+        <Dropdown
+  style={styles.dropdown}
+  placeholderStyle={styles.placeholderStyle}
+  selectedTextStyle={styles.selectedTextStyle}
+  inputSearchStyle={styles.inputSearchStyle}
+  itemTextStyle={{color: 'black'}}
+  data={driverData}  // Updated job data from API
+  search
+  maxHeight={300}
+  labelField="label"
+  valueField="value"
+  placeholder={'Select Driver'}
+  value={driverName}
+  onFocus={() => setIsFocus(true)}
+  onBlur={() => setIsFocus(false)}
+  onChange={item => {
+    setDriverId(item.value),
+    setDriverName(item.value)
+    setIsFocus(false);
+  }}
+  onChangeText={text => {
+    setSearchDriver(text);
+  }}
+/>
+</View>
           <View
             style={[
               styles.inputContainer,
@@ -189,6 +527,10 @@ const OwnerDetails = () => {
               onChangeText={text => setchallanNumber(text)}
             />
           </View>
+     <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('FGLoadingEntry')}>
+            <Text style={styles.text}>Generate Challan</Text>
+          </TouchableOpacity>
+
 
           <TouchableOpacity style={styles.button} onPress={handleShowDetails}>
             <Text style={styles.text}>Show Challan Details</Text>
@@ -226,7 +568,7 @@ const OwnerDetails = () => {
         </View>
       )}
       <CustomAlert
-        visible={showAlert}
+        visible={showAlert} 
         message={errorMessage}
         onClose={closeAlert}
       />
@@ -237,6 +579,7 @@ const OwnerDetails = () => {
         </Animated.View>
       )}
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -296,6 +639,39 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 3,
     elevation: 10, // This is for Android
+  },
+    dropdown: {
+    height: 50,
+    width: ScreenWidth * 0.8,
+    borderColor: 'black',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    alignSelf: 'center',
+    backgroundColor: '#9894e6',
+    paddingHorizontal: 15,
+  },
+  placeholderStyle: {
+    fontSize: 15,
+    color: textColor,
+  },
+  selectedTextStyle: {
+    fontSize: 15,
+    color: 'black',
+    fontWeight:'bold'
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 15,
+    color: '#6c6f73',
+  },
+   levelText: {
+    //alignItems: 'flex-start',
+    padding: 5,
+    marginLeft: '2%',
+    color: 'black',
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
+    textAlign:'left'
   },
 });
 

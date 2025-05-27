@@ -122,7 +122,8 @@ console.log('data',data.apiResult.Result)
             setFetchedData(data.apiResult.Result);
 setQRValue(`${data.apiResult.Result.ChallanNo}|${data.apiResult.Result.LoadDate}|${data.apiResult.Result.VehicleNo}`);
 navigation.navigate('qrcode', { 
-  qrValue: `${data.apiResult.Result.ChallanNo}|${data.apiResult.Result.LoadDate}|${data.apiResult.Result.VehicleNo}`, 
+  qrValue: `${data.apiResult.Result.ChallanNo}`, 
+  // |${data.apiResult.Result.LoadDate}|${data.apiResult.Result.VehicleNo}
   fetchedData: data.apiResult.Result, 
   selectedPrint 
 });

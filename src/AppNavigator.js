@@ -40,6 +40,7 @@ import { QRCodeGenerator } from './components/qrCodeGenerator';
 import ManageOwner from './screens/ManageOwner';
 import ManageDriver from './screens/ManageDriver';
 import ManageVehicle from './screens/ManageVehicle'
+import FGLoadingEntry from './screens/FGLoadingEntry';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -263,6 +264,11 @@ const AppNavigator = () => {
           name="NewChalan"
           component={NewChalan}
           options={getScreenOptions('New Challan')}
+        />
+        <Stack.Screen
+        name='FGLoadingEntry'
+        component={FGLoadingEntry}
+        options={getScreenOptions('Create New Challan')}
         />
          <Stack.Screen
   name='QRScanner' 

@@ -4,7 +4,7 @@ import LottieView from 'lottie-react-native'
 
 const Loading = () => {
   return (
-    <View>
+    <View style={{flex:1}}>
       <LottieView
       source={require('../assets/loading.json')}
       style={StyleSheet.absoluteFillObject}

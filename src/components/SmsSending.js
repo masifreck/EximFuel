@@ -18,7 +18,6 @@ const SmsSending = () => {
         loop
         style={StyleSheet.absoluteFillObject}
       />
-
     </View>
   );
 };
