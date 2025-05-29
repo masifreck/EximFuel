@@ -22,7 +22,7 @@
 //             fontSize: 18,
 //             marginBottom: 8,
 //             marginTop: 8,
-//             color: '#453D98ff',
+//             color: darkBlue,
 //             textAlign: 'center',
 //             fontFamily: 'PoppinsBold',
 //           }}>
@@ -34,8 +34,8 @@
 //           <Uploading
 //             progress={0.8}
 //             width={deviceWidth * 0.6}
-//             color={'#453D98ff'}
-//             borderColor={'#453D98ff'}
+//             color={darkBlue}
+//             borderColor={darkBlue}
 //           />
 
 //           <TouchableOpacity onPress={() => {}}>
@@ -51,8 +51,8 @@
 //           <Uploading
 //             progress={0.8}
 //             width={deviceWidth * 0.6}
-//             color={'#453D98ff'}
-//             borderColor={'#453D98ff'}
+//             color={darkBlue}
+//             borderColor={darkBlue}
 //           />
 
 //           <TouchableOpacity onPress={() => {}}>
@@ -68,8 +68,8 @@
 //           <Uploading
 //             progress={0.8}
 //             width={deviceWidth * 0.6}
-//             color={'#453D98ff'}
-//             borderColor={'#453D98ff'}
+//             color={darkBlue}
+//             borderColor={darkBlue}
 //           />
 
 //           <TouchableOpacity onPress={() => {}}>
@@ -85,8 +85,8 @@
 //           <Uploading
 //             progress={0.8}
 //             width={deviceWidth * 0.6}
-//             color={'#453D98ff'}
-//             borderColor={'#453D98ff'}
+//             color={darkBlue}
+//             borderColor={darkBlue}
 //           />
 
 //           <TouchableOpacity onPress={() => {}}>
@@ -102,8 +102,8 @@
 //           <Uploading
 //             progress={0.8}
 //             width={deviceWidth * 0.6}
-//             color={'#453D98ff'}
-//             borderColor={'#453D98ff'}
+//             color={darkBlue}
+//             borderColor={darkBlue}
 //           />
 
 //           <TouchableOpacity onPress={() => {}}>

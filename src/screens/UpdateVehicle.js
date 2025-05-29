@@ -16,7 +16,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import LoadingIndicator from '../components/LoadingIndicator';
 import useApiToken from '../components/Token';
 import { Dialog, ALERT_TYPE } from 'react-native-alert-notification';
-
+import { darkBlue } from '../components/constant';
 const UpdateVehicle = () => {
   const route = useRoute();
   const [apiTokenReceived, setapiTokenReceived] = useState(null);
@@ -234,7 +234,7 @@ const UpdateVehicle = () => {
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -561,7 +561,7 @@ width:570,
     width: 20,
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 20,
     marginBottom: 40,

@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
-
+import { darkBlue } from '../components/constant';
 const TableRow = ({title, value, color}) => (
   <View style={styles.tableRow}>
     <View style={styles.leftColumn}>
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     width: 20,
   },
   levelText: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontSize: 20,
     fontWeight: '900',
     paddingTop: 15,

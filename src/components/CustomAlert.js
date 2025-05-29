@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { darkBlue } from './constant';
 const CustomAlert = ({ visible, message, onClose }) => {
   return (
     <Modal
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     fontFamily:"PoppinsMedium"
   },
   closeButton: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontSize: 16,
     fontWeight: 'bold',
     fontFamily:"PoppinsBold"

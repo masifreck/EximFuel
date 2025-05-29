@@ -4,7 +4,7 @@ import Home from '../screens/Home';
 import Notification from '../screens/Notification';
 import Help from '../screens/Help';
 import Logout from './Logout';
-
+import { darkBlue } from './constant';
 const ButtomBar = () => {
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: 80,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   defaultButton: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
   },
   clickedButton: {
     backgroundColor: '#f1f5ff',
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     width: 24,
   },
   clickedIcon: {
-    tintColor: '#453D98ff',
+    tintColor: darkBlue,
   },
   copyright: {
     color: 'white',

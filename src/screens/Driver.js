@@ -16,6 +16,7 @@ import {CustomRequestOptionsAdmin} from '../components/CustomRequestOptions';
 import useApiToken from '../components/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Searching from '../components/Searching';
+import { darkBlue } from '../components/constant';
 const OwnerDetails = () => {
   const navigation = useNavigation();
   const [apiTokenReceived, setapiTokenReceived] = useState(null);
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
   image: {
     height: 200,
     width: '100%',
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
   },
   inputContainer: {
@@ -308,7 +309,7 @@ const styles = StyleSheet.create({
     tintColor: 'black',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 30,
     marginBottom: 20,
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button1: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginBottom: 20,
     height: 50,
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsSemiBold',
   },
   linkText: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsMedium',
   },
   blueText: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontSize: 14,
     // fontWeight: '500',
     fontFamily: 'PoppinsBold',

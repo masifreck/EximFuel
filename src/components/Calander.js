@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Modal, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
-
+import { darkBlue } from './constant';
 const CalendarModal = ({ visible, onClose, onSelect }) => {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [convselectedStartDate, setConvSelectedStartDate] = useState(null);
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   alertContainer: {
     width: 350,
     height: 420,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,

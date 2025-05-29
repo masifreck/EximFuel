@@ -143,7 +143,7 @@ const OwnerDetails = () => {
             style={{
               height: 200,
               width: '100%',
-              backgroundColor: '#453D98ff',
+              backgroundColor: darkBlue,
               borderRadius: 10,
             }}
           />
@@ -218,7 +218,7 @@ const OwnerDetails = () => {
             }}>
             <Text
               style={{
-                color: '#453D98ff',
+                color: darkBlue,
                 fontSize: 14,
                 // fontWeight: '500',
                 fontFamily: 'PoppinsBold',
@@ -234,12 +234,12 @@ const OwnerDetails = () => {
         message={errorMessage}
         onClose={closeAlert}
       />
-      {showToast && (
-        <Animated.View
-          style={[styles.toastContainer, {opacity: fadeAnim, zIndex: 999}]}>
-          <Text style={styles.toastText}>{errorMessage}</Text>
-        </Animated.View>
-      )}
+        {/* {showToast && (
+          <Animated.View
+            style={[styles.toastContainer, {opacity: fadeAnim, zIndex: 999}]}>
+            <Text style={styles.toastText}>{errorMessage}</Text>
+          </Animated.View>
+        )} */}
     </ScrollView>
   );
 };

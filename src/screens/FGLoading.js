@@ -19,6 +19,7 @@ import Loading from '../components/Loading';
 import { Dropdown } from 'react-native-element-dropdown';
 import {  Dimensions } from "react-native";
 import { textColor } from '../components/constant';
+import { darkBlue } from '../components/constant';
 import SelectButton from '../components/SelectButton';
 const ScreenWidth = Dimensions.get('window').width;
 const OwnerDetails = () => {
@@ -401,7 +402,7 @@ const OwnerDetails = () => {
                 width: '100%',
                 height: '100%',
                 borderRadius: 10,
-                backgroundColor: '#453D98ff',
+                backgroundColor: darkBlue,
               }}
               resizeMode="contain"
             />
@@ -559,7 +560,7 @@ const OwnerDetails = () => {
               flexDirection: 'column',
               alignItems: 'center',
             }}>
-            {/* <Text
+            <Text
               style={{
                 color: 'black',
                 fontSize: 18,
@@ -573,7 +574,7 @@ const OwnerDetails = () => {
               }}>
               <Text
                 style={{
-                  color: '#453D98ff',
+                  color: darkBlue,
                   fontSize: 18,
                   // fontWeight: '500',
                   fontFamily: 'PoppinsBold',
@@ -581,7 +582,7 @@ const OwnerDetails = () => {
                 }}>
                 Click Here.
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
       
         </View>
@@ -625,7 +626,7 @@ const styles = StyleSheet.create({
     tintColor: 'black',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 30,
     marginBottom: 20,

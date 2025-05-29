@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
-
+import { darkBlue } from './constant';
 const {height, width} = Dimensions.get('window');
 
 const Header = () => {
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   header: {
     width: width,
     height: 60,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

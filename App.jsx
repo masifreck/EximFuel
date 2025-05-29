@@ -3,15 +3,19 @@ import AppNavigator from './src/AppNavigator';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 
-// ✅ Import AlertNotificationRoot
+// AlertNotification
 import { AlertNotificationRoot } from 'react-native-alert-notification';
+
+// Toast
+import Toast from 'react-native-toast-message';
 
 const App = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* ✅ Wrap the navigator in AlertNotificationRoot */}
       <AlertNotificationRoot>
         <AppNavigator />
+        {/* ✅ Add Toast component at the root */}
+        <Toast />
       </AlertNotificationRoot>
     </GestureHandlerRootView>
   );

@@ -17,7 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { darkBlue } from '../components/constant';
 const Home = () => {
   const navigation = useNavigation();
   const [userId, setUserid] = useState('');
@@ -71,14 +71,14 @@ const Home = () => {
       <ScrollView>
         <View style={{height: 180}}>
           <LinearGradient
-            colors={['#453D98ff', '#453D98ff']}
+            colors={[darkBlue, darkBlue]}
             style={styles.searchBarLevel}>
             <Text style={styles.welcomeTxt}>WELCOME</Text>
             <Text style={styles.name}>{userId}</Text>
           </LinearGradient>
 
           <View style={styles.searchBar}>
-            <View style={{backgroundColor: '#453D98ff', width: '35%'}}>
+            <View style={{backgroundColor: darkBlue, width: '35%'}}>
               <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '85%',
     marginLeft: 20,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
   },
   placeholderStyle: {
     fontSize: 16,

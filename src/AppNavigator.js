@@ -41,6 +41,7 @@ import ManageOwner from './screens/ManageOwner';
 import ManageDriver from './screens/ManageDriver';
 import ManageVehicle from './screens/ManageVehicle'
 import FGLoadingEntry from './screens/FGLoadingEntry';
+import { darkBlue } from './components/constant';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -48,7 +49,7 @@ const AppNavigator = () => {
     return {
       headerShown: true,
       headerStyle: {
-        backgroundColor: '#453D98ff',
+        backgroundColor: darkBlue,
       },
       headerTintColor: 'white',
       title: title,

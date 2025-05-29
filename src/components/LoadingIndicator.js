@@ -13,7 +13,7 @@ const LoadingIndicator = () => {
           flex: 1,
           justifyContent: 'center',
           alignSelf: 'center',
-          color: '#453D98ff',
+          color: darkBlue,
           // fontWeight: '900',
           fontSize: 15,
           marginBottom: 10,

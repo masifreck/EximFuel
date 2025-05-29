@@ -14,6 +14,7 @@ import CustomFilePicker from './CustomFilePicker';
 import CalendarModal from './Calander';
 import { styles } from './Step4Styles';
 import { data, LoadtypeData } from './DropDownData';
+import { darkBlue } from './constant';
 const Step4 = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -536,7 +537,7 @@ useEffect(()=>{
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>

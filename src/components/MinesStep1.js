@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import CalendarPicker from 'react-native-calendar-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApiToken from './Token';
+import { darkBlue } from './constant';
 const deviceWidth = Dimensions.get('window').width;
 
 const MinesStep1 = () => {
@@ -247,7 +248,7 @@ const MinesStep1 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>
@@ -419,7 +420,7 @@ const MinesStep1 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>
@@ -649,7 +650,7 @@ const styles = StyleSheet.create({
   alertContainer: {
     width: 400,
     height: 450,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -672,7 +673,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,

@@ -1043,7 +1043,7 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
              fontSize: 18,
              marginBottom: 8,
              marginTop: 8,
-             color: '#453D98ff',
+             color: darkBlue,
              textAlign: 'center',
              fontFamily: 'PoppinsBold',
            }}>
@@ -1452,7 +1452,7 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
              fontSize: 18,
              marginBottom: 8,
              marginTop: 8,
-             color: '#453D98ff',
+             color: darkBlue,
              textAlign: 'center',
              fontFamily: 'PoppinsBold',
            }}>
@@ -1644,7 +1644,7 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>

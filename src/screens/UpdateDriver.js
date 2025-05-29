@@ -17,6 +17,7 @@ import CustomInput from '../components/CustomInput';
 import useApiToken from '../components/Token';
 import LoadingIndicator from '../components/LoadingIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { darkBlue } from '../components/constant';
 const UpdateDriver = () => {
   const route = useRoute();
   const {driverDetails} = route.params;
@@ -273,7 +274,7 @@ if (email && !emailRegex.test(email)) {
           <View style={styles.levelContainer}>
             <Text
               style={{
-                color: '#453D98ff',
+                color: darkBlue,
                 fontSize: 15,
                 marginBottom: 10,
                 marginTop: 8,
@@ -593,7 +594,7 @@ const styles = StyleSheet.create({
     tintColor: 'red',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 20,
     marginBottom: 40,
@@ -649,7 +650,7 @@ const styles = StyleSheet.create({
   alertContainer: {
     width: 400,
     height: 450,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -672,7 +673,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,
@@ -691,7 +692,7 @@ const styles = StyleSheet.create({
   alertContainer: {
     width: 400,
     height: 450,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -714,7 +715,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,

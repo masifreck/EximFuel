@@ -333,7 +333,7 @@ const ShowVehicleDetails = ({route, navigation}) => {
             }}>
             <Text
               style={{
-                color: '#453D98ff',
+                color: darkBlue,
                 fontSize: 20,
                 marginBottom: 10,
                 marginTop: 0,
@@ -421,7 +421,7 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <Text
                 style={{
                   width: '100%',
-                  color: '#453D98ff',
+                  color: darkBlue,
                   fontSize: 20,
                   marginBottom: 10,
                   marginTop: 20,
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     width: 20,
   },
   levelText: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontSize: 20,
     marginBottom: 10,
     marginTop: 20,
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'white'
   },
   sectionHeader: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontSize: 20,
     marginBottom: 10,
     marginTop: 20,

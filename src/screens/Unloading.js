@@ -16,6 +16,7 @@ import useApiToken from '../components/Token';
 import LottieView from 'lottie-react-native';
 import Loading from '../components/Loading';
 import { inputbgColor } from '../components/constant';
+import { darkBlue } from '../components/constant';
 const Unloading = () => {
   const navigation = useNavigation();
   const apiTokenReceived = useApiToken();
@@ -146,7 +147,7 @@ const Unloading = () => {
               style={{
                 height: '100%',
                 width: '100%',
-                backgroundColor: '#453D98ff',
+                backgroundColor: darkBlue,
                 borderRadius: 10,
               }}
               resizeMode="cover"
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     tintColor: 'black',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 30,
     marginBottom: 20,

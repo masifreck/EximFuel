@@ -22,6 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { darkBlue } from '../components/constant';
 import CustomImagePicker from '../components/CustomeImagePicker';
 import { AlertNotificationRoot } from 'react-native-alert-notification';
+
 const RegisterVehicle = ({route}) => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -405,7 +406,7 @@ style={styles.dlCard}>
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -490,7 +491,7 @@ style={styles.dlCard}>
           ]}>
           <Text
             style={{
-              color: '#453D98ff',
+              color: darkBlue,
               fontSize: 18,
               marginBottom: 10,
               marginTop: 20,
@@ -713,7 +714,7 @@ width:570,
     width: 20,
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 20,
     marginBottom: 40,

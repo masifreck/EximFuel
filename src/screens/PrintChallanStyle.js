@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-
+import { darkBlue } from "../components/constant";
 export const styles = StyleSheet.create({
     maincontainer: {
       flex: 1,
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     boxHeader: {
       fontSize: 18,
       marginBottom: 8,
-      color: '#453D98ff',
+      color: darkBlue,
       textAlign: 'center',
       fontFamily: 'PoppinsBold',
       letterSpacing: 0.5,
@@ -63,7 +63,7 @@ export const styles = StyleSheet.create({
       height: 100,
     },
     submitButton: {
-      backgroundColor: '#453D98ff',
+      backgroundColor: darkBlue,
       borderRadius: 5,
       marginTop: 30,
       marginBottom: 20,
@@ -90,7 +90,7 @@ export const styles = StyleSheet.create({
       fontWeight: 'bold',
       marginBottom: 16,
       marginTop: 8,
-      color: '#453D98ff',
+      color: darkBlue,
       textAlign: 'center',
       fontFamily: 'PoppinsBold',
     },
@@ -113,7 +113,7 @@ export const styles = StyleSheet.create({
       color: 'black',
     },
     closeButton: {
-      backgroundColor: '#453D98ff',
+      backgroundColor: darkBlue,
       borderRadius: 5,
       marginTop: 10,
       marginBottom: 20,
@@ -167,7 +167,7 @@ export const styles = StyleSheet.create({
     image: {
       height: 200,
       width: '100%',
-      backgroundColor: '#453D98ff',
+      backgroundColor: darkBlue,
       borderRadius: 10,
     },
     inputContainer: {
@@ -200,7 +200,7 @@ export const styles = StyleSheet.create({
       tintColor: 'black',
     },
     button: {
-      backgroundColor: '#453D98ff',
+      backgroundColor: darkBlue,
       borderRadius: 5,
       marginTop: 30,
       marginBottom: 20,
@@ -219,7 +219,7 @@ export const styles = StyleSheet.create({
       fontFamily: 'PoppinsSemiBold',
     },
     linkText: {
-      color: '#453D98ff',
+      color: darkBlue,
       fontSize: 16,
       fontWeight: '500',
     },
@@ -238,7 +238,7 @@ export const styles = StyleSheet.create({
       fontFamily: 'PoppinsMedium',
     },
     blueText: {
-      color: '#453D98ff',
+      color: darkBlue,
       fontSize: 14,
       // fontWeight: '500',
       fontFamily: 'PoppinsBold',

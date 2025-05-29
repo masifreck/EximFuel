@@ -5,7 +5,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {Alert} from 'react-native';
 import { styles } from './StylesStep1';
 import CustomQRCode from './CustomQRCode';
-
+import { darkBlue } from './constant';
 const Step1 = ({helloMessage ,PEwayBillNo,
   PEwayBillNo2,
   PEwayBillNo3,
@@ -348,7 +348,7 @@ const [searchPump,setSearchPump]=useState('');
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>
@@ -649,7 +649,7 @@ marginLeft:10,
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>

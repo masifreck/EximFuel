@@ -16,7 +16,7 @@ import {Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApiToken from './Token';
 const deviceWidth = Dimensions.get('window').width;
-
+import { darkBlue } from './constant';
 const MinesStep2 = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState(null);
   AsyncStorage.getItem('Token')
@@ -172,7 +172,7 @@ const MinesStep2 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>
@@ -202,7 +202,7 @@ const MinesStep2 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>
@@ -252,7 +252,7 @@ const MinesStep2 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>
@@ -321,7 +321,7 @@ const MinesStep2 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>

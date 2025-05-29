@@ -10,7 +10,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Linking,
-  Alert,ImageBackground
+  Alert,
+  ImageBackground,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import CustomAlert from '../components/CustomAlert';
@@ -43,14 +44,14 @@ const RegisterDriver = ({route}) => {
       console.log('Received token', apiTokenReceived);
       console.log('Error retrieving token:', error);
     });
-    const {DLNumber}=route?.params?route.params:'';
-   // console.log('DL NO FROM ROUTE',DLNumber)
-    useEffect(()=>{
-      if(DLNumber){
-        setdlNumber(DLNumber)
-      }
-    },[DLNumber])
-      const [IsLoading, setIsLoading] = useState(true);
+  const {DLNumber} = route?.params ? route.params : '';
+  // console.log('DL NO FROM ROUTE',DLNumber)
+  useEffect(() => {
+    if (DLNumber) {
+      setdlNumber(DLNumber);
+    }
+  }, [DLNumber]);
+  const [IsLoading, setIsLoading] = useState(true);
   const [is_everything_ok, setis_everything_ok] = useState(false);
 
   const [hasBorder, setHasBorder] = useState(false); // State for border
@@ -106,25 +107,33 @@ const RegisterDriver = ({route}) => {
   const [AdharFPhoto, setAdharFPhoto] = useState(null);
   const [AdharBPhoto, setAdharBPhoto] = useState(null);
   const [PanPhoto, setPanPhotot] = useState(null);
+  
+  const [isSamePAdd, setIsSamePAdd] = useState(false);
+  const [currentAdd, setCurrentAdd] = useState('');
+  const [isDLSearching, setIsDLSearching] = useState(false);
+  const [ValidTill, setValidTill] = useState('');
+
+  const [isPCVerified, setPCVerified] = useState(false);
+  const [isSCVerified, setSCVerified] = useState(false);
+
   const [Pverified, setPverified] = useState(false);
   const [Sverified, setSverified] = useState(false);
-  const [isSamePAdd, setIsSamePAdd] =useState(false);
-  const [currentAdd, setCurrentAdd] = useState('');
-
-  const [isPCVerified,setPCVerified]=useState(false);
-  const [isSCVerified,setSCVerified]=useState(false);
-
   const [primaryOTPUI, setprimaryOTPUI] = useState(false);
   const [secondaryOTPUI, setSecondaryOTPUI] = useState(false);
-const [Commercial,setCommercial]=useState('');
-const [Code,setCode]=useState('');
- useEffect(() => {
-  if (isSamePAdd) {
-    setCurrentAdd(driverAddress); // Copy if checked
-  } else {
-    setCurrentAdd(''); // Clear if unchecked
-  }
-}, [isSamePAdd, driverAddress]);
+  const [otp1, setOtp1] = useState(null);
+  const [otp2, setOtp2] = useState(null);
+  const [isOTP1loading, setIsOtp1Loading] = useState(false);
+  const [isOTP2loading, setIsOtp2Loading] = useState(false);
+
+  const [Commercial, setCommercial] = useState('');
+  const [Code, setCode] = useState('');
+  useEffect(() => {
+    if (isSamePAdd) {
+      setCurrentAdd(driverAddress); // Copy if checked
+    } else {
+      setCurrentAdd(''); // Clear if unchecked
+    }
+  }, [isSamePAdd, driverAddress]);
 
   const validation = () => {
     const cleanDL = dlNumber.replace(/[\s-]/g, ''); // assuming dlNumber is your state variable
@@ -283,10 +292,10 @@ const [Code,setCode]=useState('');
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
 
-  const [adharFront,setAdharFront]=useState(null);
-  const [adharBack,setAdharBack]=useState(null);
-  const [panPhoto,setPanPhoto]=useState(null);
-  const [dlPhoto,setdlPhoto]=useState(null);
+  const [adharFront, setAdharFront] = useState(null);
+  const [adharBack, setAdharBack] = useState(null);
+  const [panPhoto, setPanPhoto] = useState(null);
+  const [dlPhoto, setdlPhoto] = useState(null);
   const handleSaveImageData1 = image => {
     //console.log('Selected Image Data:', image);
     setCapturedPhoto1(image);
@@ -304,15 +313,15 @@ const [Code,setCode]=useState('');
     //console.log('Selected Image Data:', image);
     setAdharFront(image);
   };
-  const handleAdharBack=image=>{
-    setAdharBack(image)
-  }
-  const handlePan= image=>{
-    setPanPhoto(image)
-  }
-  const handleDL=image=>{
-    setDLPhoto(image)
-  }
+  const handleAdharBack = image => {
+    setAdharBack(image);
+  };
+  const handlePan = image => {
+    setPanPhoto(image);
+  };
+  const handleDL = image => {
+    setDLPhoto(image);
+  };
   const openDialScreen = number => {
     console.log('phone', number);
     if (!primaryContact || !/^\d{10}$/.test(number)) {
@@ -328,60 +337,57 @@ const [Code,setCode]=useState('');
     }
     Linking.openURL(number);
   };
-  const [otp1,setOtp1]=useState(null);
-const [otp2,setOtp2]=useState(null);
-  const handleOtpSubmit1 = (enteredOtp) => {
+
+  const handleOtpSubmit1 = enteredOtp => {
     console.log('OTP to send to server:', enteredOtp);
-   if (enteredOtp === otp1) {
-    // OTP matched ✅
-    setprimaryOTPUI(false);
-    setPverified(true);
+    if (enteredOtp === otp1) {
+      // OTP matched ✅
+      setprimaryOTPUI(false);
+      setPverified(true);
 
-    Toast.show({
-      type: 'success',
-      text1: 'PrimaryContact OTP Verified Successfully',
-      text2: `For ${secondaryContact}`,
-      visibilityTime: 3000,
-      position: 'top',
-    });
-  } else {
-    // OTP did not match ❌
-    Toast.show({
-      type: 'error',
-      text1: 'Invalid OTP',
-      text2: 'Please enter the correct OTP',
-      visibilityTime: 3000,
-      position: 'top',
-    });
-  }
+      Toast.show({
+        type: 'success',
+        text1: 'PrimaryContact OTP Verified Successfully',
+        text2: `For ${secondaryContact}`,
+        visibilityTime: 3000,
+        position: 'top',
+      });
+    } else {
+      // OTP did not match ❌
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid OTP',
+        text2: 'Please enter the correct OTP',
+        visibilityTime: 3000,
+        position: 'top',
+      });
+    }
   };
- const handleOtpSubmit2 = (enteredOtp) => {
-  if (enteredOtp === otp2) {
-    // OTP matched ✅
-    setSecondaryOTPUI(false);
-    setSverified(true);
+  const handleOtpSubmit2 = enteredOtp => {
+    if (enteredOtp === otp2) {
+      // OTP matched ✅
+      setSecondaryOTPUI(false);
+      setSverified(true);
 
-    Toast.show({
-      type: 'success',
-      text1: ' Secondary Contact OTP Verified Successfully',
-      text2: `For ${secondaryContact}`,
-      visibilityTime: 3000,
-      position: 'top',
-    });
-  } else {
-    // OTP did not match ❌
-    Toast.show({
-      type: 'error',
-      text1: 'Invalid OTP',
-      text2: 'Please enter the correct OTP',
-      visibilityTime: 3000,
-      position: 'top',
-    });
-  }
-};
+      Toast.show({
+        type: 'success',
+        text1: ' Secondary Contact OTP Verified Successfully',
+        text2: `For ${secondaryContact}`,
+        visibilityTime: 3000,
+        position: 'top',
+      });
+    } else {
+      // OTP did not match ❌
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid OTP',
+        text2: 'Please enter the correct OTP',
+        visibilityTime: 3000,
+        position: 'top',
+      });
+    }
+  };
 
-  const [isOTP1loading,setIsOtp1Loading]=useState(false);
-const [isOTP2loading,setIsOtp2Loading]=useState(false);
   const HandldeSendOTP1 = async () => {
     if (!primaryContact || !/^\d{10}$/.test(primaryContact)) {
       setErrorMessage('Please enter a valid primary contact (10 digits)');
@@ -389,191 +395,221 @@ const [isOTP2loading,setIsOtp2Loading]=useState(false);
       return;
     }
 
- try {
-    setIsOtp1Loading(true);
-   const generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-
-    setOtp1(generatedOTP);
-
-    const message = `Your OTP is ${generatedOTP} - CIYA Technologies`;
-    const encodedMessage = encodeURIComponent(message); // Properly encoded
-    const apiUrl = `https://bhashsms.com/api/sendmsg.php?user=Anil003&pass=123456&sender=TRNZOL&phone=${secondaryContact}&text=${encodedMessage}&priority=ndnd&stype=normal`;
-
-    const response = await fetch(apiUrl);
-    const resultText = await response.text();
-    console.log('SMS API response:', resultText);
-
-    setprimaryOTPUI(true);
-    Toast.show({
-      type: 'success',
-      text1: 'OTP Sent Successfully',
-      text2: `OTP sent to ${secondaryContact}`,
-      visibilityTime: 3000,
-      position: 'top',
-    });
-  } catch (error) {
-    console.log('OTP send error:', error);
-    Toast.show({
-      type: 'error',
-      text1: 'Failed to send OTP',
-      text2: 'Please try again later.',
-    });
-  } finally {
-    setIsOtp1Loading(false);
-  }
-  };
-
-
-const HadleSendOTP2 = async () => {
-  if (!secondaryContact || !/^\d{10}$/.test(secondaryContact)) {
-    setErrorMessage('Please enter a valid secondary contact (10 digits)');
-    setShowAlert(true);
-    return;
-  }
-
-  try {
-    setIsOtp2Loading(true);
-    const generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-
-    setOtp2(generatedOTP);
-
-    const message = `Your OTP is ${generatedOTP} - CIYA Technologies`;
-    const encodedMessage = encodeURIComponent(message); // Properly encoded
-    const apiUrl = `https://bhashsms.com/api/sendmsg.php?user=Anil003&pass=123456&sender=TRNZOL&phone=${secondaryContact}&text=${encodedMessage}&priority=ndnd&stype=normal`;
-
-    const response = await fetch(apiUrl);
-    const resultText = await response.text();
-    console.log('SMS API response:', resultText);
-
-    setSecondaryOTPUI(true);
-    Toast.show({
-      type: 'success',
-      text1: 'OTP Sent Successfully',
-      text2: `OTP sent to ${secondaryContact}`,
-      visibilityTime: 3000,
-      position: 'top',
-    });
-  } catch (error) {
-    console.log('OTP send error:', error);
-    Toast.show({
-      type: 'error',
-      text1: 'Failed to send OTP',
-      text2: 'Please try again later.',
-    });
-  } finally {
-    setIsOtp2Loading(false);
-  }
-};
-const [isDLSearching,setIsDLSearching]=useState(false);
-const [ValidTill,setValidTill]=useState('');
-useEffect(() => {
-  const fetchDLDetails = async () => {
-    setIsDLSearching(true);
-    const url = `https://Exim.Tranzol.com/api/OwnerApi/GetVerifyDriver?licenseNo=${dlNumber}
-    &dob=${selectedStartDate}`;
-    console.log(url);
     try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${apiTokenReceived}`,
-        },
+      setIsOtp1Loading(true);
+      const generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+      setOtp1(generatedOTP);
+
+      const message = `Your OTP is ${generatedOTP} - CIYA Technologies`;
+      const encodedMessage = encodeURIComponent(message); // Properly encoded
+      const apiUrl = `https://bhashsms.com/api/sendmsg.php?user=Anil003&pass=123456&sender=TRNZOL&phone=${secondaryContact}&text=${encodedMessage}&priority=ndnd&stype=normal`;
+
+      const response = await fetch(apiUrl);
+      const resultText = await response.text();
+      console.log('SMS API response:', resultText);
+
+      setprimaryOTPUI(true);
+      Toast.show({
+        type: 'success',
+        text1: 'OTP Sent Successfully',
+        text2: `OTP sent to ${secondaryContact}`,
+        visibilityTime: 3000,
+        position: 'top',
       });
-
-      const data = await response.json();
-    //  console.log(data);
- setCalendarVisible(false);
-      if (data?.apiResult?.Result) {
-        const Details = data.apiResult.Result;
-        setName(Details.DriverName);
-        setValidTill(Details.ValidTill);
-        setCode(Details.Code);
-        setCommercial(Details.Commercial);
-      } else {
-        Alert.alert('Error', 'Did Not Find Verification Data for This DL NO. Please Check Details');
-      }
-
-    } catch (err) {
-      Alert.alert('Error', 'Error Fetching DL Verification');
+    } catch (error) {
+      console.log('OTP send error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to send OTP',
+        text2: 'Please try again later.',
+      });
     } finally {
-      setIsDLSearching(false);
+      setIsOtp1Loading(false);
     }
   };
 
-  // Only call the API when both values are available
-  if (dlNumber && selectedStartDate) {
-    fetchDLDetails();
-  }
+  const HadleSendOTP2 = async () => {
+    if (!secondaryContact || !/^\d{10}$/.test(secondaryContact)) {
+      setErrorMessage('Please enter a valid secondary contact (10 digits)');
+      setShowAlert(true);
+      return;
+    }
 
-}, [dlNumber, selectedStartDate]);
+    try {
+      setIsOtp2Loading(true);
+      const generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
-const [currentPage, setCurrentPage] = useState(1);
-const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
+      setOtp2(generatedOTP);
+
+      const message = `Your OTP is ${generatedOTP} - CIYA Technologies`;
+      const encodedMessage = encodeURIComponent(message); // Properly encoded
+      const apiUrl = `https://bhashsms.com/api/sendmsg.php?user=Anil003&pass=123456&sender=TRNZOL&phone=${secondaryContact}&text=${encodedMessage}&priority=ndnd&stype=normal`;
+
+      const response = await fetch(apiUrl);
+      const resultText = await response.text();
+      console.log('SMS API response:', resultText);
+
+      setSecondaryOTPUI(true);
+      Toast.show({
+        type: 'success',
+        text1: 'OTP Sent Successfully',
+        text2: `OTP sent to ${secondaryContact}`,
+        visibilityTime: 3000,
+        position: 'top',
+      });
+    } catch (error) {
+      console.log('OTP send error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to send OTP',
+        text2: 'Please try again later.',
+      });
+    } finally {
+      setIsOtp2Loading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDLDetails = async () => {
+      setIsDLSearching(true);
+      const url = `https://Exim.Tranzol.com/api/OwnerApi/GetVerifyDriver?licenseNo=${dlNumber}
+    &dob=${selectedStartDate}`;
+      console.log(url);
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Basic ${apiTokenReceived}`,
+          },
+        });
+
+        const data = await response.json();
+        //  console.log(data);
+        setCalendarVisible(false);
+        if (data?.apiResult?.Result) {
+          const Details = data.apiResult.Result;
+          setName(Details.DriverName);
+          setValidTill(Details.ValidTill);
+          setCode(Details.Code);
+          setCommercial(Details.Commercial);
+        } else {
+          Alert.alert(
+            'Error',
+            'Did Not Find Verification Data for This DL NO. Please Check Details',
+          );
+        }
+      } catch (err) {
+        Alert.alert('Error', 'Error Fetching DL Verification');
+      } finally {
+        setIsDLSearching(false);
+      }
+    };
+
+    // Only call the API when both values are available
+    if (dlNumber && selectedStartDate) {
+      fetchDLDetails();
+    }
+  }, [dlNumber, selectedStartDate]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const bgcolor2 = currentPage === 1 ? 'grey' : 'limegreen';
   return (
-     <>
-    { isDLSearching? (
-      <Searching/>
-    ) :(
-      
-    <ScrollView style={{backgroundColor: '#edeef2'}}>
-      {IsLoading ? (
-        <Loading />
+    <>
+      {isDLSearching ? (
+        <Searching />
       ) : (
-        <View style={styles.container}>
+        <ScrollView style={{backgroundColor: '#edeef2'}}>
+          {IsLoading ? (
+            <Loading />
+          ) : (
+            <View style={styles.container}>
+              <View style={styles.imgContainer}>
+                <Image
+                  style={styles.img}
+                  source={require('../assets/driver.png')}
+                />
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                }}>
+                <View
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    borderColor: 'limegreen',
+                    borderWidth: 8,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  {currentPage === 1 && (
+                    <Text
+                      style={{color: 'gray', fontWeight: 'bold', fontSize: 35}}>
+                      1
+                    </Text>
+                  )}
+                  {currentPage === 2 && (
+                    <Image
+                      style={{width: 50, height: 50}}
+                      source={require('../assets/check-mark.png')}
+                    />
+                  )}
+                </View>
+                <View
+                  style={{
+                    width: 60,
+                    height: 8,
+                    backgroundColor: bgcolor2,
+                  }}></View>
+                <View
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    borderColor: bgcolor2,
+                    borderWidth: 8,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{color: 'gray', fontWeight: 'bold', fontSize: 35}}>
+                    2
+                  </Text>
+                </View>
+              </View>
+              {currentPage === 1 && (
+                <>
+                  <DLCard
+                    dlno={dlNumber}
+                    DOB={selectedStartDate}
+                    name={name}
+                    ValidTill={ValidTill}
+                    Commercial={Commercial}
+                    Code={Code}
+                  />
 
-          <View style={styles.imgContainer}>
-            <Image
-              style={styles.img}
-              source={require('../assets/driver.png')}
-            />
-          </View>
-           <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center',marginBottom:20}}>
-                <View style={{width:80,height:80,borderRadius:40,
-                  borderColor:'limegreen',borderWidth:8,
-                  justifyContent:'center',alignItems:'center'
-                }}>
-          {currentPage===1 &&<Text style={{color:'gray',fontWeight:'bold',fontSize:35}}>1</Text>}
-          {currentPage===2 && <Image style={{width:50,height:50}} source={require('../assets/check-mark.png')}/>}
-                </View>
-                <View style={{width:60,height:8,backgroundColor:bgcolor2}}>
-               
-                </View>
-                <View style={{width:80,height:80,borderRadius:40,
-                  borderColor:bgcolor2,borderWidth:8,
-                  justifyContent:'center',alignItems:'center'
-                }}>
-          <Text style={{color:'gray',fontWeight:'bold',fontSize:35}}>2</Text>
-                </View>
-                </View>
-          {currentPage === 1 && (
-            <>
-            
-            <DLCard 
-            dlno={dlNumber}
-            DOB={selectedStartDate}
-            name={name}
-            ValidTill={ValidTill}
-            Commercial={Commercial}
-            Code={Code}
-            />
-          
-          <View style={styles.levelContainer}>
-            <Text
-              style={{
-                color: '#453D98ff',
-                fontSize: 15,
-                marginBottom: 10,
-                marginTop: 8,
-                textAlign: 'center',
-                fontFamily: 'PoppinsBold',
-              }}>
-              Driver Details
-            </Text>
-            <Text style={styles.MandatoryText}>
-              Mandatory Fields<Text style={{color: 'red'}}>*</Text>
-            </Text>
-            {/* <CustomInput
+                  <View style={styles.levelContainer}>
+                    <Text
+                      style={{
+                        color: darkBlue,
+                        fontSize: 15,
+                        marginBottom: 10,
+                        marginTop: 8,
+                        textAlign: 'center',
+                        fontFamily: 'PoppinsBold',
+                      }}>
+                      Driver Details
+                    </Text>
+                    <Text style={styles.MandatoryText}>
+                      Mandatory Fields<Text style={{color: 'red'}}>*</Text>
+                    </Text>
+                    {/* <CustomInput
               labelText="DL Number"
               placeholdername="Enter DL Number"
               onChangeText={text => setdlNumber(text)}
@@ -583,40 +619,41 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
               isMandatory={true}
               value={dlNumber}
             /> */}
-            <Text style={styles.levelText}>
-              Date Of Birth <Text style={{color: 'red'}}>*</Text>
-            </Text>
-            <View
-              style={[
-                styles.inputContainer,
-                {
-                  borderWidth: hasBorder ? 0.9 : 0,
-                  borderColor: hasBorder ? 'red' : 'transparent',
-                },
-              ]}>
-              <TextInput
-                placeholderTextColor={'#6c6f73'}
-                style={{
-                  color: 'black',
-                  fontSize: 15,
-                  width: '85%',
-                  marginRight: 20,
-                }}
-                value={selectedStartDate}
-                placeholder={'DD-MM-YYYY'}
-                autoCorrect={false}
-                onChangeText={text => setDOB(text)}
-                editable={false}
-              />
+                    <Text style={styles.levelText}>
+                      Date Of Birth <Text style={{color: 'red'}}>*</Text>
+                    </Text>
+                    <View
+                      style={[
+                        styles.inputContainer,
+                        {
+                          borderWidth: hasBorder ? 0.9 : 0,
+                          borderColor: hasBorder ? 'red' : 'transparent',
+                        },
+                      ]}>
+                      <TextInput
+                        placeholderTextColor={'#6c6f73'}
+                        style={{
+                          color: 'black',
+                          fontSize: 15,
+                          width: '85%',
+                          marginRight: 20,
+                        }}
+                        value={selectedStartDate}
+                        placeholder={'DD-MM-YYYY'}
+                        autoCorrect={false}
+                        onChangeText={text => setDOB(text)}
+                        editable={false}
+                      />
 
-              <TouchableOpacity onPress={() => setCalendarVisible(true)}>
-                <Image
-                  style={styles.rightIcon}
-                  source={require('../assets/calendar.png')}
-                />
-              </TouchableOpacity>
-            </View>
-            {/* <CustomInput
+                      <TouchableOpacity
+                        onPress={() => setCalendarVisible(true)}>
+                        <Image
+                          style={styles.rightIcon}
+                          source={require('../assets/calendar.png')}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {/* <CustomInput
               labelText="Name"
               placeholdername="Enter Driver Name"
               onChangeText={text => setName(text)}
@@ -624,317 +661,391 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
               isMandatory={true}
             /> */}
 
-            <CustomInput
-              labelText="Aadhar Number"
-              placeholdername="Enter Aadhar Number"
-              onChangeText={text => setAdharNumber(text)}
-              hasBorder={hasBorder}
-              stringlength={12}
-              keyboardTypename="numeric"
-              isMandatory={true}
-            />
+                    <CustomInput
+                      labelText="Aadhar Number"
+                      placeholdername="Enter Aadhar Number"
+                      onChangeText={text => setAdharNumber(text)}
+                      hasBorder={hasBorder}
+                      stringlength={12}
+                      keyboardTypename="numeric"
+                      isMandatory={true}
+                    />
 
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: -5,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <CustomInput
-                labelText="Primary Contact Number"
-                placeholdername="Enter Mobile N0."
-                onChangeText={text => setPrimaryContact(text)}
-                hasBorder={hasBorder}
-                stringlength={10}
-                keyboardTypename="numeric"
-                isMandatory={true}
-                isIcon={true}
-              />
-              <TouchableOpacity
-                style={{position: 'absolute', right: 95, top: 20}}
-                onPress={() => openDialScreen(primaryContact)}>
-                <Image
-                  style={{width: 35, height: 35, marginTop: 22}}
-                  source={require('../assets/phonecall.png')}
-                />
-              </TouchableOpacity>
-                          {Pverified ? (
-  <Image source={require('../assets/check-mark.png')} style={{width:50,height:50,marginTop:20}} />
-) : (
-              <TouchableOpacity
-                style={{
-                  width: 70,
-                  height: 50,
-                  backgroundColor: primaryOTPUI?'gray':darkBlue,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  elevation: 4,
-                  borderRadius: 10,
-                  marginTop: 35,
-                }}
-                onPress={HandldeSendOTP1}
-                disabled={primaryOTPUI}
-                >
-                  {isOTP1loading ? (  <ActivityIndicator size="small" color="#fff" />):(
-                <Text
-                  style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>
-                  GET OTP
-                </Text>)}
-                {/* <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>OTP</Text> */}
-              </TouchableOpacity>)}
-            </View>
-            {primaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit1}  onResend={HandldeSendOTP1}/>}
-            <CustomCheckbox label="I Call and Verify the Primary No." value={isPCVerified} onChange={(value) => setPCVerified(value ? true : false)} />
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: -5,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <CustomInput
-                labelText="Secondary Contact Number"
-                placeholdername="Enter Mobile No"
-                onChangeText={text => setSecondaryContact(text)}
-                stringlength={10}
-                keyboardTypename="numeric"
-                isIcon={true}
-              />
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        gap: -5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <CustomInput
+                        labelText="Primary Contact Number"
+                        placeholdername="Enter Mobile No."
+                        onChangeText={text => setPrimaryContact(text)}
+                        hasBorder={hasBorder}
+                        stringlength={10}
+                        keyboardTypename="numeric"
+                        isMandatory={true}
+                        isIcon={true}
+                      />
+                      <TouchableOpacity
+                        style={{position: 'absolute', right: 95, top: 20}}
+                        onPress={() => openDialScreen(primaryContact)}>
+                        <Image
+                          style={{width: 35, height: 35, marginTop: 22}}
+                          source={require('../assets/phonecall.png')}
+                        />
+                      </TouchableOpacity>
+                      {Pverified ? (
+                        <Image
+                          source={require('../assets/check-mark.png')}
+                          style={{width: 50, height: 50, marginTop: 20}}
+                        />
+                      ) : (
+                        <TouchableOpacity
+                          style={{
+                            width: 70,
+                            height: 50,
+                            backgroundColor: primaryOTPUI ? 'gray' : darkBlue,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            elevation: 4,
+                            borderRadius: 10,
+                            marginTop: 35,
+                          }}
+                          onPress={HandldeSendOTP1}
+                          disabled={primaryOTPUI}>
+                          {isOTP1loading ? (
+                            <ActivityIndicator size="small" color="#fff" />
+                          ) : (
+                            <Text
+                              style={{
+                                color: 'white',
+                                fontWeight: 'bold',
+                                fontSize: 12,
+                              }}>
+                              GET OTP
+                            </Text>
+                          )}
+                          {/* <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>OTP</Text> */}
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                    {primaryOTPUI && (
+                      <CustomOTPVerify
+                        onVerify={handleOtpSubmit1}
+                        onResend={HandldeSendOTP1}
+                      />
+                    )}
+                    <CustomCheckbox
+                      label="I Call and Verify the Primary No."
+                      value={isPCVerified}
+                      onChange={value => setPCVerified(value ? true : false)}
+                    />
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        gap: -5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <CustomInput
+                        labelText="Secondary Contact Number"
+                        placeholdername="Enter Mobile No"
+                        onChangeText={text => setSecondaryContact(text)}
+                        stringlength={10}
+                        keyboardTypename="numeric"
+                        isIcon={true}
+                      />
 
-              <TouchableOpacity
-                style={{position: 'absolute', right: 95, top: 20}}
-                onPress={() => openDialScreen(primaryContact)}>
-                <Image
-                  style={{width: 35, height: 35, marginTop: 22}}
-                  source={require('../assets/phonecall.png')}
-                />
-              </TouchableOpacity>
-            {Sverified ? (
-  <Image source={require('../assets/check-mark.png')} style={{width:50,height:50,marginTop:20}} />
-) : (<TouchableOpacity
-  style={{
-    width: 70,
-    height: 50,
-    backgroundColor:secondaryOTPUI?'grey': darkBlue,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
-    borderRadius: 10,
-    marginTop: 35,
-  }}
-  onPress={HadleSendOTP2}
-  disabled={secondaryOTPUI}
->
-  {isOTP2loading ? (
-    <ActivityIndicator size="small" color="#fff" />
-  ) : (
-    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>
-      GET OTP
-    </Text>
-  )}
-</TouchableOpacity>
-)}
+                      <TouchableOpacity
+                        style={{position: 'absolute', right: 95, top: 20}}
+                        onPress={() => openDialScreen(primaryContact)}>
+                        <Image
+                          style={{width: 35, height: 35, marginTop: 22}}
+                          source={require('../assets/phonecall.png')}
+                        />
+                      </TouchableOpacity>
+                      {Sverified ? (
+                        <Image
+                          source={require('../assets/check-mark.png')}
+                          style={{width: 50, height: 50, marginTop: 20}}
+                        />
+                      ) : (
+                        <TouchableOpacity
+                          style={{
+                            width: 70,
+                            height: 50,
+                            backgroundColor: secondaryOTPUI ? 'grey' : darkBlue,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            elevation: 4,
+                            borderRadius: 10,
+                            marginTop: 35,
+                          }}
+                          onPress={HadleSendOTP2}
+                          disabled={secondaryOTPUI}>
+                          {isOTP2loading ? (
+                            <ActivityIndicator size="small" color="#fff" />
+                          ) : (
+                            <Text
+                              style={{
+                                color: 'white',
+                                fontWeight: 'bold',
+                                fontSize: 12,
+                              }}>
+                              GET OTP
+                            </Text>
+                          )}
+                        </TouchableOpacity>
+                      )}
+                    </View>
 
-             
-            </View>
-           
-            {secondaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit2}  onResend={HadleSendOTP2}/>}
-              <CustomCheckbox label="I Call and Verify the Secondary No." value={isSCVerified} onChange={(value) => setSCVerified(value ? true : false)} />
-            <CustomInput
-              labelText="Pan Number"
-              placeholdername="Enter Pan Number"
-              onChangeText={text => setPanNo(text)}
-            />
+                    {secondaryOTPUI && (
+                      <CustomOTPVerify
+                        onVerify={handleOtpSubmit2}
+                        onResend={HadleSendOTP2}
+                      />
+                    )}
+                    <CustomCheckbox
+                      label="I Call and Verify the Secondary No."
+                      value={isSCVerified}
+                      onChange={value => setSCVerified(value ? true : false)}
+                    />
+                    <CustomInput
+                      labelText="Pan Number"
+                      placeholdername="Enter Pan Number"
+                      onChangeText={text => setPanNo(text)}
+                    />
 
-            <CustomInput
-              labelText="Email Address"
-              placeholdername="Enter Email Id"
-              onChangeText={text => setEmail(text)}
-            />
-            {/* <CustomInput
+                    <CustomInput
+                      labelText="Email Address"
+                      placeholdername="Enter Email Id"
+                      onChangeText={text => setEmail(text)}
+                    />
+                    {/* <CustomInput
               labelText="Driver Address"
               placeholdername="Enter Driver Address"
               onChangeText={text => setdriverAddress(text)}
               isend="true"
               isaddress={true}
             /> */}
-            
-          <CustomCheckbox label="Same As Permanent Address" value={isSamePAdd} onChange={(value) => setIsSamePAdd(value ? true : false)} />
-            <CustomInput
-            value={currentAdd}
-              labelText="Current Address"
-              placeholdername="Enter Driver Address"
-              onChangeText={text => setCurrentAdd(text)}
-              isend="true"
-              isaddress={true}
-            />
-          </View> 
-            </>
-          )}
-            {currentPage === 2 && (
-          <View style={[styles.levelContainer, {alignItems: 'center',paddingVertical:30,paddingHorizontal:20}]}>
-            <Text
-              style={{
-                color: '#453D98ff',
-                fontSize: 18,
-                marginBottom: 10,
-                marginTop: 20,
-                textAlign: 'center',
-                fontFamily: 'PoppinsBold',
-              }}>
-              Attachments
-            </Text>
 
-            <ScrollView
-              horizontal={true}
-              style={{
-                flexDirection: 'row',
-                paddingHorizontal: 10,
-                gap: 10,
-                width: Width * 1,
-              }}>
-              <CustomImagePicker
-                width={80}
-                bgImage={require('../assets/leftphoto.jpg')}
-                onlyCamera={true}
-                title="Driver Photo Left"
-                iconName="camera-enhance"
-                onImagePicked={handleSaveImageData1}
-                 imageData={capturedPhoto1}
-              />
-              <CustomImagePicker
-                width={80}
-                bgImage={require('../assets/frontphoto.png')}
-                onlyCamera={true}
-                title="Driver Photo Front"
-                iconName="camera-enhance"
-                onImagePicked={handleSaveImageData2}
-                 imageData={capturedPhoto2}
-              />
-              <CustomImagePicker
-                width={80}
-                bgImage={require('../assets/rigntphoto.jpg')}
-                onlyCamera={true}
-                title="Driver Photo Right"
-                iconName="camera-enhance"
-                onImagePicked={handleSaveImageData3}
-                imageData={capturedPhoto3}
-              />
-            </ScrollView>
-         
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-              <CustomImagePicker
-                bgImage={require('../assets/aadhaar.png')}
-                title="Driver Adhar Front"
-                iconName="camera-enhance"
-                onImagePicked={handleAdharFront}
-                imageData={adharFront}
-              />
-              <CustomImagePicker
-                bgImage={require('../assets/adhar_BACK.png')}
-                title="Driver Adhar Back"
-                iconName="camera-enhance"
-                imageData={adharBack}
-                onImagePicked={handleAdharBack}
-              />
-            </View>
-            
-               <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-               <CustomImagePicker
-              bgImage={require('../assets/dlpng.webp')}
-              title="Driving Lincence Front"
-              iconName="camera-enhance"
-              onImagePicked={handleDL}
-              imageData={DLPhoto}
-            />
+                    <CustomCheckbox
+                      label="Same As Permanent Address"
+                      value={isSamePAdd}
+                      onChange={value => setIsSamePAdd(value ? true : false)}
+                    />
+                    <CustomInput
+                      value={currentAdd}
+                      labelText="Current Address"
+                      placeholdername="Enter Driver Address"
+                      onChangeText={text => setCurrentAdd(text)}
+                      isend="true"
+                      isaddress={true}
+                    />
+                  </View>
+                </>
+              )}
+              {currentPage === 2 && (
+                <View
+                  style={[
+                    styles.levelContainer,
+                    {
+                      alignItems: 'center',
+                      paddingVertical: 30,
+                      paddingHorizontal: 20,
+                    },
+                  ]}>
+                  <Text
+                    style={{
+                      color: darkBlue,
+                      fontSize: 18,
+                      marginBottom: 10,
+                      marginTop: 20,
+                      textAlign: 'center',
+                      fontFamily: 'PoppinsBold',
+                    }}>
+                    Attachments
+                  </Text>
 
-            <CustomImagePicker
-              bgImage={require('../assets/pan-card.png')}
-              title="Driver PAN Card Front"
-              iconName="camera-enhance"
-              onImagePicked={handlePan}
-              imageData={panPhoto}
-            />
-            </View>
-          </View>)}
+                  <ScrollView
+                    horizontal={true}
+                    style={{
+                      flexDirection: 'row',
+                      paddingHorizontal: 10,
+                      gap: 10,
+                      width: Width * 1,
+                    }}>
+                    <CustomImagePicker
+                      width={80}
+                      bgImage={require('../assets/leftphoto.jpg')}
+                      onlyCamera={true}
+                      title="Driver Photo Left"
+                      iconName="camera-enhance"
+                      onImagePicked={handleSaveImageData1}
+                      imageData={capturedPhoto1}
+                    />
+                    <CustomImagePicker
+                      width={80}
+                      bgImage={require('../assets/frontphoto.png')}
+                      onlyCamera={true}
+                      title="Driver Photo Front"
+                      iconName="camera-enhance"
+                      onImagePicked={handleSaveImageData2}
+                      imageData={capturedPhoto2}
+                    />
+                    <CustomImagePicker
+                      width={80}
+                      bgImage={require('../assets/rigntphoto.jpg')}
+                      onlyCamera={true}
+                      title="Driver Photo Right"
+                      iconName="camera-enhance"
+                      onImagePicked={handleSaveImageData3}
+                      imageData={capturedPhoto3}
+                    />
+                  </ScrollView>
 
-          {/* <TouchableOpacity style={styles.button} onPress={registertheDriver}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-evenly',
+                    }}>
+                    <CustomImagePicker
+                      bgImage={require('../assets/aadhaar.png')}
+                      title="Driver Adhar Front"
+                      iconName="camera-enhance"
+                      onImagePicked={handleAdharFront}
+                      imageData={adharFront}
+                    />
+                    <CustomImagePicker
+                      bgImage={require('../assets/adhar_BACK.png')}
+                      title="Driver Adhar Back"
+                      iconName="camera-enhance"
+                      imageData={adharBack}
+                      onImagePicked={handleAdharBack}
+                    />
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-evenly',
+                    }}>
+                    <CustomImagePicker
+                      bgImage={require('../assets/dlpng.webp')}
+                      title="Driving Lincence Front"
+                      iconName="camera-enhance"
+                      onImagePicked={handleDL}
+                      imageData={DLPhoto}
+                    />
+
+                    <CustomImagePicker
+                      bgImage={require('../assets/pan-card.png')}
+                      title="Driver PAN Card Front"
+                      iconName="camera-enhance"
+                      onImagePicked={handlePan}
+                      imageData={panPhoto}
+                    />
+                  </View>
+                </View>
+              )}
+
+              {/* <TouchableOpacity style={styles.button} onPress={registertheDriver}>
             <Text style={styles.text}>Register</Text>
           </TouchableOpacity> */}
-                  <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          {currentPage > 1 && (
-              <View style={{flexDirection:'row',justifyContent:'space-between',gap:50}}>
-            <TouchableOpacity style={styles.navButton} onPress={() => setCurrentPage(currentPage - 1)}>
-              <Text style={styles.navtext}>Previous</Text>
-            </TouchableOpacity>
-             
-              <TouchableOpacity style={styles.navButton} onPress={registertheDriver}>
-            <Text style={styles.navtext}>Register</Text>
-          </TouchableOpacity>
-          </View>
-          )}
-          {currentPage < 2 && (
-          
-            <TouchableOpacity style={styles.navButton} onPress={() => setCurrentPage(currentPage + 1)}>
-              <Text style={styles.navtext}>Next</Text>
-           </TouchableOpacity>
-          
-          )}
-        </View>
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                {currentPage > 1 && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      gap: 50,
+                    }}>
+                    <TouchableOpacity
+                      style={styles.navButton}
+                      onPress={() => setCurrentPage(currentPage - 1)}>
+                      <Text style={styles.navtext}>Previous</Text>
+                    </TouchableOpacity>
 
-     
-
-        </View>
-      )}
-      {/* custom alert code==================================== */}
-      <CustomAlert
-        visible={showAlert}
-        message={errorMessage}
-        onClose={closeAlert}
-      />
-
-      <Modal transparent={true} animationType="fade" visible={calendarVisible}>
-        {calendarVisible && (
-          <View style={[styles.modalContainer]}>
-            <View style={styles.alertContainer}>
-              <CalendarPicker
-                onDateChange={onDateChange}
-                selectedDayColor="#ffffff"
-                todayBackgroundColor="#9894e6"
-                selectedDayTextColor="#453D98ff"
-                height={400}
-                width={Width * 0.9}
-                textStyle={{
-                  fontFamily: 'PoppinsBold',
-                  color: 'white',
-                  fontSize: 15,
-                }}
-              />
-
-              <View style={styles.buttoncont}>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={handleOkPress}>
-                  <Text style={styles.buttonText}>Close</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={handleOkPress}>
-                  <Text style={styles.buttonText}>Select</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.navButton}
+                      onPress={registertheDriver}>
+                      <Text style={styles.navtext}>Register</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                {currentPage < 2 && (
+                  <TouchableOpacity
+                    style={styles.navButton}
+                    onPress={() => setCurrentPage(currentPage + 1)}>
+                    <Text style={styles.navtext}>Next</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
-          </View>
-        )}
-      </Modal>
-    </ScrollView>)}
+          )}
+          {/* custom alert code==================================== */}
+          <CustomAlert
+            visible={showAlert}
+            message={errorMessage}
+            onClose={closeAlert}
+          />
+
+          <Modal
+            transparent={true}
+            animationType="fade"
+            visible={calendarVisible}>
+            {calendarVisible && (
+              <View style={[styles.modalContainer]}>
+                <View style={styles.alertContainer}>
+                  <CalendarPicker
+                    onDateChange={onDateChange}
+                    selectedDayColor="#ffffff"
+                    todayBackgroundColor="#9894e6"
+                    selectedDayTextColor="#453D98ff"
+                    height={400}
+                    width={Width * 0.9}
+                    textStyle={{
+                      fontFamily: 'PoppinsBold',
+                      color: 'white',
+                      fontSize: 15,
+                    }}
+                  />
+
+                  <View style={styles.buttoncont}>
+                    <TouchableOpacity
+                      style={styles.closeButton}
+                      onPress={handleOkPress}>
+                      <Text style={styles.buttonText}>Close</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.closeButton}
+                      onPress={handleOkPress}>
+                      <Text style={styles.buttonText}>Select</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
+          </Modal>
+        </ScrollView>
+      )}
     </>
   );
 };
-const DLCard = ({driver,name,dlno,ValidTill,DOB,Commercial,convselectedStartDate,Code}) => {
-    function convertDateFormat(inputDate) {
+const DLCard = ({
+  driver,
+  name,
+  dlno,
+  ValidTill,
+  DOB,
+  Commercial,
+  convselectedStartDate,
+  Code,
+}) => {
+  function convertDateFormat(inputDate) {
     const [year, month, day] = inputDate.split('T')[0].split('-');
     return `${day}-${month}-${year}`;
   }
@@ -942,7 +1053,7 @@ const DLCard = ({driver,name,dlno,ValidTill,DOB,Commercial,convselectedStartDate
     const [year, month, day] = inputDate.split('T')[0].split('-');
     return `${day}-${month}-${year}`;
   }
-  const dob = driver?.Dob?driver.Dob:'';
+  const dob = driver?.Dob ? driver.Dob : '';
 
   let formattedDate;
   if (dob) {
@@ -952,64 +1063,82 @@ const DLCard = ({driver,name,dlno,ValidTill,DOB,Commercial,convselectedStartDate
   }
   return (
     <ImageBackground
-  source={require('../assets/DL.png')} // replace with your background image
-  style={styles.dlCard}
-  imageStyle={{ borderRadius: 10, }} // optional: applies rounded corners to the background
->
-    
-      <View style={styles.dlCardHeader}>
-       
-      </View>
-      <Text style={[styles.dlText,{position:'absolute',top:28,left:70,
-        fontSize:16
-      }]}>{dlno?dlno:''}</Text>
-     
-       
-        <View style={styles.dlDetails}>
-        
-           <Text style={[styles.dlText,{position:'absolute',top:54,left:140,fontSize:13}]}> {ValidTill ? ValidTill : '-'}</Text>
-          <Text style={[styles.dlText,{position:'absolute',top:85,left:73,fontSize:12}]}> {DOB ? DOB : '-'}</Text>
-          {/* <Text style={styles.dlText}>{driver.PrimaryContactNo}</Text> */}
-            <Text style={[styles.dlText,{position:'absolute',bottom:24,left:10,fontSize:15}]}>{name?name:''}</Text>
-{Code &&                  <Text
-  style={[
-    styles.dlText,
-    {
-      position: 'absolute',
-      bottom: 20,
-      left: 195,
-      fontSize: 11,
-      
-    }
-  ]}
->
-  Code:{' '}
-  <Text style={{ color: Code === 'VERIFIED' ? 'green' : 'red' }}>
-    {Code ? Code : ''}
-  </Text>
-</Text>}
+      source={require('../assets/DL.png')} // replace with your background image
+      style={styles.dlCard}
+      imageStyle={{borderRadius: 10}} // optional: applies rounded corners to the background
+    >
+      <View style={styles.dlCardHeader}></View>
+      <Text
+        style={[
+          styles.dlText,
+          {position: 'absolute', top: 28, left: 70, fontSize: 16},
+        ]}>
+        {dlno ? dlno : ''}
+      </Text>
 
-{Commercial &&      <Text
-  style={[
-    styles.dlText,
-    {
-      position: 'absolute',
-      bottom: 8,
-      left: 195,
-      fontSize: 11,
-      
-    }
-  ]}
->
-  Commercial:{' '}
-  <Text style={{ color: Commercial === 'YES' ? 'green' : 'red' }}>
-    {Commercial ? Commercial : ''}
-  </Text>
-</Text>}
-        
-         {/* <Image source={require('../assets/driver.png')} style={[styles.dlPhoto,{position:'absolute',right:-10,top:35}]} /> */}
+      <View style={styles.dlDetails}>
+        <Text
+          style={[
+            styles.dlText,
+            {position: 'absolute', top: 54, left: 140, fontSize: 13},
+          ]}>
+          {' '}
+          {ValidTill ? ValidTill : '-'}
+        </Text>
+        <Text
+          style={[
+            styles.dlText,
+            {position: 'absolute', top: 85, left: 73, fontSize: 12},
+          ]}>
+          {' '}
+          {DOB ? DOB : '-'}
+        </Text>
+        {/* <Text style={styles.dlText}>{driver.PrimaryContactNo}</Text> */}
+        <Text
+          style={[
+            styles.dlText,
+            {position: 'absolute', bottom: 24, left: 10, fontSize: 15},
+          ]}>
+          {name ? name : ''}
+        </Text>
+        {Code && (
+          <Text
+            style={[
+              styles.dlText,
+              {
+                position: 'absolute',
+                bottom: 20,
+                left: 195,
+                fontSize: 11,
+              },
+            ]}>
+            Code:{' '}
+            <Text style={{color: Code === 'VERIFIED' ? 'green' : 'red'}}>
+              {Code ? Code : ''}
+            </Text>
+          </Text>
+        )}
+
+        {Commercial && (
+          <Text
+            style={[
+              styles.dlText,
+              {
+                position: 'absolute',
+                bottom: 8,
+                left: 195,
+                fontSize: 11,
+              },
+            ]}>
+            Commercial:{' '}
+            <Text style={{color: Commercial === 'YES' ? 'green' : 'red'}}>
+              {Commercial ? Commercial : ''}
+            </Text>
+          </Text>
+        )}
+
+        {/* <Image source={require('../assets/driver.png')} style={[styles.dlPhoto,{position:'absolute',right:-10,top:35}]} /> */}
       </View>
-   
     </ImageBackground>
   );
 };
@@ -1040,45 +1169,45 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsMedium',
   },
   dlCard: {
-height:200,
-width:320,
-  borderRadius: 10,
-  margin: 16,
-  padding: 12,
-  shadowColor: '#000',
-  shadowOpacity: 0.2,
-  shadowRadius: 4,
-  shadowOffset: { width: 0, height: 2 },
-  elevation: 5,
-},
-dlCardHeader: {
-  alignItems: 'center',
-  marginBottom: 8,
-},
-dlCardTitle: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#1a237e',
-},
-dlCardBody: {
-  flexDirection: 'row',
-  alignItems: 'center',
-},
-dlPhoto: {
-  height: 70,
-  width: 70,
-  borderRadius: 8,
-  marginRight: 10,
-},
-dlDetails: {
-  flex: 1,
-},
-dlText: {
-  fontSize: 14,
-  color: darkBlue,
-  marginBottom: 4,
-  fontWeight:'bold'
-},
+    height: 200,
+    width: 320,
+    borderRadius: 10,
+    margin: 16,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: {width: 0, height: 2},
+    elevation: 5,
+  },
+  dlCardHeader: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  dlCardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1a237e',
+  },
+  dlCardBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dlPhoto: {
+    height: 70,
+    width: 70,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  dlDetails: {
+    flex: 1,
+  },
+  dlText: {
+    fontSize: 14,
+    color: darkBlue,
+    marginBottom: 4,
+    fontWeight: 'bold',
+  },
   container: {
     alignItems: 'center',
     flex: 1,
@@ -1100,14 +1229,20 @@ dlText: {
     fontSize: 13,
     fontFamily: 'PoppinsMedium',
   },
-  navButton:{
-    width:120,height:50,backgroundColor:darkBlue,elevation:4,borderRadius:10,
-    justifyContent:'center',alignItems:'center',marginBottom:10
+  navButton: {
+    width: 120,
+    height: 50,
+    backgroundColor: darkBlue,
+    elevation: 4,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  navtext:{
-    color:'#fff',
-    fontSize:16,
-    fontWeight:'bold',
+  navtext: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   imgContainer: {
     height: 110,
@@ -1150,7 +1285,7 @@ dlText: {
     tintColor: 'red',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 20,
     marginBottom: 40,
@@ -1201,7 +1336,7 @@ dlText: {
   alertContainer: {
     width: 400,
     height: 450,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -1224,7 +1359,7 @@ dlText: {
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,
@@ -1243,7 +1378,7 @@ dlText: {
   alertContainer: {
     width: 400,
     height: 450,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -1266,7 +1401,7 @@ dlText: {
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,

@@ -206,7 +206,7 @@
 //             style={{
 //               height: 200,
 //               width: '100%',
-//               backgroundColor: '#453D98ff',
+//               backgroundColor: darkBlue,
 //               borderRadius: 10,
 //             }}
 //           />
@@ -273,7 +273,7 @@
 //             }}>
 //             <Text
 //               style={{
-//                 color: '#453D98ff',
+//                 color: darkBlue,
 //                 fontSize: 14,
 //                 // fontWeight: '500',
 //                 fontFamily: 'PoppinsBold',
@@ -323,7 +323,7 @@
 //     tintColor: 'black',
 //   },
 //   button: {
-//     backgroundColor: '#453D98ff',
+//     backgroundColor: darkBlue,
 //     borderRadius: 5,
 //     marginTop: 30,
 //     marginBottom: 20,
@@ -334,7 +334,7 @@
 //     justifyContent: 'center',
 //   },
 //   button1: {
-//     backgroundColor: '#453D98ff',
+//     backgroundColor: darkBlue,
 //     borderRadius: 5,
 //     marginTop: 10,
 //     marginBottom: 20,
@@ -420,6 +420,7 @@ import {
   useCameraDevice,
 } from 'react-native-vision-camera';
 import RNRestart from 'react-native-restart';
+import { darkBlue } from '../components/constant';
 import {it} from 'date-fns/locale';
 const MinesLoading = () => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -1144,7 +1145,7 @@ const MinesLoading = () => {
                 fontSize: 25,
                 // marginBottom: 8,
 
-                color: '#453D98ff',
+                color: darkBlue,
                 fontFamily: 'PoppinsBold',
                 textAlign: 'center',
               }}>
@@ -1206,7 +1207,7 @@ const MinesLoading = () => {
                 fontSize: 25,
                 // marginBottom: 8,
 
-                color: '#453D98ff',
+                color: darkBlue,
                 fontFamily: 'PoppinsBold',
                 textAlign: 'center',
               }}>
@@ -1238,7 +1239,7 @@ const MinesLoading = () => {
               <Text
                 style={{
                   fontSize: 25,
-                  color: '#453D98ff',
+                  color: darkBlue,
                   fontFamily: 'PoppinsBold',
                   textAlign: 'center',
                   marginTop: 10,
@@ -1272,13 +1273,13 @@ const MinesLoading = () => {
         )}
 
         {screen4 && (
-          <ScrollView style={{backgroundColor: '#453D98ff', width: '100%'}}>
+          <ScrollView style={{backgroundColor: darkBlue, width: '100%'}}>
             <View
               style={{
                 // height: '100%',
                 width: '100%',
                 alignItems: 'center',
-                backgroundColor: '#453D98ff',
+                backgroundColor: darkBlue,
               }}>
               <Text
                 style={{
@@ -1461,7 +1462,7 @@ const MinesLoading = () => {
                   setscreen5(true);
                   setscreen6(false);
                 }}>
-                <Text style={[styles.buttonText, {color: '#453D98ff'}]}>
+                <Text style={[styles.buttonText, {color: darkBlue}]}>
                   Enter
                 </Text>
               </TouchableOpacity>
@@ -1470,13 +1471,13 @@ const MinesLoading = () => {
         )}
 
         {screen5 && (
-          <ScrollView style={{backgroundColor: '#453D98ff', width: '100%'}}>
+          <ScrollView style={{backgroundColor: darkBlue, width: '100%'}}>
             <View
               style={{
                 // height: '100%',
                 width: '100%',
                 alignItems: 'center',
-                backgroundColor: '#453D98ff',
+                backgroundColor: darkBlue,
               }}>
               <Text
                 style={{
@@ -2902,7 +2903,7 @@ const MinesLoading = () => {
                   setscreen5(false);
                   setscreen6(true);
                 }}>
-                <Text style={[styles.buttonText, {color: '#453D98ff'}]}>
+                <Text style={[styles.buttonText, {color: darkBlue}]}>
                   Enter
                 </Text>
               </TouchableOpacity>
@@ -2910,13 +2911,13 @@ const MinesLoading = () => {
           </ScrollView>
         )}
         {screen6 && (
-          <ScrollView style={{backgroundColor: '#453D98ff', width: '100%'}}>
+          <ScrollView style={{backgroundColor: darkBlue, width: '100%'}}>
             <View
               style={{
                 // height: '100%',
                 width: '100%',
                 alignItems: 'center',
-                backgroundColor: '#453D98ff',
+                backgroundColor: darkBlue,
               }}>
               <Text
                 style={{
@@ -3066,7 +3067,7 @@ const MinesLoading = () => {
                     {cancelable: false},
                   );
                 }}>
-                <Text style={[styles.buttonText, {color: '#453D98ff'}]}>
+                <Text style={[styles.buttonText, {color: darkBlue}]}>
                   Enter
                 </Text>
               </TouchableOpacity>
@@ -3088,7 +3089,7 @@ const styles = StyleSheet.create({
   truckImage: {
     height: 200,
     width: '100%',
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
   },
   inputContainer: {
@@ -3123,7 +3124,7 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsSemiBold',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginBottom: 20,
     height: 50,

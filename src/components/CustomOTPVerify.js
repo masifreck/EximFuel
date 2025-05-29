@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Keyboard, ActivityIndicator } from 'react-native';
-
+import { darkBlue } from './constant';
 const CustomOTPVerify = ({ onVerify ,onResend ,isVloading}) => {
   const [otp, setOtp] = useState(new Array(4).fill(''));
   const inputRefs = useRef([]);
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 10,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   resendText: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontWeight: 'bold',
   },
   timerText: {

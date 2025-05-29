@@ -17,6 +17,7 @@ import CustomAlert from '../components/CustomAlert';
 import useApiToken from '../components/Token';
 import LoadingIndicator from '../components/LoadingIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { darkBlue } from '../components/constant';
 const MinesUpdateScreen = () => {
   const route = useRoute();
   const [apiTokenReceived, setapiTokenReceived] = useState(null);
@@ -544,7 +545,7 @@ const MinesUpdateScreen = () => {
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -603,7 +604,7 @@ const MinesUpdateScreen = () => {
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -716,7 +717,7 @@ const MinesUpdateScreen = () => {
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -762,7 +763,7 @@ const MinesUpdateScreen = () => {
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -1100,7 +1101,7 @@ const MinesUpdateScreen = () => {
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -1394,7 +1395,7 @@ const styles = StyleSheet.create({
   alertContainer: {
     width: 400,
     height: 450,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -1417,7 +1418,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,
@@ -1430,7 +1431,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 50,
     marginBottom: 20,

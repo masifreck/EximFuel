@@ -1,11 +1,11 @@
 import { StyleSheet, Dimensions } from "react-native";
 const ScreenWidth = Dimensions.get('window').width;
-
+import { darkBlue } from "../components/constant";
 export const styles = StyleSheet.create({
   btn: {
     width: 90,
     height: 45,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     elevation: 4,
     justifyContent: 'center',

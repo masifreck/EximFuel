@@ -12,6 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApiToken from './Token';
+import { darkBlue } from './constant';
 // const CustomInput = ({ placeholder, value, onChangeText }) => (
 //   <View style={[styles.inputContainer, {marginTop: 10}]}>
 //     <TextInput
@@ -526,7 +527,7 @@ const MinesStep4 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>
@@ -1027,7 +1028,7 @@ const MinesStep4 = () => {
             fontSize: 18,
             marginBottom: 8,
             marginTop: 8,
-            color: '#453D98ff',
+            color: darkBlue,
             textAlign: 'center',
             fontFamily: 'PoppinsBold',
           }}>

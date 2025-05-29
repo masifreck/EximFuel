@@ -9,7 +9,7 @@ import {
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useRoute} from '@react-navigation/native';
-
+import { darkBlue } from '../components/constant';
 
 const ShowOwnerDetails = () => {
   const route = useRoute();
@@ -45,7 +45,7 @@ const ShowOwnerDetails = () => {
           }}>
           <Text
             style={{
-              color: '#453D98ff',
+              color: darkBlue,
               fontSize: 20,
               marginBottom: 10,
               marginTop: 20,
@@ -86,7 +86,7 @@ const ShowOwnerDetails = () => {
               style={{
   
                 width: '100%',
-                color: '#453D98ff',
+                color: darkBlue,
                 fontSize: 20,
                 marginBottom: 10,
                 marginTop: 20,
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'white'
   },
     sectionHeader: {
-    color: '#453D98ff',
+    color: darkBlue,
     fontSize: 20,
     marginBottom: 10,
     marginTop: 20,

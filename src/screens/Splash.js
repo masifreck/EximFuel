@@ -30,7 +30,7 @@ const Splash = ({navigation}) => {
       {/* Lottie background animation */}
       
       <LottieView
-        source={require('../assets/truckanimation.json')}
+        source={require('../assets/eximTruck.json')}
         autoPlay
         loop
         style={StyleSheet.absoluteFillObject}

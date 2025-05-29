@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Platform, PermissionsAndroid } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-
+import { darkBlue } from './constant';
 const CustomImagePicker = ({ title, onFileSelected, showFileDetails }) => {
   const [imageFile, setImageFile] = useState(null);
 
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',

@@ -19,6 +19,7 @@ import useApiToken from '../components/Token';
 import LoadingIndicator from '../components/LoadingIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Unloading from './Unloading';
+import { darkBlue } from '../components/constant';
 const RegisterOwner = () => {
   // calander==================
   const [selectedStartDate, setSelectedStartDate] = useState('');
@@ -211,7 +212,7 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 8,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -381,7 +382,7 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
                 fontSize: 18,
                 marginBottom: 8,
                 marginTop: 10,
-                color: '#453D98ff',
+                color: darkBlue,
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
@@ -656,7 +657,7 @@ const styles = StyleSheet.create({
     width: 20,
   },
   button: {
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 5,
     marginTop: 20,
     marginBottom: 40,
@@ -699,7 +700,7 @@ const styles = StyleSheet.create({
   alertContainer: {
     width: 400,
     height: 450,
-    backgroundColor: '#453D98ff',
+    backgroundColor: darkBlue,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -722,7 +723,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#453D98ff',
+    color: darkBlue,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 15,
