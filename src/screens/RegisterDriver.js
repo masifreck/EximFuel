@@ -24,11 +24,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import CustomRequestOptions from '../components/CustomRequestOptions';
 import {CustomRequestOptions} from '../components/CustomRequestOptions';
 import CustomImagePicker from '../components/CustomeImagePicker';
-import {darkBlue, Width} from '../components/constant';
+import {darkBlue, inputbgColor, Width} from '../components/constant';
 import CustomOTPVerify from '../components/CustomOTPVerify';
 import CustomCheckbox from '../components/CustomeCheckBox';
 import SmsSending from '../components/SmsSending';
-const RegisterDriver = () => {
+import Loading from '../components/Loading';
+import Searching from '../components/Searching';
+const RegisterDriver = ({route}) => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
     .then(token => {
@@ -41,7 +43,14 @@ const RegisterDriver = () => {
       console.log('Received token', apiTokenReceived);
       console.log('Error retrieving token:', error);
     });
-  const [IsLoading, setIsLoading] = useState(true);
+    const {DLNumber}=route?.params?route.params:'';
+   // console.log('DL NO FROM ROUTE',DLNumber)
+    useEffect(()=>{
+      if(DLNumber){
+        setdlNumber(DLNumber)
+      }
+    },[DLNumber])
+      const [IsLoading, setIsLoading] = useState(true);
   const [is_everything_ok, setis_everything_ok] = useState(false);
 
   const [hasBorder, setHasBorder] = useState(false); // State for border
@@ -107,7 +116,8 @@ const RegisterDriver = () => {
 
   const [primaryOTPUI, setprimaryOTPUI] = useState(false);
   const [secondaryOTPUI, setSecondaryOTPUI] = useState(false);
-
+const [Commercial,setCommercial]=useState('');
+const [Code,setCode]=useState('');
  useEffect(() => {
   if (isSamePAdd) {
     setCurrentAdd(driverAddress); // Copy if checked
@@ -318,11 +328,32 @@ const RegisterDriver = () => {
     }
     Linking.openURL(number);
   };
+  const [otp1,setOtp1]=useState(null);
 const [otp2,setOtp2]=useState(null);
-  const handleOtpSubmit1 = otp => {
-    console.log('OTP to send to server:', otp);
-    // ✅ Now send this OTP to your backend
-    setprimaryOTPUI(true);
+  const handleOtpSubmit1 = (enteredOtp) => {
+    console.log('OTP to send to server:', enteredOtp);
+   if (enteredOtp === otp1) {
+    // OTP matched ✅
+    setprimaryOTPUI(false);
+    setPverified(true);
+
+    Toast.show({
+      type: 'success',
+      text1: 'PrimaryContact OTP Verified Successfully',
+      text2: `For ${secondaryContact}`,
+      visibilityTime: 3000,
+      position: 'top',
+    });
+  } else {
+    // OTP did not match ❌
+    Toast.show({
+      type: 'error',
+      text1: 'Invalid OTP',
+      text2: 'Please enter the correct OTP',
+      visibilityTime: 3000,
+      position: 'top',
+    });
+  }
   };
  const handleOtpSubmit2 = (enteredOtp) => {
   if (enteredOtp === otp2) {
@@ -332,7 +363,7 @@ const [otp2,setOtp2]=useState(null);
 
     Toast.show({
       type: 'success',
-      text1: 'OTP Verified Successfully',
+      text1: ' Secondary Contact OTP Verified Successfully',
       text2: `For ${secondaryContact}`,
       visibilityTime: 3000,
       position: 'top',
@@ -349,60 +380,51 @@ const [otp2,setOtp2]=useState(null);
   }
 };
 
-
-  const handleOTP1 = async () => {
+  const [isOTP1loading,setIsOtp1Loading]=useState(false);
+const [isOTP2loading,setIsOtp2Loading]=useState(false);
+  const HandldeSendOTP1 = async () => {
     if (!primaryContact || !/^\d{10}$/.test(primaryContact)) {
       setErrorMessage('Please enter a valid primary contact (10 digits)');
       setShowAlert(true);
       return;
     }
 
-    const payload = {
-      PhoneNumber: primaryContact,
-      Username: userName || 'Abhijit Pradhan', // fallback
-    };
+ try {
+    setIsOtp1Loading(true);
+   const generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
-    try {
-      const response = await fetch(
-        'http://visa4health.tranzol.com/api/CodeLogin/SendOtp',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        },
-      );
+    setOtp1(generatedOTP);
 
-      const data = await response.json();
+    const message = `Your OTP is ${generatedOTP} - CIYA Technologies`;
+    const encodedMessage = encodeURIComponent(message); // Properly encoded
+    const apiUrl = `https://bhashsms.com/api/sendmsg.php?user=Anil003&pass=123456&sender=TRNZOL&phone=${secondaryContact}&text=${encodedMessage}&priority=ndnd&stype=normal`;
 
-      if (data && data.PhoneNumber === primaryContact) {
-        setprimaryOTPUI(true);
+    const response = await fetch(apiUrl);
+    const resultText = await response.text();
+    console.log('SMS API response:', resultText);
 
-        Toast.show({
-          type: 'success',
-          text1: 'OTP Sent Successfully',
-          text2: `OTP sent to ${primaryContact}`,
-          visibilityTime: 3000,
-          position: 'top',
-        });
-      } else {
-        throw new Error('Failed to send OTP');
-      }
-    } catch (error) {
-      console.log('OTP send error:', error);
-      setErrorMessage('Failed to send OTP. Please try again.');
-      setShowAlert(true);
-    }
-
-    try {
-      setprimaryOTPUI(true);
-    } catch (error) {
-      console.log(error);
-    }
+    setprimaryOTPUI(true);
+    Toast.show({
+      type: 'success',
+      text1: 'OTP Sent Successfully',
+      text2: `OTP sent to ${secondaryContact}`,
+      visibilityTime: 3000,
+      position: 'top',
+    });
+  } catch (error) {
+    console.log('OTP send error:', error);
+    Toast.show({
+      type: 'error',
+      text1: 'Failed to send OTP',
+      text2: 'Please try again later.',
+    });
+  } finally {
+    setIsOtp1Loading(false);
+  }
   };
-const [isOTP2loading,setIsOtp2Loading]=useState(false);
-const handleOTP2 = async () => {
+
+
+const HadleSendOTP2 = async () => {
   if (!secondaryContact || !/^\d{10}$/.test(secondaryContact)) {
     setErrorMessage('Please enter a valid secondary contact (10 digits)');
     setShowAlert(true);
@@ -411,7 +433,8 @@ const handleOTP2 = async () => {
 
   try {
     setIsOtp2Loading(true);
-    const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+    const generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
     setOtp2(generatedOTP);
 
     const message = `Your OTP is ${generatedOTP} - CIYA Technologies`;
@@ -441,18 +464,61 @@ const handleOTP2 = async () => {
     setIsOtp2Loading(false);
   }
 };
+const [isDLSearching,setIsDLSearching]=useState(false);
+const [ValidTill,setValidTill]=useState('');
+useEffect(() => {
+  const fetchDLDetails = async () => {
+    setIsDLSearching(true);
+    const url = `https://Exim.Tranzol.com/api/OwnerApi/GetVerifyDriver?licenseNo=${dlNumber}
+    &dob=${selectedStartDate}`;
+    console.log(url);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${apiTokenReceived}`,
+        },
+      });
 
+      const data = await response.json();
+    //  console.log(data);
+ setCalendarVisible(false);
+      if (data?.apiResult?.Result) {
+        const Details = data.apiResult.Result;
+        setName(Details.DriverName);
+        setValidTill(Details.ValidTill);
+        setCode(Details.Code);
+        setCommercial(Details.Commercial);
+      } else {
+        Alert.alert('Error', 'Did Not Find Verification Data for This DL NO. Please Check Details');
+      }
+
+    } catch (err) {
+      Alert.alert('Error', 'Error Fetching DL Verification');
+    } finally {
+      setIsDLSearching(false);
+    }
+  };
+
+  // Only call the API when both values are available
+  if (dlNumber && selectedStartDate) {
+    fetchDLDetails();
+  }
+
+}, [dlNumber, selectedStartDate]);
 
 const [currentPage, setCurrentPage] = useState(1);
 const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
   return (
      <>
-    {isOTP2loading ? (
-      <SmsSending />
-    ) : (
+    { isDLSearching? (
+      <Searching/>
+    ) :(
+      
     <ScrollView style={{backgroundColor: '#edeef2'}}>
       {IsLoading ? (
-        <LoadingIndicator />
+        <Loading />
       ) : (
         <View style={styles.container}>
 
@@ -483,7 +549,14 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
           {currentPage === 1 && (
             <>
             
-            <DLCard/>
+            <DLCard 
+            dlno={dlNumber}
+            DOB={selectedStartDate}
+            name={name}
+            ValidTill={ValidTill}
+            Commercial={Commercial}
+            Code={Code}
+            />
           
           <View style={styles.levelContainer}>
             <Text
@@ -500,7 +573,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
             <Text style={styles.MandatoryText}>
               Mandatory Fields<Text style={{color: 'red'}}>*</Text>
             </Text>
-            <CustomInput
+            {/* <CustomInput
               labelText="DL Number"
               placeholdername="Enter DL Number"
               onChangeText={text => setdlNumber(text)}
@@ -508,7 +581,8 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
               width="85%"
               isVerified={isVerified}
               isMandatory={true}
-            />
+              value={dlNumber}
+            /> */}
             <Text style={styles.levelText}>
               Date Of Birth <Text style={{color: 'red'}}>*</Text>
             </Text>
@@ -585,26 +659,32 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
                   source={require('../assets/phonecall.png')}
                 />
               </TouchableOpacity>
+                          {Pverified ? (
+  <Image source={require('../assets/check-mark.png')} style={{width:50,height:50,marginTop:20}} />
+) : (
               <TouchableOpacity
                 style={{
                   width: 70,
                   height: 50,
-                  backgroundColor: darkBlue,
+                  backgroundColor: primaryOTPUI?'gray':darkBlue,
                   alignItems: 'center',
                   justifyContent: 'center',
                   elevation: 4,
                   borderRadius: 10,
                   marginTop: 35,
                 }}
-                onPress={handleOTP1}>
+                onPress={HandldeSendOTP1}
+                disabled={primaryOTPUI}
+                >
+                  {isOTP1loading ? (  <ActivityIndicator size="small" color="#fff" />):(
                 <Text
                   style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>
                   GET OTP
-                </Text>
+                </Text>)}
                 {/* <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>OTP</Text> */}
-              </TouchableOpacity>
+              </TouchableOpacity>)}
             </View>
-            {primaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit1} />}
+            {primaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit1}  onResend={HandldeSendOTP1}/>}
             <CustomCheckbox label="I Call and Verify the Primary No." value={isPCVerified} onChange={(value) => setPCVerified(value ? true : false)} />
             <View
               style={{
@@ -643,7 +723,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
     borderRadius: 10,
     marginTop: 35,
   }}
-  onPress={handleOTP2}
+  onPress={HadleSendOTP2}
   disabled={secondaryOTPUI}
 >
   {isOTP2loading ? (
@@ -659,7 +739,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
              
             </View>
            
-            {secondaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit2}  onResend={handleOTP2}/>}
+            {secondaryOTPUI && <CustomOTPVerify onVerify={handleOtpSubmit2}  onResend={HadleSendOTP2}/>}
               <CustomCheckbox label="I Call and Verify the Secondary No." value={isSCVerified} onChange={(value) => setSCVerified(value ? true : false)} />
             <CustomInput
               labelText="Pan Number"
@@ -853,7 +933,7 @@ const bgcolor2 = currentPage===1 ? 'grey' : 'limegreen';
     </>
   );
 };
-const DLCard = ({driver}) => {
+const DLCard = ({driver,name,dlno,ValidTill,DOB,Commercial,convselectedStartDate,Code}) => {
     function convertDateFormat(inputDate) {
     const [year, month, day] = inputDate.split('T')[0].split('-');
     return `${day}-${month}-${year}`;
@@ -880,18 +960,54 @@ const DLCard = ({driver}) => {
       <View style={styles.dlCardHeader}>
        
       </View>
-      <Text style={[styles.dlText,{position:'absolute',top:25,left:70,fontWeight:'bold'}]}>TEST 123456789</Text>
+      <Text style={[styles.dlText,{position:'absolute',top:28,left:70,
+        fontSize:16
+      }]}>{dlno?dlno:''}</Text>
      
        
         <View style={styles.dlDetails}>
         
-          
-          <Text style={[styles.dlText,{position:'absolute',top:85,left:70,fontSize:10}]}> {formattedDate ? formattedDate : '-'}</Text>
+           <Text style={[styles.dlText,{position:'absolute',top:54,left:140,fontSize:13}]}> {ValidTill ? ValidTill : '-'}</Text>
+          <Text style={[styles.dlText,{position:'absolute',top:85,left:73,fontSize:12}]}> {DOB ? DOB : '-'}</Text>
           {/* <Text style={styles.dlText}>{driver.PrimaryContactNo}</Text> */}
-            <Text style={[styles.dlText,{position:'absolute',bottom:22,left:10,fontSize:11}]}>Driver Name</Text>
-       
+            <Text style={[styles.dlText,{position:'absolute',bottom:24,left:10,fontSize:15}]}>{name?name:''}</Text>
+{Code &&                  <Text
+  style={[
+    styles.dlText,
+    {
+      position: 'absolute',
+      bottom: 20,
+      left: 195,
+      fontSize: 11,
+      
+    }
+  ]}
+>
+  Code:{' '}
+  <Text style={{ color: Code === 'VERIFIED' ? 'green' : 'red' }}>
+    {Code ? Code : ''}
+  </Text>
+</Text>}
+
+{Commercial &&      <Text
+  style={[
+    styles.dlText,
+    {
+      position: 'absolute',
+      bottom: 8,
+      left: 195,
+      fontSize: 11,
+      
+    }
+  ]}
+>
+  Commercial:{' '}
+  <Text style={{ color: Commercial === 'YES' ? 'green' : 'red' }}>
+    {Commercial ? Commercial : ''}
+  </Text>
+</Text>}
         
-         <Image source={require('../assets/driver.png')} style={[styles.dlPhoto,{position:'absolute',right:-10,top:35}]} />
+         {/* <Image source={require('../assets/driver.png')} style={[styles.dlPhoto,{position:'absolute',right:-10,top:35}]} /> */}
       </View>
    
     </ImageBackground>
@@ -926,7 +1042,6 @@ const styles = StyleSheet.create({
   dlCard: {
 height:200,
 width:320,
-backgroundColor:'red',
   borderRadius: 10,
   margin: 16,
   padding: 12,
@@ -960,8 +1075,9 @@ dlDetails: {
 },
 dlText: {
   fontSize: 14,
-  color: '#000',
+  color: darkBlue,
   marginBottom: 4,
+  fontWeight:'bold'
 },
   container: {
     alignItems: 'center',
@@ -1014,7 +1130,7 @@ dlText: {
   inputContainer: {
     height: 50,
     width: '90%',
-    backgroundColor: '#cedff0',
+    backgroundColor: inputbgColor,
     flexDirection: 'row',
     paddingHorizontal: 15,
     borderRadius: 10,

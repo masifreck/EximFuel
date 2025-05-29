@@ -8,20 +8,21 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
-  Animated,
+  Animated,Alert
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import CustomAlert from '../components/CustomAlert';
 import {CustomRequestOptionsAdmin} from '../components/CustomRequestOptions';
 import useApiToken from '../components/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Searching from '../components/Searching';
 const OwnerDetails = () => {
   const navigation = useNavigation();
   const [apiTokenReceived, setapiTokenReceived] = useState(null);
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      console.log('Retrieved token:', token);
+     // console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
@@ -78,7 +79,7 @@ const OwnerDetails = () => {
         setIsLoading(true); // Set loading state to true
         // console.log('entered if');
         try {
-          console.log('entered try');
+         // console.log('entered try');
           const {url, requestOptions} = CustomRequestOptionsAdmin(
             `https://Exim.Tranzol.com/api/OwnerApi/GetDriver?licenseNo=${dlNumber}`,
             apiTokenReceived,
@@ -87,7 +88,7 @@ const OwnerDetails = () => {
           setIsLoading(false);
           if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            //console.log('driver fetch main api',data);
             if (data.error) {
               const errorMessage = data.error;
               console.log('API Response Error:', errorMessage);
@@ -96,15 +97,45 @@ const OwnerDetails = () => {
               resetInputs();
             } else {
               if (data.apiResult.Result === null) {
-                const errorMessage = 'DL Number Not Found';
-                setErrorMessage(errorMessage);
-                handleShowToast();
-                resetInputs();
+                 Alert.alert(
+                   'Driver Not Registered',
+                   'This Driver is not registered. Do you want to register it?',
+                   [
+                     {
+                       text: 'No',
+                       style: 'cancel',
+                     },
+                     {
+                       text: 'Yes',
+                       onPress: () => {
+                         navigation.navigate('RegisterDriver', {
+                           DLNumber: dlNumber,
+                         });
+                       },
+                     },
+                   ],
+                   { cancelable: false }
+                 );
               } else if (data.apiResult.Result.DLNumber === null) {
-                const errorMessage = 'DL Number Not Found';
-                setErrorMessage(errorMessage);
-                handleShowToast();
-                resetInputs();
+                  Alert.alert(
+                   'Driver Not Registered',
+                   'This Driver is not registered. Do you want to register it?',
+                   [
+                     {
+                       text: 'No',
+                       style: 'cancel',
+                     },
+                     {
+                       text: 'Yes',
+                       onPress: () => {
+                         navigation.navigate('RegisterDriver', {
+                           DLNumber: dlNumber,
+                         });
+                       },
+                     },
+                   ],
+                   { cancelable: false }
+                 );
               } else {
                 navigation.navigate(redirectpage, {
                   driverDetails: data,
@@ -137,6 +168,10 @@ const OwnerDetails = () => {
   };
 
   return (
+    <>
+    {isLoading?(
+      <Searching/>
+    ):(
     <ScrollView>
       <View style={styles.container}>
         <View
@@ -211,13 +246,14 @@ const OwnerDetails = () => {
         onClose={closeAlert}
       />
 
-      {showToast && (
+      {/* {showToast && (
         <Animated.View
           style={[styles.toastContainer, {opacity: fadeAnim, zIndex: 999}]}>
           <Text style={styles.toastText}>{errorMessage}</Text>
         </Animated.View>
-      )}
-    </ScrollView>
+      )} */}
+    </ScrollView>)}
+    </>
   );
 };
 

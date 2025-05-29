@@ -1,28 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
 import { darkBlue } from './constant';
 
-const SelectButton = ({ onSelect }) => {
-  const [selectedOption, setSelectedOption] = useState('E-Challan');
+const SelectButton = ({ isFirstSelected, onSelect, button1Text = 'E-Challan', button2Text = 'Manually' }) => {
+  const scaleFirst = useRef(new Animated.Value(1)).current;
+  const scaleSecond = useRef(new Animated.Value(1)).current;
 
-  const scaleEChallan = useRef(new Animated.Value(1)).current;
-  const scaleManual = useRef(new Animated.Value(1)).current;
+  const handleSelect = (value) => {
+    onSelect(value);
 
-  useEffect(() => {
-    onSelect(selectedOption); // notify parent on mount and update
-  }, [selectedOption]);
+    const animatedValue = value ? scaleFirst : scaleSecond;
 
-  const handleSelect = (option) => {
-    setSelectedOption(option);
-
-    // Animate
     Animated.sequence([
-      Animated.timing(option === 'E-Challan' ? scaleEChallan : scaleManual, {
+      Animated.timing(animatedValue, {
         toValue: 1.1,
         duration: 100,
         useNativeDriver: true,
       }),
-      Animated.timing(option === 'E-Challan' ? scaleEChallan : scaleManual, {
+      Animated.timing(animatedValue, {
         toValue: 1,
         duration: 100,
         useNativeDriver: true,
@@ -32,40 +27,24 @@ const SelectButton = ({ onSelect }) => {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={{ transform: [{ scale: scaleEChallan }] }}>
+      <Animated.View style={{ transform: [{ scale: scaleFirst }] }}>
         <TouchableOpacity
-          style={[
-            styles.button,
-            selectedOption === 'E-Challan' && styles.selectedButton,
-          ]}
-          onPress={() => handleSelect('E-Challan')}
+          style={[styles.button, isFirstSelected && styles.selectedButton]}
+          onPress={() => handleSelect(true)}
         >
-          <Text
-            style={[
-              styles.buttonText,
-              selectedOption === 'E-Challan' && styles.selectedText,
-            ]}
-          >
-            E-Challan
+          <Text style={[styles.buttonText, isFirstSelected && styles.selectedText]}>
+            {button1Text}
           </Text>
         </TouchableOpacity>
       </Animated.View>
 
-      <Animated.View style={{ transform: [{ scale: scaleManual }] }}>
+      <Animated.View style={{ transform: [{ scale: scaleSecond }] }}>
         <TouchableOpacity
-          style={[
-            styles.button,
-            selectedOption === 'Manually' && styles.selectedButton,
-          ]}
-          onPress={() => handleSelect('Manually')}
+          style={[styles.button, !isFirstSelected && styles.selectedButton]}
+          onPress={() => handleSelect(false)}
         >
-          <Text
-            style={[
-              styles.buttonText,
-              selectedOption === 'Manually' && styles.selectedText,
-            ]}
-          >
-            Manually
+          <Text style={[styles.buttonText, !isFirstSelected && styles.selectedText]}>
+            {button2Text}
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -77,27 +56,32 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    padding: 16,
+    padding: 10,
+    gap:20,
+    alignItems:'center'
   },
   button: {
     paddingVertical: 10,
-    paddingHorizontal: 30,
+    paddingHorizontal: 10,
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
-    elevation:4
+    elevation: 4,
+    width:120
   },
   selectedButton: {
     backgroundColor: darkBlue,
   },
   buttonText: {
     color: darkBlue,
-    fontSize: 18,
-    fontWeight:'bold'
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign:'center'
   },
   selectedText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize:18
+    fontSize: 14,
+    textAlign:'center'
   },
 });
 

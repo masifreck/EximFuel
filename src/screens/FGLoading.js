@@ -19,6 +19,7 @@ import Loading from '../components/Loading';
 import { Dropdown } from 'react-native-element-dropdown';
 import {  Dimensions } from "react-native";
 import { textColor } from '../components/constant';
+import SelectButton from '../components/SelectButton';
 const ScreenWidth = Dimensions.get('window').width;
 const OwnerDetails = () => {
   const navigation = useNavigation();
@@ -361,7 +362,11 @@ const OwnerDetails = () => {
       fetchJobOthers(); // Call the function to fetch job details
     }
   }, [selectedJobNo]);
+  const [selected, setSelected] = useState(true);
 
+  const handleSelection = (value) => {
+    setSelected(value);
+  };
   return (
         <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -377,6 +382,7 @@ const OwnerDetails = () => {
             marginTop: '30%',
             marginBottom: 20,
           }}>
+         
           <View
             style={{
               height: 200,
@@ -400,6 +406,13 @@ const OwnerDetails = () => {
               resizeMode="contain"
             />
           </View>
+           <SelectButton 
+           isFirstSelected={selected}
+              button1Text="Entry"
+        button2Text="Check Details"
+           onSelect={handleSelection} />
+           {selected? (
+            <>
            <View>
    <Text style={styles.levelText}>
           Job No 
@@ -496,7 +509,13 @@ const OwnerDetails = () => {
     setSearchDriver(text);
   }}
 />
+  <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('FGLoadingEntry')}>
+            <Text style={styles.text}>Generate Challan</Text>
+          </TouchableOpacity>
 </View>
+</>
+):(
+  <>
           <View
             style={[
               styles.inputContainer,
@@ -527,21 +546,20 @@ const OwnerDetails = () => {
               onChangeText={text => setchallanNumber(text)}
             />
           </View>
-     <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('FGLoadingEntry')}>
-            <Text style={styles.text}>Generate Challan</Text>
-          </TouchableOpacity>
+   
 
 
           <TouchableOpacity style={styles.button} onPress={handleShowDetails}>
             <Text style={styles.text}>Show Challan Details</Text>
           </TouchableOpacity>
-
+          </>
+)}
           <View
             style={{
               flexDirection: 'column',
               alignItems: 'center',
             }}>
-            <Text
+            {/* <Text
               style={{
                 color: 'black',
                 fontSize: 18,
@@ -563,8 +581,9 @@ const OwnerDetails = () => {
                 }}>
                 Click Here.
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
+      
         </View>
       )}
       <CustomAlert
@@ -572,12 +591,12 @@ const OwnerDetails = () => {
         message={errorMessage}
         onClose={closeAlert}
       />
-      {showToast && (
+      {/* {showToast && (
         <Animated.View
           style={[styles.toastContainer, {opacity: fadeAnim, zIndex: 999}]}>
           <Text style={styles.toastText}>{errorMessage}</Text>
         </Animated.View>
-      )}
+      )} */}
     </ScrollView>
     </KeyboardAvoidingView>
   );
