@@ -1,29 +1,32 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import SelectButton from '../components/SelectButton';
-import FGLoadingCard from '../components/FGLoadingCard';
 import FirstPage from '../components/FGLoading/FirstPage';
+import BaseCard from '../FGLoading/BaseCard';
 
 const FGLoadingEntry = () => {
   const [selected, setSelected] = useState(true);
+  const [vehicleNo, setVehicleNo] = useState('');
 
-  const handleSelection = (value) => {
-    setSelected(value);
-  };
+  const vehicleOptions = [
+    { label: 'MH12AB1234', value: 'MH12AB1234' },
+    { label: 'MH13CD5678', value: 'MH13CD5678' },
+    { label: 'MH14EF9012', value: 'MH14EF9012' },
+  ];
 
   return (
     <View style={{ flex: 1, paddingTop: 10 }}>
-      <SelectButton onSelect={handleSelection} 
-       isFirstSelected={selected}
-      />
-   
-      <FGLoadingCard
-  imageSource={require('../assets/rcfrontnew.jpg')}
-  imageOpacity={0.1} // You can adjust opacity here
->
-<FirstPage/>
-</FGLoadingCard>
+      <SelectButton onSelect={setSelected} isFirstSelected={selected} />
 
+      <BaseCard
+        Key="Vehicle No"
+        value={vehicleNo}
+        isEditable={selected}
+        dropDownData={vehicleOptions}
+        onSelect={setVehicleNo}
+      />
+
+      <FirstPage />
     </View>
   );
 };

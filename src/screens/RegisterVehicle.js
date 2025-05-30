@@ -363,7 +363,7 @@ setTaxExpiry(details.TaxExpiry)
                       />
                     </View>
                     <ScrollView horizontal={true} style={{flexDirection:'row'}}>
-<ImageBackground source={require('../assets/rcfrontnew.jpg')} imageStyle={{borderRadius:10}}
+<ImageBackground source={require('../assets/rcfrontnew.png')} imageStyle={{borderRadius:10}}
 style={styles.dlCard}>
 <Text
   style={{
@@ -503,7 +503,7 @@ style={styles.dlCard}>
 
           <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
             <CustomImagePicker
-              bgImage={require('../assets/rcfrontnew.jpg')}
+              bgImage={require('../assets/rcfrontnew.png')}
               title=" RC Front"
               onImagePicked={handleRCFront}
               imageData={RCFrontPhoto}

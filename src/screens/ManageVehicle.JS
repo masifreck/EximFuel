@@ -125,7 +125,7 @@ const ManageVehicle = () => {
 
   const imageList = [
     require('../assets/truckleft.png'),
-    require('../assets/rcfrontnew.jpg'),
+    require('../assets/rcfrontnew.png'),
     require('../assets/driver.png'),
   ];
 
