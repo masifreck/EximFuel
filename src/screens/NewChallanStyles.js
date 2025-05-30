@@ -89,7 +89,7 @@ export const styles = StyleSheet.create({
   },
   inputContainerforbtn: {
     height: 50,
-    width: '83%',
+    width:  ScreenWidth * 0.8,
     backgroundColor: '#e6eff0',
     flexDirection: 'row',
     paddingHorizontal: 15,

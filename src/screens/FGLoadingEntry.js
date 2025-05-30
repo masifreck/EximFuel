@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import SelectButton from '../components/SelectButton';
-import FirstPage from '../components/FGLoading/FirstPage';
+
 import BaseCard from '../FGLoading/BaseCard';
 
 const FGLoadingEntry = () => {
@@ -16,7 +16,7 @@ const FGLoadingEntry = () => {
 
   return (
     <View style={{ flex: 1, paddingTop: 10 }}>
-      <SelectButton onSelect={setSelected} isFirstSelected={selected} />
+  
 
       <BaseCard
         Key="Vehicle No"
@@ -26,7 +26,7 @@ const FGLoadingEntry = () => {
         onSelect={setVehicleNo}
       />
 
-      <FirstPage />
+      
     </View>
   );
 };

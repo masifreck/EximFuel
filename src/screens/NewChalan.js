@@ -5,13 +5,16 @@ import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/nativ
 
 import CustomFilePicker from '../components/CustomFilePicker';
 import CalendarModal from '../components/Calander';
-
+import { darkBlue } from '../components/constant';
 import {Dropdown} from 'react-native-element-dropdown';
 import { styles } from './NewChallanStyles';
 const ScreeWidth=Dimensions.get('window').width
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from "jwt-decode";
 import CustomImagePicker from '../components/CustomFilePicker';
+import StepIndicator from '../FGLoading/StepIndicator';
+import SelectButton from '../components/SelectButton';
+import CardType2 from '../FGLoading/CardType2';
 
 
 const NewChalan = () => {
@@ -19,7 +22,13 @@ const NewChalan = () => {
 
   const navigation = useNavigation();
   const route = useRoute();
-  
+  const {JOBNO}=route?.params? route.params :''
+console.log('job no from route',JOBNO)
+  useEffect(()=>{
+if(JOBNO){
+  setJobNo(JOBNO)
+}
+  },[JOBNO])
   // State variables
   const [data1, setData1] = useState({});
   const [data2, setData2] = useState({});
@@ -28,8 +37,9 @@ const NewChalan = () => {
   
  
   
-  const [isStep1Visible, setIsStep1Visible]=useState(true)
-  
+  const [isStep1Visible, setIsStep1Visible]=useState(false);
+  const [isFirstStep,setFirstSetp]=useState(true)
+  const [isStep3,setIsStep3]=useState(false)
   const[delNo2,setDelNo2]=useState('')
 
   const [ChallanNo, setChallanNo] = useState('');
@@ -226,6 +236,7 @@ useEffect(() => {
   const [loadingData,setLoadingData]=useState([]);
     const [unloadingData,setUnloadingData]=useState([]);
     const [materialData,setMaterialDate]=useState([])
+     const [selected, setSelected] = useState(true);
   
   const onPaymentStepComplete = async () => {
 
@@ -438,6 +449,15 @@ console.log('Api Response',response)
 };
 
 
+const HandleNext1 = async () => {
+  try {
+    setIsStep1Visible(true);   // ✅ Correct setter
+    setFirstSetp(false);     // ✅ Correct setter
+  } catch (err) {
+    Alert.alert('Error', 'In moving on to step 2');
+    console.log(err);
+  }
+};
 
 const HandleNext = async () => {
   // Perform validation before proceeding
@@ -482,6 +502,8 @@ const HandleNext = async () => {
   // Delay navigation to ensure state is updated before moving to the next step
   setTimeout(() => {
     setIsStep1Visible(false);
+    setIsStep3(true);
+  
   }, 100);
   console.log('data1',data1)
 };
@@ -496,9 +518,8 @@ const HandleNext = async () => {
 
 const HandlePrevious = async () => {
   try {
-  
-
     setIsStep1Visible(true);
+    setIsStep3(false);
   } catch (error) {
     console.error('Error retrieving data from local storage', error);
     Alert.alert('Error', 'Failed to load data');
@@ -1003,31 +1024,145 @@ const fetchLoading = async (search) => {
     console.log('Error in fetching job no:', error);
   }
 };
-const bgcolor = isStep1Visible ? 'transparent' : 'limegreen';
-const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
 
   return (
     <ScrollView style={{backgroundColor: 'white',paddingVertical:30,width:'100%'}}>
       <View style={{justifyContent:'center',alignItems:'center',width:'100%',flex:1}}>
-      <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-      <View style={{width:80,height:80,borderRadius:40,
-        borderColor:'limegreen',borderWidth:8,
-        justifyContent:'center',alignItems:'center'
-      }}>
-{isStep1Visible &&<Text style={{color:'gray',fontWeight:'bold',fontSize:35}}>1</Text>}
-{!isStep1Visible && <Image style={{width:50,height:50}} source={require('../assets/check-mark.png')}/>}
-      </View>
-      <View style={{width:70,height:8,backgroundColor:bgcolor2}}>
-     
-      </View>
-      <View style={{width:80,height:80,borderRadius:40,
-        borderColor:bgcolor2,borderWidth:8,
-        justifyContent:'center',alignItems:'center'
-      }}>
-<Text style={{color:'gray',fontWeight:'bold',fontSize:35}}>2</Text>
-      </View>
-      </View>
-      {isStep1Visible? (
+        
+         <StepIndicator
+        isFirstStep={isFirstStep}
+        isStep1Visible={isStep1Visible}
+        isStep3={isStep3}
+      />
+      
+      {isFirstStep?(
+  <View style={styles.container}>
+    
+       
+       <View style={styles.levelContainer}>
+         <SelectButton onSelect={setSelected} isFirstSelected={selected} />
+          <Text style={styles.levelText}>
+           Challan No <Text style={{color: 'red'}}>*</Text>
+         </Text>
+         <View style={[styles.inputContainer,{marginBottom:15}]}>
+           <TextInput
+             placeholderTextColor={'#6c6f73'}
+             style={{
+               color: 'black',
+               fontSize: 15,
+               width: '80%',
+               marginRight: 20,
+             }}
+             value={ChallanNo}
+             placeholder={'Enter Challan No'}
+             autoCorrect={false}
+             onChangeText={text => setChallanNo(text)}
+           />
+         </View>
+         </View>
+             <View style={styles.levelContainer}>
+         <View style={{marginTop:10}}>
+         <CardType2
+         heading='VEHICLE DETAILS'
+         title='VEHICLE NO'
+         value='MH12AB1234'
+         borderTopLeftRadius={15}
+         borderTopRightRadius={15}
+         />
+              <CardType2
+         
+         title='Verification'
+         value='Yes'
+         />
+              <CardType2
+         
+         title='Validity'
+         value='25-05-2026'
+         borderBottomLeftRadius={16}
+         borderBottomRightRadius={16}
+         />
+         </View>
+         <View style={{marginTop:10,elevation:4}}>
+          <CardType2
+          heading='OWNER DETAILS'
+          title='Name'
+          value='Dummy Name'
+               borderTopLeftRadius={15}
+         borderTopRightRadius={15}
+          />
+            <CardType2
+        title="Address"
+        value="123, Dummy Street, Test City, 567890"
+      />
+      <CardType2
+        title="Primary Contact"
+        value="+91-9876543210"
+      />
+      <CardType2
+        title="Secondary Contact"
+        value="+91-9123456789"
+      />
+      <CardType2
+        title="PAN No"
+        value="ABCDE1234F"
+          borderBottomLeftRadius={16}
+         borderBottomRightRadius={16}
+      />
+    
+         </View>
+         <View style={{marginTop:10,marginBottom:20}}>
+          <CardType2
+  heading="JOB DETAILS"
+  title="Loading"
+  value="Warehouse A"
+          borderTopLeftRadius={15}
+         borderTopRightRadius={15}
+/>
+
+<CardType2
+  title="Unloading"
+  value="Warehouse B"
+/>
+
+<CardType2
+  title="Consignor"
+  value="ABC Corporation"
+/>
+
+<CardType2
+  title="Consignee"
+  value="XYZ Enterprises"
+/>
+
+<CardType2
+  title="Material"
+  value="Electronics"
+    borderBottomLeftRadius={16}
+         borderBottomRightRadius={16}
+/>
+
+         </View>
+        </View>
+         
+             <View style={{flexDirection:'row',justifyContent:'space-between',
+          alignItems:'center',gap:130,paddingBottom:50
+        }}>
+        <TouchableOpacity
+        onPress={HandleReset}
+        style={[styles.btn,{marginBottom:50}]}>
+        <Text style={styles.btntext}>Reset</Text>
+      </TouchableOpacity>
+<TouchableOpacity
+  onPress={HandleNext1}
+  style={[styles.btn,{marginBottom:50}]}>
+  <Text style={styles.btntext}>Next</Text>
+</TouchableOpacity>
+</View>
+       </View>
+       
+      ) :
+      
+      isStep1Visible? (
        <View style={styles.container}>
        <View style={styles.levelContainer}>
        {openQRScanner1 && (
@@ -1049,24 +1184,7 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
            }}>
            Identification Information
          </Text>
-         <Text style={styles.levelText}>
-           Challan No <Text style={{color: 'red'}}>*</Text>
-         </Text>
-         <View style={styles.inputContainer}>
-           <TextInput
-             placeholderTextColor={'#6c6f73'}
-             style={{
-               color: 'black',
-               fontSize: 15,
-               width: '80%',
-               marginRight: 20,
-             }}
-             value={ChallanNo}
-             placeholder={'Enter Challan No'}
-             autoCorrect={false}
-             onChangeText={text => setChallanNo(text)}
-           />
-         </View>
+       
        
  
          
@@ -1104,103 +1222,9 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
            </TouchableOpacity>
           
            </View>
-           <TouchableOpacity
-             style={{
- marginLeft:10,
-               alignItems: 'center',
-               justifyContent: 'center',
-           }}
-             onPress={() => HandleEwaybill2()}
-           >
-   
- 
- <Image style={{width: 40, height: 40}} source={imageSource3} />
- 
-            
-           </TouchableOpacity>
+          
          </View>
-         {isVisibleEWaybill2 && (
-           <>
-           <Text style={styles.levelText}>E-Way Bill No 2</Text>
-           <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center',
-             paddingHorizontal: 15,
-           }}>
-             
-             <View style={styles.inputContainerforbtn}>
-   <TextInput
-     placeholderTextColor={'#6c6f73'}
-     style={{
-       color: 'black',
-       fontSize: 15,
-       width: '60%',
-       marginRight: 20,
-     }}
-     value={ewayBillNo2}
-     placeholder={'Enter E-Way Bill No  2'}
-     autoCorrect={false}
-     onChangeText={text => setEwayBillNo2(text)}
-   />
-     <TouchableOpacity onPress={()=>navigation.navigate('externalscanner',{field:5})}>
-           <Image
-             style={{width:50,height:50,}}
-             source={require('../assets/scannere.jpg')}
-           />
-           </TouchableOpacity>
-    <TouchableOpacity onPress={()=>navigation.navigate('QRScanner',{field:5})}>
-           <Image
-             style={styles.rightIcon}
-             source={require('../assets/qr-code.png')}
-           />
-           </TouchableOpacity>
- </View>
- <TouchableOpacity
-     style={{
-      
-       alignItems: 'center',
-       justifyContent: 'center',
-       marginLeft:10
-        
-     }}
-     onPress={() => HandleEwaybill3()}
-   >
-     <Image style={{ width: 40, height: 40 }} source={imageSource4} />
-   </TouchableOpacity>
-   </View>
-             </>
-         )}
-          {isVisibleEWaybill3 && (
-           <>
-             <Text style={styles.levelText}>E-Way Bill No 3</Text>
-             <View style={styles.inputContainer}>
-               <TextInput
-                 placeholderTextColor={'#6c6f73'}
-                 style={{
-                   color: 'black',
-                   fontSize: 15,
-                   width: '70%',
-                   marginRight: 20,
-                 }}
-                 value={ewayBillNo3}
-                 placeholder={'Enter E-Way Bill No 3'}
-                 autoCorrect={false}
-                 onChangeText={text => setEwayBillNo3(text)}
-               />
-                 <TouchableOpacity onPress={()=>navigation.navigate('externalscanner',{field:6})}>
-           <Image
-             style={{width:50,height:50,}}
-             source={require('../assets/scannere.jpg')}
-           />
-           </TouchableOpacity>
-                 <TouchableOpacity onPress={()=>navigation.navigate('QRScanner',{field:6})}>
-           <Image
-             style={styles.rightIcon}
-             source={require('../assets/qr-code.png')}
-           />
-           </TouchableOpacity>
-              
-             </View>
-             </>
-         )}
+       
         
          <Text style={styles.levelText}>Client Invoice 1</Text>
          <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center',
@@ -1233,104 +1257,10 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
            />
            </TouchableOpacity>
          </View>
-         <TouchableOpacity
-             style={{
- marginLeft:10,
-               alignItems: 'center',
-               justifyContent: 'center',
-           }}
-             onPress={() => HandleInput2()}
-           >
-   
  
- <Image style={{width: 40, height: 40}} source={imageSource} />
- 
-            
-           </TouchableOpacity>
          </View>
  
-         {inputVisible2 && (
-           <>
-           <Text style={styles.levelText}>Client Invoice 2</Text>
-           <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center',
-             paddingHorizontal: 15,
-           }}>
-             
-             <View style={styles.inputContainerforbtn}>
-   <TextInput
-     placeholderTextColor={'#6c6f73'}
-     style={{
-       color: 'black',
-       fontSize: 15,
-       width: '60%',
-       marginRight: 20,
-     }}
-     value={clientInvoice2}
-     placeholder={'Client Invoice 2'}
-     autoCorrect={false}
-     onChangeText={text => setClientInvoice2(text)}
-   />
-     <TouchableOpacity onPress={()=>navigation.navigate('externalscanner',{field:3})}>
-           <Image
-             style={{width:50,height:50,}}
-             source={require('../assets/scannere.jpg')}
-           />
-           </TouchableOpacity>
-    <TouchableOpacity onPress={()=>navigation.navigate('QRScanner',{field:3})}>
-           <Image
-             style={styles.rightIcon}
-             source={require('../assets/qr-code.png')}
-           />
-           </TouchableOpacity>
- </View>
- <TouchableOpacity
-     style={{
-      
-       alignItems: 'center',
-       justifyContent: 'center',
-       marginLeft:10
-        // optional, for padding around the image
-     }}
-     onPress={() => HandleInput3()}
-   >
-     <Image style={{ width: 40, height: 40 }} source={imageSource2} />
-   </TouchableOpacity>
-   </View>
-             </>
-         )}
-          {inputVisible3 && (
-           <>
-             <Text style={styles.levelText}>Client Invoice 3</Text>
-             <View style={styles.inputContainer}>
-               <TextInput
-                 placeholderTextColor={'#6c6f73'}
-                 style={{
-                   color: 'black',
-                   fontSize: 15,
-                   width: '70%',
-                   marginRight: 20,
-                 }}
-                 value={clientInvoice3}
-                 placeholder={'Client Invoice 3'}
-                 autoCorrect={false}
-                 onChangeText={text => setClientInvoice3(text)}
-               />
-                 <TouchableOpacity onPress={()=>navigation.navigate('externalscanner',{field:4})}>
-           <Image
-             style={{width:50,height:50,}}
-             source={require('../assets/scannere.jpg')}
-           />
-           </TouchableOpacity>
-                 <TouchableOpacity onPress={()=>navigation.navigate('QRScanner',{field:4})}>
-           <Image
-             style={styles.rightIcon}
-             source={require('../assets/qr-code.png')}
-           />
-           </TouchableOpacity>
-              
-             </View>
-             </>
-         )}
+    
 
 <Text style={styles.levelText}>Load Date
 <Text style={{color: 'red'}}> *</Text></Text>    
@@ -1374,11 +1304,10 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
   onClose={() => setModalVisible(false)}
   onSelect={(date, convDate) => {
     setSelectedDate(convDate);  // Set the formatted date (YYYY-MM-DD)
+    setModalVisible(false);
   }}
 />
 
-
-{console.log('material value',materialValue)}
            <Text style={styles.levelText}>Material Value</Text>
         <View style={styles.inputContainer}>
           <TextInput
@@ -1633,7 +1562,7 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
          </View>
        </View>
      </View>
-      ):(
+      ) : isStep3 ? (
         <View style={styles.container}>
       <View style={styles.levelContainer}>
         <Text style={styles.MandatoryText}>
@@ -1650,41 +1579,13 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
           }}>
           Other Details
         </Text>
-        <Text style={styles.levelText}>
-          Job No 
-        </Text>
        
-        
-        <Dropdown
-  style={styles.dropdown}
-  placeholderStyle={styles.placeholderStyle}
-  selectedTextStyle={styles.selectedTextStyle}
-  inputSearchStyle={styles.inputSearchStyle}
-  itemTextStyle={{color: 'black'}}
-  data={jobData}  // Updated job data from API
-  search
-  maxHeight={300}
-  labelField="label"
-  valueField="value"
-  placeholder={'Select Job No'}
-  value={jobNo}
-  onFocus={() => setIsFocus(true)}
-  onBlur={() => setIsFocus(false)}
-  onChange={item => {
-    setJobNo(item.value);  // Set selected job number
-    setSelectedJobNo(item.label)
-    setJobId(item.value)
-    
-    console.log('Selected Job ID:', item.value,selectedJobNo,item.label);  // Log the selected job ID
-    setIsFocus(false);
-  }}
-  onChangeText={text => {
-    setSearchTerm(text);  // Update searchTerm as user types
-  }}
-/>
 
 
-        <Text style={styles.levelText}>
+{!jobNo &&    
+(
+  <>
+<Text style={styles.levelText}>
         Loading Point
         </Text>
        
@@ -1848,56 +1749,12 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
             onChangeText={text => setGrossWt(text)}
             editable={false}
           />
-        </View>
-        <Text style={styles.levelText}>
-          Vehicle No <Text style={{color: 'red'}}>*</Text>
-        </Text>
+        </View> 
+        </>
+        )}
+  
        
-        
-        <Dropdown
-  style={styles.dropdown}
-  placeholderStyle={styles.placeholderStyle}
-  selectedTextStyle={styles.selectedTextStyle}
-  inputSearchStyle={styles.inputSearchStyle}
-  itemTextStyle={{color: 'black'}}
-  data={vehicleData}  // Updated job data from API
-  search
-  maxHeight={300}
-  labelField="label"
-  valueField="value"
-  placeholder={'Select Vehicle No'}
-  value={vehicleNo}
-  onFocus={() => setIsFocus(true)}
-  onBlur={() => setIsFocus(false)}
-  onChange={item => {
-    setVehicleNo(item.value);  // Set selected job number
-    setSelectedVehicleNo(item.label)
-    setVehicleId(item.value)
-    console.log('Selected Vehicle ID:', item.value,selectedVehicleNo,);  // Log the selected job ID
-    setIsFocus(false);
-  }}
-  onChangeText={text => {
-    setSearchVehicle(text);
-  }}
-/>
-<Text style={styles.levelText}>Owner Name</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholderTextColor={'#6c6f73'}
-            style={{
-              color: 'black',
-              fontSize: 15,
-              width: '80%',
-              marginRight: 20,
-            }}
-            placeholder={'Owner Name'}
-            autoCorrect={false}
-            editable={false}
-            value={ownerName}
-            
-            onChangeText={text => setOwnerName(text)}
-          />
-        </View>
+
           <Text style={styles.levelText}>Gross Weight
           
           </Text>
@@ -1998,35 +1855,7 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
             setIsFocus(false);
           }}
         />
-   <Text style={styles.levelText}>
-          Driver<Text style={{color: 'red'}}>*</Text>
-        </Text>
-       
-        
-        <Dropdown
-  style={styles.dropdown}
-  placeholderStyle={styles.placeholderStyle}
-  selectedTextStyle={styles.selectedTextStyle}
-  inputSearchStyle={styles.inputSearchStyle}
-  itemTextStyle={{color: 'black'}}
-  data={driverData}  // Updated job data from API
-  search
-  maxHeight={300}
-  labelField="label"
-  valueField="value"
-  placeholder={'Select Driver'}
-  value={driverName}
-  onFocus={() => setIsFocus(true)}
-  onBlur={() => setIsFocus(false)}
-  onChange={item => {
-    setDriverId(item.value),
-    setDriverName(item.value)
-    setIsFocus(false);
-  }}
-  onChangeText={text => {
-    setSearchDriver(text);
-  }}
-/>
+
   <Text style={styles.levelText}>
           Broker  
         </Text>
@@ -2142,15 +1971,21 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
         </View>
       </View>
        </View>
+      ):(
+        <View>
+
+        </View>
       )}
       {isStep1Visible? (
         <View style={{flexDirection:'row',justifyContent:'space-between',
           alignItems:'center',gap:130,paddingBottom:50
         }}>
         <TouchableOpacity
-        onPress={HandleReset}
+        onPress={()=>{setFirstSetp(true)
+          setIsStep1Visible(false);
+        }}
         style={[styles.btn,{marginBottom:50}]}>
-        <Text style={styles.btntext}>Reset</Text>
+        <Text style={styles.btntext}>Previous</Text>
       </TouchableOpacity>
 <TouchableOpacity
   onPress={HandleNext}
@@ -2158,7 +1993,7 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
   <Text style={styles.btntext}>Next</Text>
 </TouchableOpacity>
 </View>
-      ):(
+      ): isStep3?(
 <View style={{flexDirection:'row',justifyContent:'space-between',
   alignItems:'center',gap:130,paddingBottom:50
 }}>
@@ -2180,6 +2015,8 @@ const bgcolor2 = isStep1Visible ? 'grey' : 'limegreen';
     <Text style={styles.btntext}>Submit</Text>)}
   </TouchableOpacity>
 </View>
+      ):(
+        <View></View>
       )}
       </View>
      

@@ -510,7 +510,7 @@ const OwnerDetails = () => {
     setSearchDriver(text);
   }}
 />
-  <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('FGLoadingEntry')}>
+  <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('NewChalan',{JOBNO:jobNo})}>
             <Text style={styles.text}>Generate Challan</Text>
           </TouchableOpacity>
 </View>
