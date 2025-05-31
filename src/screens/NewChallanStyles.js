@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 const ScreenWidth = Dimensions.get('window').width;
-import { darkBlue } from "../components/constant";
+import { darkBlue, inpurtbgcolor2, textColor } from "../components/constant";
 export const styles = StyleSheet.create({
   btn: {
     width: 90,
@@ -128,5 +128,23 @@ export const styles = StyleSheet.create({
     backgroundColor: '#e6eff0',
     paddingHorizontal: 15,
     marginBottom: 10,
+  },
+   togglecontainer: {
+    marginVertical: 15,
+    marginHorizontal: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: inpurtbgcolor2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 10,
+    elevation: 2,
+  },
+  togglelabel: {
+    fontSize: 16,
+    color:textColor,
+    fontFamily: 'PoppinsRegular',
+    fontWeight: 'bold',
   },
 });

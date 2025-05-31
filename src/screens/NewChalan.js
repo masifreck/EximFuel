@@ -1,4 +1,6 @@
-import { ScrollView, ActivityIndicator, Alert,View, TouchableOpacity, Text, StyleSheet,TextInput,Image, Dimensions } from 'react-native';
+import { ScrollView, ActivityIndicator, Alert,View, TouchableOpacity, Text, StyleSheet,TextInput,Image, Dimensions,
+  Switch
+ } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { data, LoadtypeData } from '../components/DropDownData';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
@@ -15,6 +17,7 @@ import CustomImagePicker from '../components/CustomFilePicker';
 import StepIndicator from '../FGLoading/StepIndicator';
 import SelectButton from '../components/SelectButton';
 import CardType2 from '../FGLoading/CardType2';
+import { is } from 'date-fns/locale';
 
 
 const NewChalan = () => {
@@ -126,6 +129,8 @@ const [truckSource,setTruckSource]=useState('')
   const [ewayBillNo3,setEwayBillNo3]=useState('');
   const [ChallanDoc,setChallanDoc]=useState();
   const [InvoiceDoc,setInvoiceDoc]=useState();
+
+   const [isOtherAccount, setIsOtherAccount] = useState(false);
   const HandleInput2=()=>{
     setInputVisible2(!inputVisible2)
     setClientInvoice2('')
@@ -1024,7 +1029,7 @@ const fetchLoading = async (search) => {
     console.log('Error in fetching job no:', error);
   }
 };
-
+  const toggleSwitch = () => setIsOtherAccount(prev => !prev);
   return (
     <ScrollView style={{backgroundColor: 'white',paddingVertical:30,width:'100%'}}>
       <View style={{justifyContent:'center',alignItems:'center',width:'100%',flex:1}}>
@@ -1096,12 +1101,28 @@ const fetchLoading = async (search) => {
       />
       <CardType2
         title="Primary Contact"
-        value="+91-9876543210"
+        value="9876543210"
+        isNVerify={true}
       />
       <CardType2
         title="Secondary Contact"
-        value="+91-9123456789"
+        value="9123456789"
+          isNVerify={true}
       />
+      <CardType2
+  heading="BANK DETAILS"
+  title="Account Number"
+  value="123451234"
+/>
+<CardType2
+  title="IFSC Code"
+  value="HDFC0001234"
+/>
+<CardType2
+  title="Bank Name"
+  value="HDFC Bank"
+/>
+
       <CardType2
         title="PAN No"
         value="ABCDE1234F"
@@ -1109,6 +1130,36 @@ const fetchLoading = async (search) => {
          borderBottomRightRadius={16}
       />
     
+         </View>
+         <View style={{marginTop:10,marginBottom:10}}>
+          <CardType2
+  heading="DRIVER DETAILS"
+  title="Name"
+  value="John Doe"
+        borderTopLeftRadius={15}
+         borderTopRightRadius={15}
+/>
+<CardType2
+  title="Primary Contact"
+  value="9876543210"
+  isNVerify={true}
+/>
+<CardType2
+  title="Secondary Contact"
+  value="9123456789"
+  isNVerify={true}
+/>
+<CardType2
+  title="Address"
+  value="123 Transport Lane, Test City"
+/>
+<CardType2
+  title="DL No"
+  value="DL1234567890"
+          borderBottomLeftRadius={16}
+         borderBottomRightRadius={16}
+/>
+
          </View>
          <View style={{marginTop:10,marginBottom:20}}>
           <CardType2
@@ -1512,6 +1563,18 @@ const fetchLoading = async (search) => {
              keyboardType='numeric'
            />
          </View>
+    <View style={styles.togglecontainer}>
+      <Text style={styles.togglelabel}>Other Account</Text>
+      <Switch
+        value={isOtherAccount}
+        onValueChange={toggleSwitch}
+        thumbColor={isOtherAccount ? 'white' : '#f4f3f4'}
+        trackColor={{ false: '#ccc', true: darkBlue || '#4682B4' }}
+        ios_backgroundColor="#ccc"
+      />
+    </View>
+{isOtherAccount && (
+  <>
          <Text style={styles.levelText}>Account Holder Name</Text>
          <View style={styles.inputContainerend}>
            <TextInput
@@ -1559,7 +1622,8 @@ const fetchLoading = async (search) => {
             
            />
            
-         </View>
+         </View> 
+         </>)}
        </View>
      </View>
       ) : isStep3 ? (
@@ -1752,9 +1816,6 @@ const fetchLoading = async (search) => {
         </View> 
         </>
         )}
-  
-       
-
           <Text style={styles.levelText}>Gross Weight
           
           </Text>

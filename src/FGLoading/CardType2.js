@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet ,TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { darkBlue, inpurtbgcolor2, textColor } from '../components/constant';
+import { darkBlue, inpurtbgcolor2, inputbgColor, textColor } from '../components/constant';
+import { is } from 'date-fns/locale';
 
 const getIconName = (title = '') => {
   switch (title.toLowerCase()) {
@@ -22,22 +23,34 @@ const getIconName = (title = '') => {
     case 'pan no':
       return 'id-card';
     case 'loading':
-      return 'arrow-up';        // icon for loading
+      return 'arrow-up';
     case 'unloading':
-      return 'arrow-down';      // icon for unloading
+      return 'arrow-down';
     case 'consignor':
-      return 'industry';        // icon for consignor
+      return 'industry';
     case 'consignee':
-      return 'building';        // icon for consignee
+      return 'building';
     case 'material':
-      return 'archive';           // icon for material
+      return 'archive';
+    case 'account number':
+      return 'bank';            // icon for Account Number
+    case 'ifsc code':
+      return 'code';            // icon for IFSC Code
+    case 'bank name':
+      return 'university';   
+      case 'dl no':
+  return 'id-badge';
+case 'driver':
+  return 'user-circle';
+   // icon for Bank Name
     default:
       return 'info-circle';
   }
 };
 
 
-const CardType2 = ({ heading, title, value ,borderTopLeftRadius,borderTopRightRadius,borderBottomLeftRadius,borderBottomRightRadius}) => {
+
+const CardType2 = ({ heading, title, value ,borderTopLeftRadius,borderTopRightRadius,borderBottomLeftRadius,borderBottomRightRadius,isNVerify}) => {
   const iconName = getIconName(title);
 
   return (
@@ -50,6 +63,11 @@ const CardType2 = ({ heading, title, value ,borderTopLeftRadius,borderTopRightRa
           <Text style={styles.keyText}>{title}</Text>
         </View>
         <Text style={styles.valueText}>{value}</Text>
+        {isNVerify && (
+          <TouchableOpacity style={styles.btn}>
+            <Text style={styles.btnText}>VERIFY</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -57,9 +75,9 @@ const CardType2 = ({ heading, title, value ,borderTopLeftRadius,borderTopRightRa
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: inpurtbgcolor2,
+    backgroundColor: inputbgColor,
     paddingHorizontal: 8,
-    padding: 4,
+    padding: 6,
    
   },
   row: {
@@ -90,8 +108,22 @@ const styles = StyleSheet.create({
   valueText: {
     color: textColor,
     fontWeight: 'bold',
-    flex: 2,
+    flex: 1,
   },
+  btn:{
+    padding:8,
+    justifyContent:'center',
+    alignItems:'center',
+    flex:1,
+    width:50,
+   // backgroundColor:'yellow',
+    marginRight:-20
+  },
+  btnText:{
+    color:'red',
+    fontWeight:'bold',
+    fontSize:12
+  }
 });
 
 export default CardType2;
