@@ -23,7 +23,7 @@ const CustomDropbox = ({
         style={{
           alignItems: 'flex-start',
           padding: 5,
-          marginLeft: '5%',
+         // marginLeft: '5%',
           color: 'black',
           fontSize: 13,
           fontFamily: 'PoppinsMedium',

@@ -28,6 +28,16 @@ import CustomCheckbox from '../components/CustomeCheckBox';
 import CustomOTPVerify from '../components/CustomOTPVerify';
 import Toast from 'react-native-toast-message';
 import {darkBlue, inputbgColor} from '../components/constant';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import { Alert, Platform } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
+import {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+  openSettings,
+} from 'react-native-permissions';
 const RegisterOwner = () => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -71,6 +81,11 @@ const RegisterOwner = () => {
   const [TotalVehicles, setTotalVehicles] = useState(0);
   const [ShortageRecovery, setShortageRecovery] = useState(0);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
+
+  const [StateId,setStateId]=useState(null);
+  const [StateData,setStateData]=useState([]);
+  const [stateSearch, setStateSearch] = useState('');
+
   const [hasBorder, setHasBorder] = useState(false); // State for border
 
   const [adharFront, setAdharFront] = useState(null);
@@ -86,7 +101,8 @@ const RegisterOwner = () => {
   const [acTypeData, setAcTypeData] = useState([]);
   const [searchAcType, setSearchAcType] = useState('');
   
-
+  const [ZipCode, setZipCode] = useState('');
+const [MapUrl,setMapUrl] = useState('');  
   const [isPCVerified, setPCVerified] = useState(false);
   const [isSCVerified, setSCVerified] = useState(false);
 
@@ -111,35 +127,79 @@ const RegisterOwner = () => {
 
   const [banksearch, setbanksearch] = useState('bank');
 
-  // useEffect(() => {
-  //   if (banksearch && apiTokenReceived !== null) {
-  //     fetchData1();
-  //   }
-  //   if (apiTokenReceived !== null) {
-  //     fetchData2();
-  //   }
-  // }, [banksearch, apiTokenReceived]);
-  // useEffect(() => {
-  //   console.log(data1, data2, 'data is here');
-  //   if (data1.length === 0 || data2.length === 0) {
-  //     setIsLoading(true);
-  //   } else {
-  //     setIsLoading(false);
-  //     setis_everything_ok(true);
-  //   }
-  // }, [data1, data2]);
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     if (is_everything_ok === false) {
-  //       // Redirect to home page if is_everything_ok is still false after 45 seconds
-  //       console.log('Redirecting to home page...');
-  //       setErrorMessage('Unexpected Error! Login Again');
-  //       setShowAlert(true);
-  //     }
-  //   }, 45000); // 45 seconds in milliseconds
+const getCurrentCoordinates = async () => {
+  const permissionType = Platform.select({
+    android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+    ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+  });
 
-  //   return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
-  // }, [is_everything_ok]);
+  try {
+    let permissionStatus = await check(permissionType);
+
+    if (permissionStatus === RESULTS.DENIED || permissionStatus === RESULTS.LIMITED) {
+      permissionStatus = await request(permissionType);
+    }
+
+    if (permissionStatus === RESULTS.GRANTED) {
+      return await new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+          position => {
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          error => {
+            reject(new Error('Failed to fetch location: ' + error.message));
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000,
+            forceRequestLocation: true,
+            showLocationDialog: true,
+          }
+        );
+      });
+    } else if (permissionStatus === RESULTS.BLOCKED) {
+      Alert.alert(
+        'Location Permission Blocked',
+        'Please enable location access in your settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open Settings', onPress: openSettings },
+        ]
+      );
+      throw new Error('Location permission blocked');
+    } else {
+      throw new Error('Location permission denied');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+// Create a function to fetch and set the map URL
+const fetchAndSetCurrentLocation = async () => {
+  try {
+    const coordinates = await getCurrentCoordinates();
+    console.log('Current Coordinates:', coordinates);
+    const { latitude, longitude } = coordinates;
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    setMapUrl(mapUrl);
+    console.log('Map URL:', mapUrl);
+  } catch (error) {
+    console.error('Error fetching coordinates:', error);
+    setErrorMessage('Failed to fetch location. Please enable location services.');
+    setShowAlert(true);
+  }
+};
+
+// Call this function inside useEffect or anywhere else
+useEffect(() => {
+  fetchAndSetCurrentLocation();
+}, []);
+
+
 
   // ============================================================
   const validation = () => {
@@ -183,77 +243,139 @@ const RegisterOwner = () => {
       setShowAlert(true);
       return false;
     }
+    if(!MapUrl){
+      setErrorMessage('Please enalbe your location');
+      setShowAlert(true);
+       fetchAndSetCurrentLocation();
+      return false;
+    }
 
     return true;
   };
 
-  const registertheOwner = () => {
-    if (!validation()) return;
-    setIsLoading(true);
-    const postData = {
-      OwnerName: name,
-      PanNo: panno,
-      AdharNo: adharNumber,
-      DobOwner: ConvSelectedStartDate,
-      TdsTypeId: partytype,
-      PrimaryMobileNo: primaryContact,
-      SecondaryMobileNo: secondaryContact,
-      Address: ownerAddress,
-      EmailAddress: email,
-      AccountNo: acnumber,
-      BankId: bankName,
-      AccountTypeId: acType,
-      IFSCCode: IfscCode,
-      TotalNoVehicle: TotalVehicles,
-      ShortageRecovery: ShortageRecovery,
-    };
-    console.log('posted data==============', postData);
-    const {url, requestOptions} = CustomRequestOptions(
-      'https://Exim.Tranzol.com/api/OwnerApi/CreateOwner',
-      apiTokenReceived,
-      postData,
-    );
-    console.log(url, requestOptions);
-    fetch(url, requestOptions)
-      .then(response => {
-        setIsLoading(false);
-        if (!response.ok) {
-          const error = 'Network response was not ok';
-          setErrorMessage(error);
-          setShowAlert(true);
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setIsLoading(false);
-        if (data.apiResult.Result !== null) {
-          const errorMessage = 'Registration Successfull';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
-        } else {
-          if (
-            data.apiResult.Error ===
-            "Violation of UNIQUE KEY constraint 'owner_panNo'. Cannot insert duplicate key in object 'dbo.App_Owner'. The duplicate key value is (AAAAA1111A).\r\nThe statement has been terminated."
-          ) {
-            const errorMessage = 'Panno is already exists.';
-            setErrorMessage(errorMessage);
-            setShowAlert(true);
-          } else {
-            const errorMessage = data.apiResult.Error;
-            setErrorMessage(errorMessage);
-            setShowAlert(true);
-            console.log('logged', data.apiResult);
-          }
-        }
-      })
-      .catch(error => {
-        setIsLoading(false);
-        console.log('Error:', error);
-        setErrorMessage('Network Error');
-        setShowAlert(true);
-      });
+const registertheOwner = () => {
+  if (!validation()) return;
+  setIsLoading(true);
+  
+  const postData = {
+    OwnerName: name,
+    PanNo: panno,
+    AdharNo: adharNumber,
+    DobOwner: ConvSelectedStartDate,
+    TdsTypeId: partytype,
+    PrimaryMobileNo: primaryContact,
+    SecondaryMobileNo: secondaryContact,
+    Address: ownerAddress,
+    IsPCVerification: isPCVerified,
+    IsSCVefication: isSCVerified,
+    PCVerification: Pverified,
+    SCVerification: isSCVerified,
+    MapUrl: MapUrl,
+    ZipCode: ZipCode,
+    StateId:StateId,
+    EmailAddress: email,
+    AccountNo: acnumber,
+    BankId: bankName,
+    AccountTypeId: acType,
+    IFSCCode: IfscCode,
+    TotalNoVehicle: TotalVehicles,
+    ShortageRecovery: ShortageRecovery,
   };
+
+  const formData = new FormData();
+
+  // Append all fields after converting boolean & number to string
+  Object.keys(postData).forEach(key => {
+    if (postData[key] !== null) {
+      let value = postData[key];
+      if (typeof value === 'boolean' || typeof value === 'number') {
+        value = String(value);
+      }
+      formData.append(key, value);
+      console.log(`${key}: ${value}`);  // Hermes-safe logging
+    }
+  });
+
+  // Append files if available
+  if (adharFront) {
+    formData.append('AadharFront', {
+      uri: adharFront.uri,
+      type: adharFront.type,
+      name: adharFront.fileName || 'AdharFront.jpg',
+    });
+    console.log("AadharFront attached");
+  }
+
+  if (adharBack) {
+    formData.append('AadharBack', {
+      uri: adharBack.uri,
+      type: adharBack.type,
+      name: adharBack.fileName || 'AdharBack.jpg',
+    });
+    console.log("AadharBack attached");
+  }
+
+  if (PanPhotot) {
+    formData.append('Pan', {
+      uri: PanPhotot.uri, 
+      type: PanPhotot.type,
+      name: PanPhotot.fileName || 'PanCard.jpg',
+    });
+    console.log("Pan attached");
+  }
+
+  if (passPhoto) {
+    formData.append('Passbook', { 
+      uri: passPhoto.uri,
+      type: passPhoto.type,
+      name: passPhoto.fileName || 'Passbook.jpg',
+    });
+    console.log("Passbook attached");
+  }
+
+  // Now send request
+  fetch('https://Exim.Tranzol.com/api/OwnerApi/CreateOwnerWithImage', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiTokenReceived}`
+      // Do NOT add Content-Type here; let fetch handle it for multipart/form-data
+    },
+    body: formData
+  }) 
+  .then(async response => {
+    setIsLoading(false);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log("Server Error Response:", errorText);
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    console.log('Response:', data);
+    return data;
+  })
+  .then(data => {
+    if (data.apiResult.Result !== null) {
+      Alert.alert('Registration Successful', 'Owner registered successfully!', )
+      navigation.goBack();
+    } else {
+      if (data.apiResult.Error.includes("owner_panNo")) {
+        setErrorMessage('Panno already exists.');
+      } else {
+        setErrorMessage(data.apiResult.Error);
+      }
+      setShowAlert(true);
+    }
+  })
+  .catch(error => {
+    setIsLoading(false);
+    console.log('Error:', error);
+    setErrorMessage('Network Error');
+    setShowAlert(true);
+  });
+};
+
+
+
   const closeAlert = () => {
     setShowAlert(false);
     //navigation.navigate('OwnerDetails');
@@ -290,15 +412,54 @@ const RegisterOwner = () => {
     setPanPhoto(image);
   }, []);
 
+    const fetchState = async search => {
+    try {
+      console.log('Fetching Association with search:', search);
+      const encodedSearch = encodeURIComponent(search);
+      const url = `https://Exim.Tranzol.com/api/DropDown/State?search=${encodedSearch}`;
+      console.log('Request URL:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Basic ${apiTokenReceived}`, // assuming this token is defined correctly
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+
+        if (data.StateList) {
+          const StateData = data.StateList.map(item => ({
+            label: item.StateName,
+            value: item.Id,
+          }));
+          setStateData(StateData);
+        } else {
+          console.log('No bank results found.');
+        }
+      } else {
+        console.log('Error in fetching state data. Status:', response.status);
+      }
+    } catch (error) {
+      console.log('Error in fetching state data:', error);
+    }
+  };
   useEffect(() => {
     if (serachBank) {
       fetchBankName(serachBank);
     }
   }, [serachBank]);
-  const fetchBankName = async search => {
+  useEffect(()=>{
+    if(stateSearch){
+      fetchState(stateSearch);
+    }
+  },[stateSearch])
+  const fetchBankName = async stateSearch => {
     try {
-      console.log('Fetching Association with search:', search);
-      const encodedSearch = encodeURIComponent(search);
+      console.log('Fetching Association with stateSearch:', stateSearch);
+      const encodedSearch = encodeURIComponent(stateSearch);
       const url = `https://Exim.Tranzol.com/api/OwnerApi/GetBankNameList?search=${encodedSearch}`;
       console.log('Request URL:', url);
 
@@ -761,6 +922,27 @@ const HadleSendOTP2 = async () => {
             labelText="Email Address"
             placeholdername="Enter Email Id"
             onChangeText={text => setEmail(text)}
+          />
+          <CustomDropbox
+            hasBorder={hasBorder}
+            labelText="State Name"
+            dropData={StateData}
+            placeholdername={'Enter State Name'}
+            searchPlaceholdername={'search...'}
+            value={bankName}
+            onChange={item => {
+              setStateId(item.value);
+              setStateSearch(stateSearch);
+            }}
+            onChangeText={text => setStateSearch(text)}
+          />
+             <CustomInput
+            labelText="Zip Code"
+            placeholdername="Enter Zip Code"
+            onChangeText={text => setZipCode(text)}
+            value={ZipCode}
+               stringlength={6}
+            keyboardTypename="numeric"
           />
           <CustomInput
             labelText="Owner Address"

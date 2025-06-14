@@ -33,16 +33,15 @@ const getIconName = (title = '') => {
     case 'material':
       return 'archive';
     case 'account number':
-      return 'bank';            // icon for Account Number
+      return 'bank';            
     case 'ifsc code':
-      return 'code';            // icon for IFSC Code
+      return 'code';            
     case 'bank name':
       return 'university';   
       case 'dl no':
   return 'id-badge';
 case 'driver':
   return 'user-circle';
-   // icon for Bank Name
     default:
       return 'info-circle';
   }

@@ -1,6 +1,6 @@
 import {View, Text,ActivityIndicator} from 'react-native';
 import React from 'react';
-
+import { darkBlue } from './constant';
 const LoadingIndicator = () => {
   return (
     <View
