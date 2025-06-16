@@ -31,6 +31,14 @@ import CustomCheckbox from '../components/CustomeCheckBox';
 import SmsSending from '../components/SmsSending';
 import Loading from '../components/Loading';
 import Searching from '../components/Searching';
+import Geolocation from 'react-native-geolocation-service';
+import {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+  openSettings,
+} from 'react-native-permissions';
 const RegisterDriver = ({route}) => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -100,13 +108,8 @@ const RegisterDriver = ({route}) => {
   const [driverAddress, setdriverAddress] = useState('');
   const [PanNo, setPanNo] = useState('');
 
-  const [capturedPhoto1, setCapturedPhoto1] = useState(null);
-  const [capturedPhoto2, setCapturedPhoto2] = useState(null);
-  const [capturedPhoto3, setCapturedPhoto3] = useState(null);
-  const [DLPhoto, setDLPhoto] = useState(null);
-  const [AdharFPhoto, setAdharFPhoto] = useState(null);
-  const [AdharBPhoto, setAdharBPhoto] = useState(null);
-  const [PanPhoto, setPanPhotot] = useState(null);
+
+ 
   
   const [isSamePAdd, setIsSamePAdd] = useState(false);
   const [currentAdd, setCurrentAdd] = useState('');
@@ -127,6 +130,8 @@ const RegisterDriver = ({route}) => {
 
   const [Commercial, setCommercial] = useState('');
   const [Code, setCode] = useState('');
+
+  const [MapUrl,setMapUrl] = useState('');
   useEffect(() => {
     if (isSamePAdd) {
       setCurrentAdd(driverAddress); // Copy if checked
@@ -134,7 +139,77 @@ const RegisterDriver = ({route}) => {
       setCurrentAdd(''); // Clear if unchecked
     }
   }, [isSamePAdd, driverAddress]);
+const getCurrentCoordinates = async () => {
+  const permissionType = Platform.select({
+    android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+    ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+  });
 
+  try {
+    let permissionStatus = await check(permissionType);
+
+    if (permissionStatus === RESULTS.DENIED || permissionStatus === RESULTS.LIMITED) {
+      permissionStatus = await request(permissionType);
+    }
+
+    if (permissionStatus === RESULTS.GRANTED) {
+      return await new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+          position => {
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          error => {
+            reject(new Error('Failed to fetch location: ' + error.message));
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000,
+            forceRequestLocation: true,
+            showLocationDialog: true,
+          }
+        );
+      });
+    } else if (permissionStatus === RESULTS.BLOCKED) {
+      Alert.alert(
+        'Location Permission Blocked',
+        'Please enable location access in your settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open Settings', onPress: openSettings },
+        ]
+      );
+      throw new Error('Location permission blocked');
+    } else {
+      throw new Error('Location permission denied');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+// Create a function to fetch and set the map URL
+const fetchAndSetCurrentLocation = async () => {
+  try {
+    const coordinates = await getCurrentCoordinates();
+    console.log('Current Coordinates:', coordinates);
+    const { latitude, longitude } = coordinates;
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    setMapUrl(mapUrl);
+   // console.log('Map URL:', mapUrl);
+  } catch (error) {
+    console.error('Error fetching coordinates:', error);
+    setErrorMessage('Failed to fetch location. Please enable location services.');
+    setShowAlert(true);
+  }
+};
+
+// Call this function inside useEffect or anywhere else
+useEffect(() => {
+  fetchAndSetCurrentLocation();
+}, []);
   const validation = () => {
     const cleanDL = dlNumber.replace(/[\s-]/g, ''); // assuming dlNumber is your state variable
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
@@ -192,32 +267,109 @@ const RegisterDriver = ({route}) => {
       setShowAlert(true);
       return false;
     }
-
+   if(!MapUrl){
+      setErrorMessage('Please enalbe your location');
+      setShowAlert(true);
+       fetchAndSetCurrentLocation();
+      return false;
+    }
     // If valid
     return true;
   };
 
   const registertheDriver = () => {
     if (!validation()) return;
-    // setIsLoading(true);
+     setIsLoading(true);
+     console.log('date',convselectedStartDate)
+     const parts=convselectedStartDate.split('/');
+     const formattedDate = `${parts[0]}-${parts[1]}-${parts[2]}`
     const postData = {
       DLNumber: dlNumber,
       DriverName: name,
       AdharNo: adharNumber,
-      Dob: convselectedStartDate,
+      Dob: formattedDate,
       PrimaryContactNo: primaryContact,
+          MapUrl: MapUrl,
+           IsPCVerification: isPCVerified,
+    IsSCVefication: isSCVerified,
+    PCVerification: Pverified,
+    SCVerification: isSCVerified,
       SecondaryContactNo: secondaryContact,
       DriverEmail: email,
       DriverAddress: driverAddress,
       PanNo: PanNo,
     };
+      const formData = new FormData();
+
+  // Append all fields after converting boolean & number to string
+  Object.keys(postData).forEach(key => {
+    if (postData[key] !== null) {
+      let value = postData[key];
+      if (typeof value === 'boolean' || typeof value === 'number') {
+        value = String(value);
+      }
+      formData.append(key, value);
+    }
+  });
+if(DriverFrontImage){
+formData.append('DriverFrontImage',{
+  uri:DriverFrontImage.uri,
+  type:DriverFrontImage.type,
+  name:DriverFrontImage.fileName || 'driver.jpg'
+});
+}
+if(DriverLeftImage){
+  formData.append('DriverLeftImage',{  
+  uri:DriverLeftImage.uri,
+  type:DriverLeftImage.type,
+  name:DriverLeftImage.fileName || 'driver.jpg'
+});
+}
+if(DriverRightImage){
+  formData.append('DriverRightImage',{
+  uri:DriverRightImage.uri,
+  type:DriverRightImage.type,
+  name:DriverRightImage.fileName || 'driver.jpg'
+});
+}
+if(DLPhoto){
+  formData.append('DrivingLicence',{
+  uri:DLPhoto.uri,
+  type:DLPhoto.type,
+  name:DLPhoto.fileName || 'dl.jpg'
+})
+}
+if(adharFront){
+  formData.append('AadharFront',{
+  uri:adharFront.uri,
+  type:adharFront.type,
+  name:adharFront.fileName || 'adhar.jpg'
+})
+}
+if(adharBack){
+  formData.append('AdharBack',{
+  uri:adharBack.uri,
+  type:adharBack.type,
+  name:adharBack.fileName || 'adhar.jpg'
+});
+}
+if(panPhoto){
+  formData.append('Pan',{
+  uri:panPhoto.uri,
+    
+  type:panPhoto.type,
+  name:panPhoto.fileName || 'pan.jpg'
+});
+}
+
     console.log('data', postData);
-    const {url, requestOptions} = CustomRequestOptions(
-      'https://Exim.Tranzol.com/api/OwnerApi/CreateDriver',
-      apiTokenReceived,
-      postData,
-    );
-    fetch(url, requestOptions)
+
+    fetch('https://Exim.Tranzol.com/api/OwnerApi/CreateDriver',{
+      method:'POST',
+      headers:{
+        'Authorization':`Basic ${apiTokenReceived}`,
+      },body:formData,
+    })
       .then(response => {
         setIsLoading(false);
         if (!response.ok) {
@@ -236,18 +388,20 @@ const RegisterDriver = ({route}) => {
           setShowAlert(true);
         } else if (data.apiResult.Result === null) {
           if (
-            data.apiResult.Error ===
-            "Violation of UNIQUE KEY constraint 'Driver_Dl'. Cannot insert duplicate key in object 'dbo.App_Driver'. The duplicate key value is (123451234512345).\r\nThe statement has been terminated."
+            data.apiResult.Error.includes(
+            "Violation of UNIQUE KEY constraint 'Driver_Dl'.")
           ) {
             const errorMessage = 'Driver license is already exists.';
             setErrorMessage(errorMessage);
             setShowAlert(true);
           } else {
-            handleShowToast();
+              setErrorMessage(data.apiResult.Error);
+            setShowAlert(true);
             console.log('logged', data.apiResult);
           }
         } else {
-          handleShowToast();
+          setErrorMessage(data.apiResult.Error);
+            setShowAlert(true);
           console.log('logged', data.apiResult);
         }
       })
@@ -264,13 +418,7 @@ const RegisterDriver = ({route}) => {
   };
 
   // Verification code=======================================================================
-  useEffect(() => {
-    if (dlNumber.length === 15 || dlNumber.length === 16) {
-      setIsVerified(true);
-    } else {
-      setIsVerified(false);
-    }
-  }, [dlNumber]);
+
 
   useEffect(() => {
     // Check if apiTokenReceived is not null
@@ -292,21 +440,25 @@ const RegisterDriver = ({route}) => {
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
 
+  const [DriverFrontImage,setDriverFrontImage]=useState(null);
+const [DriverLeftImage,setDriverLeftImage]=useState(null);
+const [DriverRightImage,setDriverRightImage]=useState(null);
+  const [DLPhoto, setDLPhoto] = useState(null);
   const [adharFront, setAdharFront] = useState(null);
   const [adharBack, setAdharBack] = useState(null);
   const [panPhoto, setPanPhoto] = useState(null);
-  const [dlPhoto, setdlPhoto] = useState(null);
+  
   const handleSaveImageData1 = image => {
     //console.log('Selected Image Data:', image);
-    setCapturedPhoto1(image);
+    setDriverLeftImage(image);
   };
   const handleSaveImageData2 = image => {
     //console.log('Selected Image Data:', image);
-    setCapturedPhoto2(image);
+    setDriverFrontImage(image);
   };
   const handleSaveImageData3 = image => {
     //console.log('Selected Image Data:', image);
-    setCapturedPhoto3(image);
+    setDriverRightImage(image);
   };
 
   const handleAdharFront = image => {
@@ -816,6 +968,7 @@ const RegisterDriver = ({route}) => {
                       labelText="Pan Number"
                       placeholdername="Enter Pan Number"
                       onChangeText={text => setPanNo(text)}
+                      autoCapitalize={'charters'}
                     />
 
                     <CustomInput
@@ -884,7 +1037,7 @@ const RegisterDriver = ({route}) => {
                       title="Driver Photo Left"
                       iconName="camera-enhance"
                       onImagePicked={handleSaveImageData1}
-                      imageData={capturedPhoto1}
+                      imageData={DriverLeftImage}
                     />
                     <CustomImagePicker
                       width={80}
@@ -893,7 +1046,7 @@ const RegisterDriver = ({route}) => {
                       title="Driver Photo Front"
                       iconName="camera-enhance"
                       onImagePicked={handleSaveImageData2}
-                      imageData={capturedPhoto2}
+                      imageData={DriverFrontImage}
                     />
                     <CustomImagePicker
                       width={80}
@@ -902,7 +1055,7 @@ const RegisterDriver = ({route}) => {
                       title="Driver Photo Right"
                       iconName="camera-enhance"
                       onImagePicked={handleSaveImageData3}
-                      imageData={capturedPhoto3}
+                      imageData={DriverRightImage}
                     />
                   </ScrollView>
 

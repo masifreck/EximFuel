@@ -9,7 +9,7 @@ import {
   Button,
   Modal,
   ActivityIndicator,
-  ScrollView,
+  ScrollView,Linking
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 // import {ScrollView} from 'react-native-gesture-handler';
@@ -186,7 +186,7 @@ const fetchAndSetCurrentLocation = async () => {
     const { latitude, longitude } = coordinates;
     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
     setMapUrl(mapUrl);
-    console.log('Map URL:', mapUrl);
+   // console.log('Map URL:', mapUrl);
   } catch (error) {
     console.error('Error fetching coordinates:', error);
     setErrorMessage('Failed to fetch location. Please enable location services.');
@@ -531,21 +531,30 @@ const registertheOwner = () => {
   const handleImage = image => {
     setPanPhoto(image);
   };
-  const openDialScreen = number => {
-    console.log('phone', number);
-    if (!primaryContact || !/^\d{10}$/.test(number)) {
-      setErrorMessage('Please enter a valid primary contact (10 digits)');
-      setShowAlert(true);
-      return false;
-    }
+const openDialScreen = async (number) => {
+  console.log('phone', number);
 
-    if (Platform.OS === 'ios') {
-      number = `telprompt:${number}`;
+  // Validate 10-digit number
+  if (!number || !/^\d{10}$/.test(number)) {
+    Alert.alert('Invalid Number', 'Please enter a valid 10-digit phone number.');
+    return;
+  }
+
+  // Format the dial URL depending on the platform
+  const dialURL = Platform.OS === 'ios' ? `telprompt:${number}` : `tel:${number}`;
+
+  try {
+    const canOpen = await Linking.canOpenURL(dialURL);
+    if (canOpen) {
+      await Linking.openURL(dialURL);
     } else {
-      number = `tel:${number}`;
+      Alert.alert('Error', 'Dialer not supported on this device.');
     }
-    Linking.openURL(number);
-  };
+  } catch (error) {
+    console.error('Dialer Error:', error);
+    Alert.alert('Error', 'Something went wrong while trying to open the dialer.');
+  }
+};
   
  const handleOtpSubmit1 = enteredOtp => {
     console.log('OTP to send to server:', enteredOtp);

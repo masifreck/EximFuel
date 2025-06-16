@@ -4,7 +4,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,ScrollView,Image,
-  ImageBackground
+  ImageBackground,
+  ActivityIndicator
 } from 'react-native';
 import React, {useState, useEffect,useCallback} from 'react';
 import CustomAlert from '../components/CustomAlert';
@@ -14,15 +15,20 @@ import useApiToken from '../components/Token';
 import CustomInput from '../components/CustomInput';
 import CustomDropbox from '../components/CustomDropbox';
 import { Dialog, ALERT_TYPE } from 'react-native-alert-notification';
-// import CustomRequestOptions from '../components/CustomRequestOptions';
-import { getCurrentCoordinates } from '../components/CutomeLocation';
-import {CustomRequestOptions} from '../components/CustomRequestOptions';
 import NetInfoWrapper from '../components/CheckNetInfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { darkBlue } from '../components/constant';
 import CustomImagePicker from '../components/CustomeImagePicker';
 import { AlertNotificationRoot } from 'react-native-alert-notification';
-
+import {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+  openSettings,
+} from 'react-native-permissions';
+import { Alert, Platform } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 const RegisterVehicle = ({route}) => {
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
@@ -37,7 +43,7 @@ const RegisterVehicle = ({route}) => {
       console.log('Error retrieving token:', error);
     });
  const { vehicleNo } = route?.params?route.params:'';
-console.log(vehicleNo)
+//console.log(vehicleNo)
 
   const navigation = useNavigation();
 
@@ -80,6 +86,7 @@ const [TaxExpiry,setTaxExpiry]=useState('' )
 
   const [RCFrontPhoto,setRCFrontPhoto]=useState(null);
   const [RCBackPhotot,setRCBackPhotot]=useState(null);
+  const [MapUrl,setMapUrl] = useState('');
   // dummy=========  
  useEffect(()=>{
 if(vehicleNo){
@@ -109,7 +116,7 @@ useEffect(() => {
           }
 
           const result = await response.json();
-          console.log('owner list', result);
+          //console.log('owner list', result);
 
           if (result.apiResult?.Result?.length) {
             const formattedData = result.apiResult.Result.map(owner => ({
@@ -133,9 +140,10 @@ useEffect(() => {
 }, [PanNumber]);
 
  const [vehicleDetails, setVehicleDetails] = useState(null);
-
+const [isDataLoading, setIsDataLoading] = useState(false);
   useEffect(() => {
     if (vehicleNo) {
+      setIsDataLoading(true);
       const fetchVehicle = async () => {
         try {
           const response = await fetch(
@@ -178,6 +186,8 @@ setTaxExpiry(details.TaxExpiry)
         } catch (error) {
           console.error('Error fetching vehicle details:', error);
           setVehicleDetails(null);
+        }finally{
+          setIsDataLoading(false);
         }
       };
 
@@ -189,19 +199,100 @@ setTaxExpiry(details.TaxExpiry)
   const [IsLoading, setIsLoading] = useState(true);
   const [is_everything_ok, setis_everything_ok] = useState(false);
 
-  const registertheVehicle =async () => {
-    setIsLoading(true);
-    let coordinates = null;
+const getCurrentCoordinates = async () => {
+  const permissionType = Platform.select({
+    android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+    ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+  });
 
   try {
-    coordinates = await getCurrentCoordinates();
-  } catch (error) {
-    setIsLoading(false);
-    setErrorMessage(error.message || 'Location access failed');
-    setShowAlert(true);
-    return;
-  }
+    let permissionStatus = await check(permissionType);
 
+    if (permissionStatus === RESULTS.DENIED || permissionStatus === RESULTS.LIMITED) {
+      permissionStatus = await request(permissionType);
+    }
+
+    if (permissionStatus === RESULTS.GRANTED) {
+      return await new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+          position => {
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          error => {
+            reject(new Error('Failed to fetch location: ' + error.message));
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000,
+            forceRequestLocation: true,
+            showLocationDialog: true,
+          }
+        );
+      });
+    } else if (permissionStatus === RESULTS.BLOCKED) {
+      Alert.alert(
+        'Location Permission Blocked',
+        'Please enable location access in your settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open Settings', onPress: openSettings },
+        ]
+      );
+      throw new Error('Location permission blocked');
+    } else {
+      throw new Error('Location permission denied');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+// Create a function to fetch and set the map URL
+const fetchAndSetCurrentLocation = async () => {
+  try {
+    const coordinates = await getCurrentCoordinates();
+    console.log('Current Coordinates:', coordinates);
+    const { latitude, longitude } = coordinates;
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    setMapUrl(mapUrl);
+   // console.log('Map URL:', mapUrl);
+  } catch (error) {
+    console.error('Error fetching coordinates:', error);
+    setErrorMessage('Failed to fetch location. Please enable location services.');
+    setShowAlert(true);
+  }
+};
+useEffect(() => {
+  fetchAndSetCurrentLocation();
+}, []);
+  const validation = () => {
+     if(!MapUrl){
+      setErrorMessage('Please enalbe your location');
+      setShowAlert(true);
+       fetchAndSetCurrentLocation();
+      return false;
+    }
+    if(!ownerNameSelected){
+      setErrorMessage('Please select Owner Name');
+      setShowAlert(true);
+      return false;
+    }
+    if(!VehicleTyres){
+      setErrorMessage('Please enter Vehicle Tyres');
+      setShowAlert(true);
+      return false;
+    }
+
+    return true;
+  };
+  const registertheVehicle =async () => {
+   
+ 
+if(!validation()) return
+ setIsLoading(true);
     const postData = {
       OwnerId: ownerNameSelected,
       VehicleTyre: VehicleTyres,
@@ -229,15 +320,71 @@ setTaxExpiry(details.TaxExpiry)
       VTaxExpiry:TaxExpiry,
       VEngineNo:engineNumber,
       VChasisNo:chassisNumber,
-
+MapUrl: MapUrl,
     };
-    console.log(postData);
-    const {url, requestOptions} = CustomRequestOptions(
-      'https://exim.tranzol.com/api/VehicleApi/CreateVehicle',
-      apiTokenReceived,
-      postData,
-    );
-    fetch(url, requestOptions)
+    const formData = new FormData();
+
+  // Append all fields after converting boolean & number to string
+  Object.keys(postData).forEach(key => {
+    if (postData[key] !== null) {
+      let value = postData[key];
+      if (typeof value === 'boolean' || typeof value === 'number') {
+        value = String(value);
+      }
+      formData.append(key, value);
+    }
+  });
+  if (truckFront) {
+    formData.append('VehicleFrontImage', {
+      uri: truckFront.uri,
+      type: truckFront.type,
+      name: truckFront.fileName || 'truckFront.jpg',
+    });
+  }
+  if (truckBack) {
+    formData.append('VehicleBackImage', {
+      uri: truckBack.uri,
+      type: truckBack.type,
+      name: truckBack.fileName || 'truckBack.jpg',
+    });
+  }
+  if (truckRight) {
+    formData.append('VehicleRightImage', {                                
+      uri: truckRight.uri,
+      type: truckRight.type,
+      name: truckRight.fileName || 'truckRight.jpg',
+    });
+  }
+  if (truckLeft) {
+    formData.append('VehicleLeftImage', {
+      uri: truckLeft.uri,
+      type: truckLeft.type,
+      name: truckLeft.fileName || 'truckLeft.jpg',
+    });   
+  }
+  if (RCFrontPhoto) {
+    formData.append('RCFrontImage', {
+      uri: RCFrontPhoto.uri,
+      type: RCFrontPhoto.type,
+      name: RCFrontPhoto.fileName || 'RCFront.jpg',
+    });
+  }
+  if (RCBackPhotot) {
+    formData.append('RCBackImage', {
+      uri: RCBackPhotot.uri,          
+      type: RCBackPhotot.type,
+      name: RCBackPhotot.fileName || 'RCBack.jpg',
+    });
+  }
+  console.log('FormData:', formData);
+      fetch('https://Exim.Tranzol.com/api/VehicleApi/CreateVehicle', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiTokenReceived}`
+      // Do NOT add Content-Type here; let fetch handle it for multipart/form-data
+    },
+    body: formData
+  }) 
       .then(response => {
         setIsLoading(false);
         if (!response.ok) {
@@ -251,19 +398,20 @@ setTaxExpiry(details.TaxExpiry)
       .then(data => {
         setIsLoading(false);
         if (data.apiResult.Result !== null) {
-          const errorMessage = 'Registration Successfull!';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
+        Alert.alert('Registration Successful', 'Owner registered successfully!', )
+           navigation.goBack();
         } else {
           if (
-            data.apiResult.Error ===
-            "Violation of UNIQUE KEY constraint 'Vehicle_No'. Cannot insert duplicate key in object 'dbo.App_Vehicle'. The duplicate key value is (111110000).\r\nThe statement has been terminated."
+            data.apiResult.Error.includes(
+            "Violation of UNIQUE KEY constraint 'Vehicle_No'.")
           ) {
             const errorMessage = 'Vehicle No is already exists.';
             setErrorMessage(errorMessage);
             setShowAlert(true);
           } else {
-            handleShowToast();
+             const errorMessage = 'Error: ' + data.apiResult.Error;
+            setErrorMessage(errorMessage);
+            setShowAlert(true);
             console.log('logged', data.apiResult);
           }
         }
@@ -271,7 +419,7 @@ setTaxExpiry(details.TaxExpiry)
       .catch(error => {
         setIsLoading(false);
         console.log('Error:', error);
-        setErrorMessage('Network Error');
+        setErrorMessage('Network Error',`${error.message}`);
         setShowAlert(true);
       });
   };
@@ -280,17 +428,7 @@ setTaxExpiry(details.TaxExpiry)
     //navigation.navigate('Vehicle');
   };
 
-  useEffect(() => {
-    if (
-      vehicleRegistrationNo &&
-      vehicleRegistrationNo.length > 8 &&
-      vehicleRegistrationNo.length < 13
-    ) {
-      setIsVerified(true);
-    } else {
-      setIsVerified(false);
-    }
-  }, [vehicleRegistrationNo]);
+ 
 
   useEffect(() => {
     // Check if apiTokenReceived is not null
@@ -352,9 +490,7 @@ setTaxExpiry(details.TaxExpiry)
       <View style={{flex:1}}>
       <NetInfoWrapper/>
       </View>
-      {IsLoading ? (
-        <LoadingIndicator />
-      ) : (
+ 
         <View style={styles.container}>
            <View style={styles.imgContainer}>
                       <Image
@@ -362,6 +498,13 @@ setTaxExpiry(details.TaxExpiry)
                         source={require('../assets/Truck.png')}
                       />
                     </View>
+                    {isDataLoading ? (
+                      <ActivityIndicator
+                        size="large"
+                        color={darkBlue}
+                        style={{marginTop: 20}}
+                      />
+                    ) : (
                     <ScrollView horizontal={true} style={{flexDirection:'row'}}>
 <ImageBackground source={require('../assets/rcfrontnew.png')} imageStyle={{borderRadius:10}}
 style={styles.dlCard}>
@@ -399,7 +542,7 @@ style={styles.dlCard}>
 <Text style={{color:'#020202',fontWeight:'bold',fontSize:15,position:'absolute',bottom:50,left:200}}>{vehicleDetails?.FitnessNo?vehicleDetails.FitnessNo:''}</Text>
 <Text style={{color:'#020202',fontWeight:'bold',fontSize:14,position:'absolute',width:110,bottom:50,left:325}}>{vehicleDetails?.FitnessExpiry?vehicleDetails.FitnessExpiry:''}</Text>
 </ImageBackground>
-                    </ScrollView>
+                    </ScrollView>)}
           <View style={styles.levelContainer}>
             <Text
               style={{
@@ -549,10 +692,13 @@ style={styles.dlCard}>
           </View>
         </View>
           <TouchableOpacity style={styles.button} onPress={registertheVehicle}>
-            <Text style={styles.text}>Register</Text>
+               {IsLoading ? (
+                        <ActivityIndicator size="small" color="white" />
+                      ) : (
+            <Text style={styles.text}>Register</Text>)} 
           </TouchableOpacity>
         </View>
-      )}
+      
       <CustomAlert
         visible={showAlert}
         message={errorMessage}
