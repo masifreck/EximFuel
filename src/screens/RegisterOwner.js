@@ -536,7 +536,8 @@ const openDialScreen = async (number) => {
 
   // Validate 10-digit number
   if (!number || !/^\d{10}$/.test(number)) {
-    Alert.alert('Invalid Number', 'Please enter a valid 10-digit phone number.');
+  setErrorMessage('Invalid Number Please enter a valid 10-digit phone number.');
+      setShowAlert(true);
     return;
   }
 

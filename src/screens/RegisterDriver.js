@@ -108,9 +108,6 @@ const RegisterDriver = ({route}) => {
   const [driverAddress, setdriverAddress] = useState('');
   const [PanNo, setPanNo] = useState('');
 
-
- 
-  
   const [isSamePAdd, setIsSamePAdd] = useState(false);
   const [currentAdd, setCurrentAdd] = useState('');
   const [isDLSearching, setIsDLSearching] = useState(false);
@@ -131,7 +128,7 @@ const RegisterDriver = ({route}) => {
   const [Commercial, setCommercial] = useState('');
   const [Code, setCode] = useState('');
 
-  const [MapUrl,setMapUrl] = useState('');
+  const [MapUrl, setMapUrl] = useState('');
   useEffect(() => {
     if (isSamePAdd) {
       setCurrentAdd(driverAddress); // Copy if checked
@@ -139,77 +136,82 @@ const RegisterDriver = ({route}) => {
       setCurrentAdd(''); // Clear if unchecked
     }
   }, [isSamePAdd, driverAddress]);
-const getCurrentCoordinates = async () => {
-  const permissionType = Platform.select({
-    android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-    ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-  });
+  const getCurrentCoordinates = async () => {
+    const permissionType = Platform.select({
+      android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+    });
 
-  try {
-    let permissionStatus = await check(permissionType);
+    try {
+      let permissionStatus = await check(permissionType);
 
-    if (permissionStatus === RESULTS.DENIED || permissionStatus === RESULTS.LIMITED) {
-      permissionStatus = await request(permissionType);
-    }
+      if (
+        permissionStatus === RESULTS.DENIED ||
+        permissionStatus === RESULTS.LIMITED
+      ) {
+        permissionStatus = await request(permissionType);
+      }
 
-    if (permissionStatus === RESULTS.GRANTED) {
-      return await new Promise((resolve, reject) => {
-        Geolocation.getCurrentPosition(
-          position => {
-            resolve({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-          },
-          error => {
-            reject(new Error('Failed to fetch location: ' + error.message));
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 10000,
-            forceRequestLocation: true,
-            showLocationDialog: true,
-          }
+      if (permissionStatus === RESULTS.GRANTED) {
+        return await new Promise((resolve, reject) => {
+          Geolocation.getCurrentPosition(
+            position => {
+              resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+            },
+            error => {
+              reject(new Error('Failed to fetch location: ' + error.message));
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 15000,
+              maximumAge: 1000000,
+              forceRequestLocation: true,
+              showLocationDialog: true,
+            },
+          );
+        });
+      } else if (permissionStatus === RESULTS.BLOCKED) {
+        Alert.alert(
+          'Location Permission Blocked',
+          'Please enable location access in your settings.',
+          [
+            {text: 'Cancel', style: 'cancel'},
+            {text: 'Open Settings', onPress: openSettings},
+          ],
         );
-      });
-    } else if (permissionStatus === RESULTS.BLOCKED) {
-      Alert.alert(
-        'Location Permission Blocked',
-        'Please enable location access in your settings.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Open Settings', onPress: openSettings },
-        ]
-      );
-      throw new Error('Location permission blocked');
-    } else {
-      throw new Error('Location permission denied');
+        throw new Error('Location permission blocked');
+      } else {
+        throw new Error('Location permission denied');
+      }
+    } catch (error) {
+      throw error;
     }
-  } catch (error) {
-    throw error;
-  }
-};
-// Create a function to fetch and set the map URL
-const fetchAndSetCurrentLocation = async () => {
-  try {
-    const coordinates = await getCurrentCoordinates();
-    console.log('Current Coordinates:', coordinates);
-    const { latitude, longitude } = coordinates;
-    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-    setMapUrl(mapUrl);
-   // console.log('Map URL:', mapUrl);
-  } catch (error) {
-    console.error('Error fetching coordinates:', error);
-    setErrorMessage('Failed to fetch location. Please enable location services.');
-    setShowAlert(true);
-  }
-};
+  };
+  // Create a function to fetch and set the map URL
+  const fetchAndSetCurrentLocation = async () => {
+    try {
+      const coordinates = await getCurrentCoordinates();
+      console.log('Current Coordinates:', coordinates);
+      const {latitude, longitude} = coordinates;
+      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+      setMapUrl(mapUrl);
+      // console.log('Map URL:', mapUrl);
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      setErrorMessage(
+        'Failed to fetch location. Please enable location services.',
+      );
+      setShowAlert(true);
+    }
+  };
 
-// Call this function inside useEffect or anywhere else
-useEffect(() => {
-  fetchAndSetCurrentLocation();
-}, []);
+  // Call this function inside useEffect or anywhere else
+  useEffect(() => {
+    fetchAndSetCurrentLocation();
+  }, []);
   const validation = () => {
     const cleanDL = dlNumber.replace(/[\s-]/g, ''); // assuming dlNumber is your state variable
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
@@ -267,10 +269,10 @@ useEffect(() => {
       setShowAlert(true);
       return false;
     }
-   if(!MapUrl){
+    if (!MapUrl) {
       setErrorMessage('Please enalbe your location');
       setShowAlert(true);
-       fetchAndSetCurrentLocation();
+      fetchAndSetCurrentLocation();
       return false;
     }
     // If valid
@@ -279,88 +281,89 @@ useEffect(() => {
 
   const registertheDriver = () => {
     if (!validation()) return;
-     setIsLoading(true);
-     console.log('date',convselectedStartDate)
-     const parts=convselectedStartDate.split('/');
-     const formattedDate = `${parts[0]}-${parts[1]}-${parts[2]}`
+      setIsLoading(true);
+    console.log('date', convselectedStartDate);
+    const parts = convselectedStartDate.split('/');
+    const formattedDate = `${parts[0]}-${parts[1]}-${parts[2]}`;
     const postData = {
       DLNumber: dlNumber,
       DriverName: name,
       AdharNo: adharNumber,
       Dob: formattedDate,
       PrimaryContactNo: primaryContact,
-          MapUrl: MapUrl,
-           IsPCVerification: isPCVerified,
-    IsSCVefication: isSCVerified,
-    PCVerification: Pverified,
-    SCVerification: isSCVerified,
+      MapUrl: MapUrl,
+      IsPCVerification: isPCVerified,
+      IsSCVefication: isSCVerified,
+      PCVerification: Pverified,
+      SCVerification: isSCVerified,
       SecondaryContactNo: secondaryContact,
       DriverEmail: email,
       DriverAddress: driverAddress,
       PanNo: PanNo,
     };
-      const formData = new FormData();
+    const formData = new FormData();
 
-  // Append all fields after converting boolean & number to string
-  Object.keys(postData).forEach(key => {
-    if (postData[key] !== null) {
-      let value = postData[key];
-      if (typeof value === 'boolean' || typeof value === 'number') {
-        value = String(value);
+    // Append all fields after converting boolean & number to string
+    Object.keys(postData).forEach(key => {
+      if (postData[key] !== null) {
+        let value = postData[key];
+        if (typeof value === 'boolean' || typeof value === 'number') {
+          value = String(value);
+        }
+        formData.append(key, value);
+        console.log(`${key}: ${value}`); // Hermes-safe logging
       }
-      formData.append(key, value);
+    });
+    if (DriverFrontImage) {
+      formData.append('DriverFrontImage', {
+        uri: DriverFrontImage.uri,
+        type: DriverFrontImage.type,
+        name: DriverFrontImage.fileName || 'driver.jpg',
+      });
     }
-  });
-if(DriverFrontImage){
-formData.append('DriverFrontImage',{
-  uri:DriverFrontImage.uri,
-  type:DriverFrontImage.type,
-  name:DriverFrontImage.fileName || 'driver.jpg'
-});
-}
-if(DriverLeftImage){
-  formData.append('DriverLeftImage',{  
-  uri:DriverLeftImage.uri,
-  type:DriverLeftImage.type,
-  name:DriverLeftImage.fileName || 'driver.jpg'
-});
-}
-if(DriverRightImage){
-  formData.append('DriverRightImage',{
-  uri:DriverRightImage.uri,
-  type:DriverRightImage.type,
-  name:DriverRightImage.fileName || 'driver.jpg'
-});
-}
-if(DLPhoto){
-  formData.append('DrivingLicence',{
-  uri:DLPhoto.uri,
-  type:DLPhoto.type,
-  name:DLPhoto.fileName || 'dl.jpg'
-})
-}
-if(adharFront){
-  formData.append('AadharFront',{
-  uri:adharFront.uri,
-  type:adharFront.type,
-  name:adharFront.fileName || 'adhar.jpg'
-})
-}
-if(adharBack){
-  formData.append('AdharBack',{
-  uri:adharBack.uri,
-  type:adharBack.type,
-  name:adharBack.fileName || 'adhar.jpg'
-});
-}
-if(panPhoto){
-  formData.append('Pan',{
-  uri:panPhoto.uri,
-    
-  type:panPhoto.type,
-  name:panPhoto.fileName || 'pan.jpg'
-});
-}
+    if (DriverLeftImage) {
+      formData.append('DriverLeftImage', {
+        uri: DriverLeftImage.uri,
+        type: DriverLeftImage.type,
+        name: DriverLeftImage.fileName || 'driver.jpg',
+      });
+    }
+    if (DriverRightImage) {
+      formData.append('DriverRightImage', {
+        uri: DriverRightImage.uri,
+        type: DriverRightImage.type,
+        name: DriverRightImage.fileName || 'driver.jpg',
+      });
+    }
+    if (DLPhoto) {
+      formData.append('DrivingLicence', {
+        uri: DLPhoto.uri,
+        type: DLPhoto.type,
+        name: DLPhoto.fileName || 'dl.jpg',
+      });
+    }
+    if (adharFront) {
+      formData.append('AadharFront', {
+        uri: adharFront.uri,
+        type: adharFront.type,
+        name: adharFront.fileName || 'adhar.jpg',
+      });
+    }
+    if (adharBack) {
+      formData.append('AadharBack', {
+        uri: adharBack.uri,
+        type: adharBack.type,
+        name: adharBack.fileName || 'adhar.jpg',
+      });
+    }
+    if (panPhoto) {
+      formData.append('Pan', {
+        uri: panPhoto.uri,
+
+        type: panPhoto.type,
+        name: panPhoto.fileName || 'pan.jpg',
+      });
+    }
 
     console.log('data', postData);
 
@@ -383,9 +386,8 @@ if(panPhoto){
       .then(data => {
         setIsLoading(false);
         if (data.apiResult.Result !== null) {
-          const errorMessage = 'Registration Successfull';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
+           Alert.alert('Registration Successful', 'Owner registered successfully!', )
+          navigation.goBack();
         } else if (data.apiResult.Result === null) {
           if (
             data.apiResult.Error.includes(
@@ -419,7 +421,6 @@ if(panPhoto){
 
   // Verification code=======================================================================
 
-
   useEffect(() => {
     // Check if apiTokenReceived is not null
     if (apiTokenReceived !== null) {
@@ -440,14 +441,14 @@ if(panPhoto){
     return () => clearTimeout(timeoutId); // Clear the timeout when the component unmounts or when is_everything_ok changes
   }, [is_everything_ok]);
 
-  const [DriverFrontImage,setDriverFrontImage]=useState(null);
-const [DriverLeftImage,setDriverLeftImage]=useState(null);
-const [DriverRightImage,setDriverRightImage]=useState(null);
+  const [DriverFrontImage, setDriverFrontImage] = useState(null);
+  const [DriverLeftImage, setDriverLeftImage] = useState(null);
+  const [DriverRightImage, setDriverRightImage] = useState(null);
   const [DLPhoto, setDLPhoto] = useState(null);
   const [adharFront, setAdharFront] = useState(null);
   const [adharBack, setAdharBack] = useState(null);
   const [panPhoto, setPanPhoto] = useState(null);
-  
+
   const handleSaveImageData1 = image => {
     //console.log('Selected Image Data:', image);
     setDriverLeftImage(image);
@@ -474,21 +475,32 @@ const [DriverRightImage,setDriverRightImage]=useState(null);
   const handleDL = image => {
     setDLPhoto(image);
   };
-  const openDialScreen = number => {
-    console.log('phone', number);
-    if (!primaryContact || !/^\d{10}$/.test(number)) {
-      setErrorMessage('Please enter a valid primary contact (10 digits)');
-      setShowAlert(true);
-      return false;
-    }
+const openDialScreen = async (number) => {
+  console.log('phone', number);
 
-    if (Platform.OS === 'ios') {
-      number = `telprompt:${number}`;
+  // Validate 10-digit number
+  if (!number || !/^\d{10}$/.test(number)) {
+  //  Alert.alert();
+    setErrorMessage('Invalid Number Please enter a valid 10-digit phone number.');
+      setShowAlert(true);
+    return;
+  }
+
+  // Format the dial URL depending on the platform
+  const dialURL = Platform.OS === 'ios' ? `telprompt:${number}` : `tel:${number}`;
+
+  try {
+    const canOpen = await Linking.canOpenURL(dialURL);
+    if (canOpen) {
+      await Linking.openURL(dialURL);
     } else {
-      number = `tel:${number}`;
+      Alert.alert('Error', 'Dialer not supported on this device.');
     }
-    Linking.openURL(number);
-  };
+  } catch (error) {
+    console.error('Dialer Error:', error);
+    Alert.alert('Error', 'Something went wrong while trying to open the dialer.');
+  }
+};
 
   const handleOtpSubmit1 = enteredOtp => {
     console.log('OTP to send to server:', enteredOtp);
