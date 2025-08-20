@@ -42,6 +42,13 @@ import ManageDriver from './screens/ManageDriver';
 import ManageVehicle from './screens/ManageVehicle'
 import FGLoadingEntry from './screens/FGLoadingEntry';
 import { darkBlue } from './components/constant';
+import NewMinesLoading from './screens/NewMinesLoading';
+import NewMinesMainScreen from './screens/NewMinesMainScreen';
+import CustomQRCode2 from './components/CustomQRCODE2';
+import LoadingRowDetails from './screens/MinesLoadingDetails';
+import UpdateMinesLoading from './screens/updateMinesLoading';
+import PrintMines from './screens/PrintMines';
+import { MinesQRCode } from './components/MinesQRCode';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -276,7 +283,41 @@ const AppNavigator = () => {
   component={CustomQRCode}
   options={getScreenOptions('Scan QR Codes')}
   />
-  
+           <Stack.Screen
+  name='QRScanner2' 
+  component={CustomQRCode2}
+  options={getScreenOptions('Scan QR Codes')}
+  />
+  <Stack.Screen 
+  name="NewMinesLoading"
+  component={NewMinesLoading}
+  options={getScreenOptions('Raw Material Loading')}
+  />
+  <Stack.Screen
+  name='minesmainScreen'
+  component={NewMinesMainScreen}
+  options={getScreenOptions('Manage Raw Materials')}
+  />
+    <Stack.Screen
+  name='LoadingRowDetails'
+  component={LoadingRowDetails}
+  options={getScreenOptions('Raw Materials Loading Details')}
+  />
+      <Stack.Screen
+  name='updateMinesLoading'
+  component={UpdateMinesLoading}
+  options={getScreenOptions('Update Raw Materials')}
+  />
+     <Stack.Screen
+  name='printmines'
+  component={PrintMines}
+  options={getScreenOptions('Select Print Type')}
+  />
+       <Stack.Screen
+  name='minesQRCode'
+  component={MinesQRCode}
+  options={getScreenOptions('QR Code')}
+  />
       </Stack.Navigator>
     </NavigationContainer>
   );

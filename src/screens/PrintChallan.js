@@ -10,6 +10,7 @@ import {
   Animated,
   Image,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import {HTMLContent} from './HTMLContent';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
@@ -95,7 +96,8 @@ const [selectedPrint,setSelectedPrint]=useState("1")
     });
     setShowToast(false);
   };
-  const fetchData = async () => {
+  const 
+  fetchData = async () => {
     setIsLoading(true);
     if (ChallanNo.length !== 0) {
       try {

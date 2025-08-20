@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  StyleSheet,
+  StyleSheet,ActivityIndicator
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -16,135 +16,65 @@ import ImageViewing from 'react-native-image-viewing';
 import CustomCheckbox from '../components/CustomeCheckBox'; // Ensure this exists or adjust
 import { darkBlue } from '../components/constant'; // Update according to your theme/colors
 //import dummyDrivers from '../data/dummyDrivers'; // Dummy data file
-const dummyVehicleDetails = [
-  {
-    Id: 1,
-    vehicleNo: "MH12AB1234",
-    rcNo: "RC987654321",
-    chasisNo: "CHS123456789",
-    statePermitNo: "SPMH001122",
-    ownerName: "Rahul Sharma",
-    ownerFatherName: "Mahesh Sharma",
-    ownerAddress: "123 MG Road, Pune",
-    createdBy: "Admin",
-    mobile: "9876543210",
-    model: "Tata Ace",
-    color: "White",
-    manufacturingMonthYear: "March-2021",
-    registrationDate: "2021-03-15",
-    insuranceValidTill: "2025-03-14",
-    CreatedBy: 'employee2',
-    Status:'Approved'
-  },
-  {
-    Id: 2,
-    vehicleNo: "DL04CD5678",
-    rcNo: "RC123456789",
-    chasisNo: "CHS234567890",
-    statePermitNo: "SPDL334455",
-    ownerName: "Priya Mehta",
-    ownerFatherName: "Ramesh Mehta",
-    ownerAddress: "56 Green Park, Delhi",
-    createdBy: "User1",
-    mobile: "9812345678",
-    model: "Mahindra Bolero",
-    color: "Silver",
-    manufacturingMonthYear: "June-2022",
-    registrationDate: "2022-06-20",
-    insuranceValidTill: "2026-06-19",
-    Status: 'Pending',
-    CreatedBy: 'admin',
-  },
-  {
-    Id: 3,
-    vehicleNo: "KA05EF9101",
-    rcNo: "RC456789123",
-    chasisNo: "CHS345678901",
-    statePermitNo: "SPKA778899",
-    ownerName: "Suresh Kumar",
-    ownerFatherName: "Vijay Kumar",
-    ownerAddress: "9 Residency Road, Bangalore",
-    createdBy: "Supervisor",
-    mobile: "9900112233",
-    model: "Ashok Leyland Dost",
-    color: "Blue",
-    manufacturingMonthYear: "January-2020",
-    registrationDate: "2020-01-10",
-    insuranceValidTill: "2024-01-09",
-    Status: 'Pending',
-    CreatedBy: 'admin',
-  },
-  {
-    Id: 4,
-    vehicleNo: "TN07GH1122",
-    rcNo: "RC321654987",
-    chasisNo: "CHS456789012",
-    statePermitNo: "SPTN991122",
-    ownerName: "Meena Iyer",
-    ownerFatherName: "Sundar Iyer",
-    ownerAddress: "22 T Nagar, Chennai",
-    createdBy: "Admin",
-    mobile: "9876001122",
-    model: "Eicher Pro 2049",
-    color: "Red",
-    manufacturingMonthYear: "August-2019",
-    registrationDate: "2019-08-25",
-    insuranceValidTill: "2023-08-24",
-    Status: 'Pending',
-    CreatedBy: 'admin',
-  },
-  {
-    Id: 5,
-    vehicleNo: "GJ01JK3344",
-    rcNo: "RC112233445",
-    chasisNo: "CHS567890123",
-    statePermitNo: "SPGJ556677",
-    ownerName: "Anil Patel",
-    ownerFatherName: "Kiran Patel",
-    ownerAddress: "88 Ring Road, Ahmedabad",
-    createdBy: "User2",
-    mobile: "9090909090",
-    model: "Force Traveller",
-    color: "Yellow",
-    manufacturingMonthYear: "January-2023",
-    registrationDate: "2023-01-01",
-    insuranceValidTill: "2027-12-31",
-    Status: 'Pending',
-    CreatedBy: 'employee1',
-  }
-];
+
 
 
 const ManageVehicle = () => {
   const [search, setSearch] = useState('');
-  const [selectedVehicle, setSelectedDriver] = useState(null);
+  const [selectedVehicle, setSelectedDriver] = useState(null);  
   const [modalVisible, setModalVisible] = useState(false);
   const [declare, setDeclare] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [vehicleList,setVehicleList]=useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+ const FetchVehicleData = async () => {
+  setIsLoading(true);
+    try {
+      const response = await fetch('https://Exim.Tranzol.com/api/FetchDataApi/GetVehiclePendingApprove?search=');
+      const data = await response.json();
+      if (data?.Entities) {
+        setVehicleList(data.Entities);
+        console.log('Vehicle data fetched successfully:', data.Entities);
+      } else {
+        console.warn('Unexpected response format', data);
+        setVehicleList([]);
+      }
+    } catch (error) {
+      console.error('Error fetching driver data:', error);
+      setVehicleList([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    FetchVehicleData();
+  }, []);
   const imageList = [
     require('../assets/truckleft.png'),
     require('../assets/rcfrontnew.png'),
     require('../assets/driver.png'),
   ];
 
-  const filteredDrivers = dummyVehicleDetails.filter(
+  const filteredDrivers = vehicleList.filter(
     item =>
-      item.vehicleNo?item.vehicleNo.toLowerCase().includes(search.toLowerCase()) :'' ||
-      item.rcNo?item.rcNo.toLowerCase().includes(search.toLowerCase()) :''
+      item.VehicleNo?item.VehicleNo.toLowerCase().includes(search.toLowerCase()) :'' ||
+      item.EngineNo?item.EngineNo.toLowerCase().includes(search.toLowerCase()) :''
   );
 
   const openDetails = item => {
     setSelectedDriver(item);
     setModalVisible(true);
   };
-
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="blue" />;
+  }
   return (
     <View style={styles.container}>
       {/* Search Bar */}
       <TextInput
-        placeholder="Search by License No or Driver Name"
+        placeholder="Search by Vehicle No or Engine No"
         style={styles.searchBar}
         value={search}
         onChangeText={setSearch}
@@ -155,7 +85,7 @@ const ManageVehicle = () => {
         <View>
           <View style={[styles.row, styles.headerRow]}>
             <Text style={[styles.cell, styles.headerCell]}>Vehicle No</Text>
-            <Text style={[styles.cell, styles.headerCell]}>RC No.</Text>
+            <Text style={[styles.cell, styles.headerCell]}>Engine No.</Text>
             <Text style={[styles.cell, styles.headerCell]}>Status</Text>
              <Text style={[styles.cell, styles.headerCell]}>Created By</Text>
           </View>
@@ -172,15 +102,15 @@ const ManageVehicle = () => {
                     { backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#fff' },
                   ]}
                 >
-                  <Text style={styles.cell}>{item.vehicleNo}</Text>
-                  <Text style={styles.cell}>{item.rcNo}</Text>
+                  <Text style={styles.cell}>{item.VehicleNo}</Text>
+                  <Text style={styles.cell}>{item.EngineNo}</Text>
                   <Text
                     style={[
                       styles.cell,
-                      { color: item.Status === 'Approved' ? 'green' : 'orange' },
+                      { color: item.ApproveStatus === 'Approved' ? 'green' : 'orange' },
                     ]}
                   >
-                    {item.Status}
+                    {item.ApproveStatus}
                   </Text>
                    <Text style={styles.cell}>{item.CreatedBy}</Text>
                 </View>
@@ -208,8 +138,8 @@ const ManageVehicle = () => {
                 <>
               {[
   ['ID', selectedVehicle.Id],
-  ['Vehicle No', selectedVehicle.vehicleNo],
-  ['RC No', selectedVehicle.rcNo],
+  ['Vehicle No', selectedVehicle.VehicleNo],
+  ['RC No', selectedVehicle.EngineNo],
   ['Chassis No.', selectedVehicle.chasisNo],
   ['State Permit No', selectedVehicle.statePermitNo],
   ['Owner Name', selectedVehicle.ownerName],

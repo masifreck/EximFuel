@@ -13,7 +13,7 @@ import { darkBlue } from '../components/constant';
 
 const ShowOwnerDetails = () => {
   const route = useRoute();
-  const {ownerDetails} = route.params;
+  const {ownerDetails} = route.params
   const FetchOwnerDetails = ownerDetails.apiResult.Result;
 
   return (
@@ -257,7 +257,7 @@ const PanCard = () => {
           position: 'absolute',
           top: 30,
           left: 15,
-          fontSize: 13,
+          fontSize: 10,
           fontWeight: '700',
           width:'70%'
         }}>
@@ -269,7 +269,7 @@ const PanCard = () => {
           position: 'absolute',
           top: 44,
           left: 15,
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '700',
         }}>
         {FetchOwnerDetails.DobOwner1}
@@ -280,7 +280,7 @@ const PanCard = () => {
           position: 'absolute',
           bottom: 65,
           left: 15,
-          fontSize: 9,
+          fontSize: 8,
           fontWeight: '700',
           width:'70%'
         }}>
@@ -301,7 +301,8 @@ const PanCard = () => {
   );
 };
 
-const AdharCard = () => {
+
+  const AdharCard = () => {
   const route = useRoute();
   const {ownerDetails} = route.params;
   const FetchOwnerDetails = ownerDetails.apiResult.Result;
@@ -312,6 +313,8 @@ const AdharCard = () => {
         width: 240,
         margin: 8,
       }}>
+        {FetchOwnerDetails.AdharNo &&(
+          <>
       <Image
         style={{
           height: '100%',
@@ -326,11 +329,12 @@ const AdharCard = () => {
         style={{
           color: 'black',
           position: 'absolute',
-          top: 40,
-          left: 80,
-          fontSize: 13,
+          top: 36,
+          left: 72,
+          fontSize: 10,
           fontWeight: '700',
-          width:'65%'
+          width:'65%',
+         // backgroundColor:'red'
         }}>
         {FetchOwnerDetails.OwnerName}
       </Text>
@@ -339,7 +343,7 @@ const AdharCard = () => {
           color: 'black',
           position: 'absolute',
           top: 60,
-          left: 80,
+          left: 72,
           fontSize: 11,
           fontWeight: '700',
         }}>
@@ -350,7 +354,7 @@ const AdharCard = () => {
           color: 'black',
           position: 'absolute',
           bottom: 30,
-          left: 80,
+          left: 72,
 
           fontSize: 9,
           fontWeight: '700',
@@ -369,6 +373,8 @@ const AdharCard = () => {
         }}>
         {FetchOwnerDetails.AdharNo}
       </Text>
+      </>
+        )}
     </View>
   );
 };

@@ -29,7 +29,7 @@ const wH = Dimensions.get('screen').height;
 import LottieView from 'lottie-react-native';
 const isFine = wW < 400;
 
-const CustomQRCode = ({route}) => {
+const CustomQRCode2 = ({route}) => {
   const navigation = useNavigation();
   const [cameraActive, setCameraActive] = useState(true);
   const [ScannedData, setScannedData] = useState('')
@@ -43,7 +43,7 @@ const CustomQRCode = ({route}) => {
     Alert.alert(
       'Info',
       'Restart App after Permissions',
-      [
+      [ 
         {
           text: 'OK',
           onPress: () => checkAndRequestCameraPermission(),
@@ -124,54 +124,20 @@ const CustomQRCode = ({route}) => {
   
       let params = {};
       switch (route.params.field) {
-        case 1:
-          params = { scannedEwayBillNo: scannedValue };
+          case 1:
+           params = {scannedValue1:scannedValue[0]}
+           navigation.navigate('NewMinesLoading',params);
           break;
-        case 2:
-          params = { scannedClientInvoice1: scannedValue };
-          break;
-        case 3:
-          params = { scannedClientInvoice2: scannedValue };
-          break;
-        case 4:
-          params = { scannedClientInvoice3: scannedValue };
-          break;
-          case 5:
-          params = { scannedEwayBillNo2: scannedValue };
-          break;
-          case 6:
-          params = { scannedEwayBillNo3: scannedValue };
-          break;
-          case 7:
-            params = {scannedValue:scannedValue}
-            navigation.navigate('Unloading',params);
-            break;
-            case 8:
-            params = {scannedValue:scannedValue}
+          case 2:
+            params = {scannedValue2:scannedValue[0]}
             navigation.navigate('NewMinesLoading',params);
             break;
         default:
           console.log('Invalid field value');
           break;
       }
-  Alert.alert(
-        'Scanned Value',
-        `Scanned value is: ${scannedValue}`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Optionally, you can navigate to another screen here
-              // navigation.navigate('SomeScreen', params);
-            },
-          },
-        ],
-        {cancelable: false},
-      );
   
-      // Optionally, you can navigate to another screen with the scanned value
-      // For example:
-     // navigation.navigate('NewChalan', params);
+      navigation.navigate('NewMinesLoading', params);
     },
   });
   
@@ -241,4 +207,4 @@ const styles=StyleSheet.create({
 })
 
 
-export default CustomQRCode;
+export default CustomQRCode2;

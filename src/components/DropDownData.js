@@ -18,3 +18,11 @@ export const data = [
     { label: 'Consignor Copy', value: '7' },
 
   ];
+    export  const PrintMinesData = [
+    { label: 'All Print', value: '1' },
+    { label: 'Book Copy', value: '2' },
+    { label: 'Driver Copy', value: '3' },
+    { label: 'Consignee Copy', value: '4' },
+    { label: 'Consignor Copy', value: '5' },
+
+  ];

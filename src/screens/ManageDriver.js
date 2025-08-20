@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  StyleSheet,
+  StyleSheet,ActivityIndicator
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -16,96 +16,6 @@ import ImageViewing from 'react-native-image-viewing';
 import CustomCheckbox from '../components/CustomeCheckBox'; // Ensure this exists or adjust
 import { darkBlue } from '../components/constant'; // Update according to your theme/colors
 //import dummyDrivers from '../data/dummyDrivers'; // Dummy data file
-const driverList = [
-  {
-    Id: 64,
-    DLNumber: '000091234DL',
-    DriverName: 'new 64 test update',
-    AdharNo: 'AdharNo',
-    Dob: '2024-02-01',
-    PanNo: 'PanNo',
-    Mobile:'1234567890',
-    DriverEmail: 'DriverEmail',
-    InserUserId: null,
-    UpdateUserId: null,
-    InsertDate: null,
-    UpdateDate: null,
-    PrimaryContactNo: '12369',
-    SecondaryContactNo: 'SecondaryContactNo',
-    DriverAddress: 'DriverAddress',
-    Status: 'Pending',
-    isPCVerified: false,
-    isSCVerified: true,
-    Address:'7th floor esplande nexus mall bhubaneshwar',
-    CreatedBy: 'admin',
-  },
-  {
-    Id: 65,
-    DLNumber: '00010987654DL',
-    DriverName: 'Ravi Sharma',
-    AdharNo: 'AADHAR456',
-    Dob: '1990-08-12T',
-     Mobile:'1234567890',
-    PanNo: 'PAN456',
-    DriverEmail: 'ravi@example.com',
-    InserUserId: null,
-    UpdateUserId: null,
-    InsertDate: null,
-    UpdateDate: null,
-    PrimaryContactNo: '9876543210',
-    SecondaryContactNo: '9123456789',
-    DriverAddress: 'Sector 45, Gurgaon',
-    Status: 'Approved',
-    isPCVerified: true,
-    isSCVerified: true,
-     Address:'7th floor esplande nexus mall bhubaneshwar',
-    CreatedBy: 'admin',
-  },
-  {
-    Id: 66,
-    DLNumber: '000113456789FG',
-    DriverName: 'Sita Verma',
-    AdharNo: 'AADHAR789',
-    Dob: '1985-02-20',
-    PanNo: 'PAN789',
-     Mobile:'1234567890',
-    DriverEmail: 'sita@example.com',
-    InserUserId: null,
-    UpdateUserId: null,
-    InsertDate: null,
-    UpdateDate: null,
-    PrimaryContactNo: '7564839201',
-    SecondaryContactNo: 'Not Provided',
-    DriverAddress: 'MG Road, Bangalore',
-    Status: 'Rejected',
-    isPCVerified: true,
-     Address:'7th floor esplande nexus mall bhubaneshwar',
-    isSCVerified: false,
-    CreatedBy: 'superadmin',
-  },
-  {
-    Id: 67,
-    DLNumber: '00012345778FG',
-    DriverName: 'Karan Patel',
-    AdharNo: 'AADHAR999',
-     Mobile:'1234567890',
-    Dob: '1993-11-03',
-    PanNo: 'PAN999',
-    DriverEmail: 'karan@example.com',
-    InserUserId: null,
-    UpdateUserId: null,
-    InsertDate: null,
-    UpdateDate: null,
-     Address:'7th floor esplande nexus mall bhubaneshwar',
-    PrimaryContactNo: '9876541230',
-    SecondaryContactNo: '9123451234',
-    DriverAddress: 'Ahmedabad, Gujarat',
-    Status: 'Pending',
-    isPCVerified: false,
-    isSCVerified: false,
-    CreatedBy: 'admin',
-  },
-];
 
 const ManageDriver = () => {
   const [search, setSearch] = useState('');
@@ -114,13 +24,35 @@ const ManageDriver = () => {
   const [declare, setDeclare] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+const [isLoading,setIsLoading]=useState(false);
+const [driverList, setDriverList] = useState([]); // Replace with actual data fetching logic
   const imageList = [
     require('../assets/dlpng.webp'),
     require('../assets/aadhaar.png'),
     require('../assets/driver.png'),
   ];
+ const FetchDriverData = async () => {
+  setIsLoading(true);
+    try {
+      const response = await fetch('https://Exim.Tranzol.com/api/FetchDataApi/GetDriverPendingApprove?search=');
+      const data = await response.json();
+      if (data?.Entities) {
+        setDriverList(data.Entities);
+      } else {
+        console.warn('Unexpected response format', data);
+        setDriverList([]);
+      }
+    } catch (error) {
+      console.error('Error fetching driver data:', error);
+      setDriverList([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    FetchDriverData();
+  }, []);
   const filteredDrivers = driverList.filter(
     item =>
       item.DriverName?item.DriverName.toLowerCase().includes(search.toLowerCase()) :'' ||
@@ -131,7 +63,9 @@ const ManageDriver = () => {
     setSelectedDriver(item);
     setModalVisible(true);
   };
-
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="blue" />;
+  }
   return (
     <View style={styles.container}>
       {/* Search Bar */}
@@ -169,10 +103,10 @@ const ManageDriver = () => {
                   <Text
                     style={[
                       styles.cell,
-                      { color: item.Status === 'Approved' ? 'green' : 'orange' },
+                      { color: item.ApproveStatus === 'Approved' ? 'green' : 'orange' },
                     ]}
                   >
-                    {item.Status}
+                    {item.ApproveStatus}
                   </Text>
                    <Text style={styles.cell}>{item.CreatedBy}</Text>
                 </View>
