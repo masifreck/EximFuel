@@ -1042,7 +1042,7 @@ const openDialScreen = async (number) => {
                       gap: 10,
                       width: Width * 1,
                     }}>
-                    <CustomImagePicker
+                    {/* <CustomImagePicker
                       width={80}
                       bgImage={require('../assets/leftphoto.jpg')}
                       onlyCamera={true}
@@ -1050,7 +1050,7 @@ const openDialScreen = async (number) => {
                       iconName="camera-enhance"
                       onImagePicked={handleSaveImageData1}
                       imageData={DriverLeftImage}
-                    />
+                    /> */}
                     <CustomImagePicker
                       width={80}
                       bgImage={require('../assets/frontphoto.png')}
@@ -1060,7 +1060,7 @@ const openDialScreen = async (number) => {
                       onImagePicked={handleSaveImageData2}
                       imageData={DriverFrontImage}
                     />
-                    <CustomImagePicker
+                    {/* <CustomImagePicker
                       width={80}
                       bgImage={require('../assets/rigntphoto.jpg')}
                       onlyCamera={true}
@@ -1068,7 +1068,7 @@ const openDialScreen = async (number) => {
                       iconName="camera-enhance"
                       onImagePicked={handleSaveImageData3}
                       imageData={DriverRightImage}
-                    />
+                    /> */}
                   </ScrollView>
 
                   <View

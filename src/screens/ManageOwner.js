@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,91 +8,92 @@ import {
   FlatList,
   ScrollView,
   StyleSheet, TouchableOpacity,
-  Image
+  Image ,ActivityIndicator, Alert
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { darkBlue, textColor } from '../components/constant';
 import CustomCheckbox from '../components/CustomeCheckBox';
 import ImageViewing from 'react-native-image-viewing';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
-const dummyOwners = [
-  {
-    Id: null,
-    Name: 'First Owner Name',
-    PanNo: 'test01pan',
-    DOB: '1995-06-30',
-    Tds: 1,
-    AdharNo: '123569',
-    PMobileNo: '9648433287',
-    SMobileNo: 'SecondaryNo',
-    IFSC: 'IFSC',
-    AccountNo: 'AccountNo',
-    BankId: '1',
-    Account: 3,
-    Email: 'Email',
-    Address: 'Address',
-    Status: 'Pending',
-    isPCVerified:true,
-     isSCVerified:false
-  },
-    {
-    Id: null,
-    Name: 'Second  Owner Name',
-    PanNo: 'test02pan',
-    DOB: '1995-06-30',
-    Tds: 1,
-    AdharNo: '123569',
-    PMobileNo: '9648433287',
-    SMobileNo: 'SecondaryNo',
-    IFSC: 'IFSC',
-    AccountNo: 'AccountNo',
-    BankId: '1',
-    Account: 3,
-    Email: 'Email',
-    Address: 'Address',
-    Status: 'Pending',
-     isPCVerified:true,
-      isSCVerified:false
-  },
-    {
-    Id: null,
-    Name: 'Update Owner',
-    PanNo: 'test06pan',
-    DOB: '1995-06-30',
-    Tds: 1,
-    AdharNo: '123569',
-    PMobileNo: '9648433287',
-    SMobileNo: 'SecondaryNo',
-    IFSC: 'IFSC',
-    AccountNo: 'AccountNo',
-    BankId: '1',
-    Account: 3,
-    Email: 'Email',
-    Address: 'Address',
-    Status: 'Pending',
-     isPCVerified:false,
-      isSCVerified:true
-  },
-  {
-    Id: null,
-    Name: 'Another Owner',
-    PanNo: 'samplePAN2',
-    DOB: '1993-04-10',
-    Tds: 1,
-    AdharNo: '654321',
-    PMobileNo: '9998887770',
-    SMobileNo: 'SecondaryNo2',
-    IFSC: 'IFSC1234',
-    AccountNo: '123456789',
-    BankId: '2',
-    Account: 2,
-    Email: 'another@email.com',
-    Address: 'Another Address',
-    Status: 'Approved',
-     isPCVerified:true,
-     isSCVerified:true
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+//   {
+//     Id: null,
+//     Name: 'First Owner Name',
+//     PanNo: 'test01pan',
+//     DOB: '1995-06-30',
+//     Tds: 1,
+//     AdharNo: '123569',
+//     PMobileNo: '9648433287',
+//     SMobileNo: 'SecondaryNo',
+//     IFSC: 'IFSC',
+//     AccountNo: 'AccountNo',
+//     BankId: '1',
+//     Account: 3,
+//     Email: 'Email',
+//     Address: 'Address',
+//     Status: 'Pending',
+//     isPCVerified:true,
+//      isSCVerified:false
+//   },
+//     {
+//     Id: null,
+//     Name: 'Second  Owner Name',
+//     PanNo: 'test02pan',
+//     DOB: '1995-06-30',
+//     Tds: 1,
+//     AdharNo: '123569',
+//     PMobileNo: '9648433287',
+//     SMobileNo: 'SecondaryNo',
+//     IFSC: 'IFSC',
+//     AccountNo: 'AccountNo',
+//     BankId: '1',
+//     Account: 3,
+//     Email: 'Email',
+//     Address: 'Address',
+//     Status: 'Pending',
+//      isPCVerified:true,
+//       isSCVerified:false
+//   },
+//     {
+//     Id: null,
+//     Name: 'Update Owner',
+//     PanNo: 'test06pan',
+//     DOB: '1995-06-30',
+//     Tds: 1,
+//     AdharNo: '123569',
+//     PMobileNo: '9648433287',
+//     SMobileNo: 'SecondaryNo',
+//     IFSC: 'IFSC',
+//     AccountNo: 'AccountNo',
+//     BankId: '1',
+//     Account: 3,
+//     Email: 'Email',
+//     Address: 'Address',
+//     Status: 'Pending',
+//      isPCVerified:false,
+//       isSCVerified:true
+//   },
+//   {
+//     Id: null,
+//     Name: 'Another Owner',
+//     PanNo: 'samplePAN2',
+//     DOB: '1993-04-10',
+//     Tds: 1,
+//     AdharNo: '654321',
+//     PMobileNo: '9998887770',
+//     SMobileNo: 'SecondaryNo2',
+//     IFSC: 'IFSC1234',
+//     AccountNo: '123456789',
+//     BankId: '2',
+//     Account: 2,
+//     Email: 'another@email.com',
+//     Address: 'Another Address',
+//     Status: 'Approved',
+//      isPCVerified:true,
+//      isSCVerified:true
+//   },
+// ];
 
 const ManageOwner = () => {
   const [search, setSearch] = useState('');
@@ -101,6 +102,72 @@ const ManageOwner = () => {
   const [declare,setDeclayer]=useState(false)
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
 const [currentImageIndex, setCurrentImageIndex] = useState(0);
+const [ownerList, setOwnerList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+const [singleLoader,setSingleLoader]=useState(false)
+  const [apiTokenReceived, setapiTokenReceived] = useState();
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+      // console.log('Retrieved token:', token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+      console.log('Received token', apiTokenReceived);
+      console.log('Error retrieving token:', error);
+    });
+  const FetchSingleOnwer = async(id)=>{
+setSingleLoader(true)
+try {
+  const response =await fetch(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${id}`,
+    {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Basic ${apiTokenReceived}`,
+          },
+        });
+  const data =await response.json();
+  console.log('Single Owner Data:', data);
+  if(data.apiResult?.Result){
+    setSelectedOwner(data.apiResult.Result)  
+    
+  }else{
+    Alert.alert("No Data Found")
+  }
+
+}catch(error){
+  console.error('Error fetching single owner data:', error);
+  Alert.alert("Error fetching data")  
+
+  }finally{
+    setSingleLoader(false)
+  }
+}
+ const FetchOwnerData = async () => {
+  setIsLoading(true);
+    try {
+      const response = await fetch('https://Exim.Tranzol.com/api/FetchDataApi/GetOwnerPendingApprove?search=');
+      const data = await response.json();
+      if (data?.Entities) {
+        setOwnerList(data.Entities);
+       // console.log('Owner data fetched successfully:', data.Entities);
+      } else {
+        console.warn('Unexpected response format', data);
+        setOwnerList([]);
+      }
+    } catch (error) {
+      console.error('Error fetching driver data:', error);
+      setOwnerList([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    FetchOwnerData();
+  }, []);
 const imageList = [
   require('../assets/adhar_BACK.png'),
   require('../assets/delivery-truck.png'),
@@ -108,14 +175,15 @@ const imageList = [
 ];
 
 
-  const filteredOwners = dummyOwners.filter(
+  const filteredOwners = ownerList.filter(
     item =>
-      item.Name.toLowerCase().includes(search.toLowerCase()) ||
-      item.PanNo.toLowerCase().includes(search.toLowerCase())
+      item.OwnerName?.toLowerCase().includes(search.toLowerCase()) ||
+      item.PanNo?.toLowerCase().includes(search.toLowerCase())
   );
 
   const openDetails = item => {
-    setSelectedOwner(item);
+    FetchSingleOnwer(item.PanNo)
+    // setSelectedOwner(item);
     setModalVisible(true);
   };
 
@@ -150,15 +218,15 @@ const imageList = [
         styles.row,
         { backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#ffffff' }, // now index is defined
       ]}>
-        <Text style={styles.cell}>{item.Name}</Text>
+        <Text style={styles.cell}>{item.OwnerName}</Text>
         <Text style={styles.cell}>{item.PanNo}</Text>
         <Text
           style={[
             styles.cell,
-            { color: item.Status === 'Approved' ? 'green' : 'orange' },
+            { color: item.ApproveStatus === 'Approved' ? 'green' : 'orange' },
           ]}
         >
-          {item.Status}
+          {item.ApproveStatus}
         </Text>
       </View>
     </Pressable>
@@ -183,97 +251,111 @@ const imageList = [
         <View style={styles.modalContent}>
           <ScrollView showsVerticalScrollIndicator={false}>
 {selectedOwner && (
-  <>
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Id</Text>
-      <Text style={styles.detailValue}>{selectedOwner.Id}</Text>
-    </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Name</Text>
-      <Text style={styles.detailValue}>{selectedOwner.Name}</Text>
-    </View>
-
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Pan No</Text>
-      <Text style={styles.detailValue}>{selectedOwner.PanNo}</Text>
-    </View>
-
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>DOB</Text>
-      <Text style={styles.detailValue}>{selectedOwner.DOB}</Text>
-    </View>
-
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>TDS</Text>
-      <Text style={styles.detailValue}>{selectedOwner.Tds}</Text>
-    </View>
-
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Adhar No</Text>
-      <Text style={styles.detailValue}>{selectedOwner.AdharNo}</Text>
-    </View>
-
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>P. Mobile No</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' ,flex:2}}>
-        <Text style={styles.detailValue}>{selectedOwner.PMobileNo} </Text>
-        <Icon
-          name={selectedOwner.isPCVerified ? 'check-circle' : 'times-circle'}
-          size={18}
-          color={selectedOwner.isPCVerified ? 'green' : 'red'}
-        />
+  singleLoader ? (
+    <ActivityIndicator size="large" color={darkBlue} />
+  ) : (
+    <>
+    {  console.log('Selected Owner in ui:', selectedOwner)}
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Id</Text>
+        <Text style={styles.detailValue}>{selectedOwner.Id}</Text>
       </View>
-    </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>S.Mobile No</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' ,flex:2}}>
-        <Text style={styles.detailValue}>{selectedOwner.SMobileNo} </Text>
-        <Icon
-          name={selectedOwner.isSCVerified ? 'check-circle' : 'times-circle'}
-          size={18}
-          color={selectedOwner.isSCVerified ? 'green' : 'red'}
-        />
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Name</Text>
+        <Text style={styles.detailValue}>{selectedOwner.OwnerName}</Text>
       </View>
-    </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>IFSC</Text>
-      <Text style={styles.detailValue}>{selectedOwner.IFSC}</Text>
-    </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Pan No</Text>
+        <Text style={styles.detailValue}>{selectedOwner.PanNo}</Text>
+      </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Account No</Text>
-      <Text style={styles.detailValue}>{selectedOwner.AccountNo}</Text>
-    </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>DOB</Text>
+        <Text style={styles.detailValue}>{selectedOwner.DobOwner?.split('T')[0]}</Text>
+      </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Bank ID</Text>
-      <Text style={styles.detailValue}>{selectedOwner.BankId}</Text>
-    </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>TDS</Text>
+        <Text style={styles.detailValue}>{selectedOwner.TDSTypeName}</Text>
+      </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Account</Text>
-      <Text style={styles.detailValue}>{selectedOwner.Account}</Text>
-    </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Adhar No</Text>
+        <Text style={styles.detailValue}>{selectedOwner.AdharNo}</Text>
+      </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Email</Text>
-      <Text style={styles.detailValue}>{selectedOwner.Email}</Text>
-    </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>P. Mobile No</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 2 }}>
+          <Text style={styles.detailValue}>{selectedOwner.PrimaryMobileNo} </Text>
+          <Icon
+            name={selectedOwner.isPCVerified ? 'check-circle' : 'times-circle'}
+            size={18}
+            color={selectedOwner.isPCVerified ? 'green' : 'red'}
+          />
+        </View>
+      </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Address</Text>
-      <Text style={styles.detailValue}>{selectedOwner.Address}</Text>
-    </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>S. Mobile No</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 2 }}>
+          <Text style={styles.detailValue}>{selectedOwner.SecondaryNo} </Text>
+          <Icon
+            name={selectedOwner.isSCVerified ? 'check-circle' : 'times-circle'}
+            size={18}
+            color={selectedOwner.isSCVerified ? 'green' : 'red'}
+          />
+        </View>
+      </View>
+     <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Bank </Text>
+        <Text style={styles.detailValue}>{selectedOwner.BankNameName}</Text>
+      </View>
+        <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Bank Type</Text>
+        <Text style={styles.detailValue}>{selectedOwner.BankTypeName}</Text>
+      </View>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>IFSC</Text>
+        <Text style={styles.detailValue}>{selectedOwner.IFSCCode}</Text>
+      </View>
 
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Status</Text>
-      <Text style={styles.detailValue}>{selectedOwner.Status}</Text>
-    </View>
-  </>
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Account No</Text>
+        <Text style={styles.detailValue}>{selectedOwner.AccountNo}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Bank ID</Text>
+        <Text style={styles.detailValue}>{selectedOwner.BankId}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Account</Text>
+        <Text style={styles.detailValue}>{selectedOwner.Account}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Email</Text>
+        <Text style={styles.detailValue}>{selectedOwner.Email}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Address</Text>
+        <Text style={styles.detailValue}>{selectedOwner.ZipCode}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.detailKey}>Status</Text>
+        <Text style={styles.detailValue}>{selectedOwner.ApproveStatus}</Text>
+      </View>
+    </>
+  )
 )}
+
 <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
   <TouchableOpacity onPress={() => {
     setCurrentImageIndex(0);

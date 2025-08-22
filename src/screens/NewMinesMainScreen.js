@@ -169,12 +169,12 @@ const NewMinesMainScreen = ({navigation}) => {
           >
           <Text style={styles.text}>Update Details</Text>
         </TouchableOpacity>
- {/* <TouchableOpacity
+ <TouchableOpacity
           style={styles.button}
          onPress={() => PrintLoadingRowMetrial(tpno)} 
           >
           <Text style={styles.text}>Print & Share</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
 
         <View
           style={{
