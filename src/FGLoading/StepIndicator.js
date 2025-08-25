@@ -47,25 +47,25 @@ const styles = StyleSheet.create({
     marginBottom:20
   },
   circle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 8,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 6,
     justifyContent: 'center',
     alignItems: 'center',
   },
   line: {
-    width: 40,
-    height: 8,
+    width: 30,
+    height: 6,
   },
   stepText: {
     color: 'gray',
     fontWeight: 'bold',
-    fontSize: 35,
+    fontSize: 25,
   },
   checkIcon: {
-    width: 50,
-    height: 50,
+    width: 30,
+    height: 30,
   },
 });
 

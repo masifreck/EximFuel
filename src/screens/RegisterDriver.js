@@ -141,7 +141,6 @@ const RegisterDriver = ({route}) => {
       android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
     });
-
     try {
       let permissionStatus = await check(permissionType);
 

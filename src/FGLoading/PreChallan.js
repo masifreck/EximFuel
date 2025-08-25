@@ -60,6 +60,8 @@ const [DLNo,setDLNo]=useState('');
       const [searchDriver,setSearchDriver]=useState('')
   const [selectedJobNo,setSelectedJobNo]=useState('')
   const [selectedVehicleNo,setSelectedVehicleNo]=useState('');
+  const [ownerName,setOwnerName]=useState('');
+    const [ownerId,setOwnerId]=useState('');
    const [vehicleId, setVehicleId] = useState('');
     const [driverId, setDriverId] = useState('');
     const [jobNo,setJobNo]=useState('');
@@ -161,7 +163,7 @@ const fetchDriver = async (search) => {
   
       if (response.ok) {
         const data = await response.json();
-        console.log('API Response:', data);
+        console.log('vehicle API Response:', data);
   
         if (data.VehicleNoList) {
           // Corrected to use VehicleNoList
@@ -169,6 +171,8 @@ const fetchDriver = async (search) => {
             label: vehicle.VehicleNo + " " + vehicle.PANNumber??'' ,
             value: vehicle.VehicleId,
             PANNumber:vehicle.PANNumber??'',
+            OwnerId:vehicle.OwnerId??'',
+            
           }));
           setVehicleData(vehicleData);
         } else {
@@ -352,6 +356,9 @@ const handleGenerateChallan = () => {
       VEHICLEID: vehicleId,
       DLNo: DLNo,
       PANNo: PANNo,
+      driverName:driverName,
+      driverId:driverId,
+      ownerId:ownerId,
       selectedDate:selectedDate,
     });
   }
@@ -370,7 +377,7 @@ const handleGenerateChallan = () => {
             alignItems: 'center',
             justifyContent: 'center',
             marginTop: '10%',
-            marginBottom: 20,
+            marginBottom: 20,paddingBottom:50
           }}>
          
           <View
@@ -455,6 +462,7 @@ const handleGenerateChallan = () => {
     setSelectedVehicleNo(item.label)
     setVehicleId(item.value)
     setPANNo(item.PANNumber??'')
+    setOwnerId(item.OwnerId??'')
     console.log('Selected Vehicle ID:', item.value,selectedVehicleNo,);  // Log the selected job ID
     setIsFocus(false);
   }}

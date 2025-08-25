@@ -9,24 +9,29 @@ import {
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { se } from 'date-fns/locale';
+import { darkBlue } from '../components/constant';
 
-const SubmitPreChallan = ({ route }) => {
-  const { JobDetails, VEHICLENO, VEHICLEID, DLNo, PANNo ,selectedDate} = route.params;
-console.log(selectedDate)
-  const [apiTokenReceived, setApiTokenReceived] = useState(null);
+
+const SubmitPreChallan = ({ route,navigation }) => {
+    const [apiTokenReceived, setapiTokenReceived] = useState(null);
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+      console.log('Retrieved token:', token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+      // console.log('Received token', apiTokenReceived);
+      // console.log('Error retrieving token:', error);
+    });
+  const { JobDetails, VEHICLENO, VEHICLEID, DLNo, PANNo ,selectedDate, driverId,driverName,ownerId} = route.params;
+console.log('owner id',ownerId)
+ 
   const [ownerData, setOwnerData] = useState([]);
   const [loading, setLoading] = useState(false);
+   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    AsyncStorage.getItem('Token')
-      .then(token => {
-        setApiTokenReceived(token);
-      })
-      .catch(error => {
-        console.log("Error retrieving token:", error);
-      });
-  }, []);
 
   useEffect(() => {
     if (PANNo && apiTokenReceived) {
@@ -68,7 +73,53 @@ console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`)
       fetchOwnerDetails();
     }
   }, [PANNo, apiTokenReceived]);
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
 
+      const payload = {
+        JobId: JobDetails?.value,
+        VehicleId: VEHICLEID,
+        OwnerId: ownerId,
+        DriverId: driverId, // You may pass correct driverId if available
+        DriverDlNo: DLNo,
+        AllotmentDate: selectedDate,
+       // CreatedBy: 1,
+      };
+
+      console.log("Submitting Payload:", payload);
+
+  const response = await fetch(
+  "https://Exim.Tranzol.com/api/LoadingChallan/CreatePreLoading",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Basic ${apiTokenReceived}`, // exactly as in Postman
+    },
+    body: JSON.stringify(payload),
+  }
+);
+
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+      const result = await response.json();
+      console.log("Pre-Challan API Response:", result);
+
+      if (result?.data?.JobId) {
+        Alert.alert("Success", `Allotment ID: ${result.data.JobId}`);
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", "Failed to create Pre-Challan");
+      }
+
+    } catch (error) {
+      console.error("Error submitting Pre-Challan:", error);
+      Alert.alert("Error", "Failed to submit Pre-Challan");
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Submit Pre-Challan</Text>
@@ -164,9 +215,14 @@ console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`)
       )}
 
       {/* Submit button */}
-      <TouchableOpacity style={styles.button} onPress={() => Alert.alert("Submitted", "Pre-Challan Submitted!")}>
-        <Text style={styles.buttonText}>Submit</Text>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={submitting}>
+        {submitting ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Submit</Text>
+        )}
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -210,7 +266,7 @@ const styles = StyleSheet.create({
     color: "#555"
   },
   button: {
-    backgroundColor: "blue",
+    backgroundColor: darkBlue,
     padding: 14,
     borderRadius: 8,
     alignItems: "center",

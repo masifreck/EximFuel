@@ -1,5 +1,5 @@
 import { ScrollView, ActivityIndicator, Alert,View, TouchableOpacity, Text, StyleSheet,TextInput,Image, Dimensions,
-  Switch
+  Switch,
  } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { data, LoadtypeData } from '../components/DropDownData';
@@ -36,15 +36,15 @@ const NewChalan = ({navigation,route}) => {
     });
 
   
- const { params: { JobDetails, VEHICLENO, VEHICLEID, DLNo, PANNo } = {} } = useRoute();
+ const { params: { JobDetails, VEHICLENO, VEHICLEID, DLNo,} = {} } = useRoute();
 
-console.log("Job Details from route:", JobDetails);
+//console.log("Job Details from route:", JobDetails);
 console.log("Vehicle No:", VEHICLENO);
 console.log("Vehicle ID:", VEHICLEID);
 console.log("DL No:", DLNo);
-console.log("PAN No:", PANNo);
 
-console.log('job no from route',JobDetails.label + '' , 'JOBID' ,JobDetails.value)
+
+//console.log('job no from route',JobDetails.label + '' , 'JOBID' ,JobDetails.value)
 //   useEffect(()=>{
 // if(JOBNO){
 //   setJobNo(JOBNO)
@@ -171,50 +171,100 @@ const [truckSource,setTruckSource]=useState('')
   
  const [ownerData, setOwnerData] = useState(null);
   const [loading, setLoading] = useState(false);
+const [jobDetails2,setJobDetails2]=useState({})
+const [driverData2,setDriverData2]=useState({});
 
- useEffect(() => {
-  if (PANNo  && apiTokenReceived) {
-    const fetchOwnerDetails = async () => {
-      try {
-        setLoading(true);
+const [loadingDetails,setLoadingDetails]=useState(false);
+useEffect(() => {
+  const fetchAllDetails = async () => {
+    if (!apiTokenReceived) return;
 
-        const response = await fetch(
-          `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",   // ✅ correct for GET
-              Authorization: `Basic ${apiTokenReceived}`,
-            },
+    try {
+      setLoadingDetails(true);
+
+      // ================= VEHICLE → OWNER DETAILS =================
+      if (VEHICLENO) {
+        const encodedSearch = encodeURIComponent(VEHICLENO);
+        const vehicleUrl = `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${encodedSearch}`;
+        const vehicleRes = await fetch(vehicleUrl, {
+          method: "GET",
+          headers: { Authorization: `Basic ${apiTokenReceived}` },
+        });
+
+        if (vehicleRes.ok) {
+          const vehicleData = await vehicleRes.json();
+          if (vehicleData?.VehicleNoList?.length > 0) {
+            const vehicle = vehicleData.VehicleNoList[0];
+            if (vehicle?.PANNumber) {
+              const ownerUrl = `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${vehicle.PANNumber}`;
+              const ownerRes = await fetch(ownerUrl, {
+                method: "GET",
+                headers: { Authorization: `Basic ${apiTokenReceived}` },
+              });
+
+              if (ownerRes.ok) {
+                const ownerDataRes = await ownerRes.json();
+                if (ownerDataRes?.apiResult?.Result) {
+                  setOwnerData(ownerDataRes.apiResult.Result);
+                }
+              }
+            }
           }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
-        const data = await response.json();
-        console.log("Owner API Response:", data);
-
-        if (data?.apiResult?.StatusCode === 200 && data.apiResult.Result) {
-          setOwnerData(data.apiResult.Result);
-        } else {
-          Alert.alert("Error", data?.apiResult?.Error || "No owner details found.");
-        }
-      } catch (error) {
-        console.error("Error fetching owner details:", error);
-        Alert.alert("Error", "Failed to fetch owner details. Please try again.");
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchOwnerDetails();
-  }
-}, [PANNo,]);
+      // ================= JOB DETAILS =================
+      if (JobDetails) {
+        setJobId(JobDetails.value);
+        const jobUrl = `https://exim.tranzol.com/api/DropDown/Jobno?search=${JobDetails.label}`;
+        const jobRes = await fetch(jobUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${apiTokenReceived}`,
+          },
+        });
 
+        if (jobRes.ok) {
+          const jobData = await jobRes.json();
+          if (jobData?.JobList?.length > 0) {
+            const job = jobData.JobList[0];
+            setJobDetails2(job);
+            setLoadingPointId(job.LoadingPointId);
+            setUnLoadingPointId(job.UnloadingPointId);
+            setConsignorId(job.ConsignorId);
+            setConsigneeId(job.ConsigneeId);
+            setMaterialId(job.MaterialId);
+          }
+        }
+      }
 
+      // ================= DRIVER DETAILS =================
+      if (DLNo) {
+        const encodedSearch = encodeURIComponent(DLNo);
+        const driverUrl = `https://exim.tranzol.com/api/OwnerApi/GetDriverList?name=${encodedSearch}`;
+        const driverRes = await fetch(driverUrl, {
+          method: "GET",
+          headers: { Authorization: `Basic ${apiTokenReceived}` },
+        });
 
+        if (driverRes.ok) {
+          const driverData = await driverRes.json();
+          if (driverData?.apiResult?.Result) {
+            setDriverData2(driverData.apiResult.Result);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching details:", error);
+      Alert.alert("Error", "Failed to fetch details. Please try again.");
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  fetchAllDetails();
+}, [VEHICLENO, JobDetails, DLNo, apiTokenReceived]);
 
 
 const convertDateFormat = (dateString) => {
@@ -471,21 +521,21 @@ const HandleSubmit = async () => {
   });
   
   // Append documents if they exist
-  if (ChallanDoc) {
-    formData.append('ChallanDoc', {
-      uri: ChallanDoc.uri,
-      type: ChallanDoc.type, // Ensure correct MIME type is set
-      name: ChallanDoc.name,
-    });
-  }
+  // if (ChallanDoc) {
+  //   formData.append('ChallanDoc', {
+  //     uri: ChallanDoc.uri,
+  //     type: ChallanDoc.type, // Ensure correct MIME type is set
+  //     name: ChallanDoc.name,
+  //   });
+  // }
   
-  if (InvoiceDoc) {
-    formData.append('InvoiceDoc', {
-      uri: InvoiceDoc.uri,
-      type: InvoiceDoc.type, // Ensure correct MIME type is set
-      name: InvoiceDoc.name,
-    });
-  }
+  // if (InvoiceDoc) {
+  //   formData.append('InvoiceDoc', {
+  //     uri: InvoiceDoc.uri,
+  //     type: InvoiceDoc.type, // Ensure correct MIME type is set
+  //     name: InvoiceDoc.name,
+  //   });
+  // }
   
   // Now you can send formData in your API request
   console.log('sending Data', formData);
@@ -506,7 +556,7 @@ console.log('Api Response',response)
       const responseText = await response.text(); // Get raw response text
       console.log('Server Response:', responseText); // Log the success message
       Alert.alert('Success', responseText); // Show an alert with the server's message
-      navigation.navigate('FGLoading')
+      //navigation.navigate('FGLoading')
     } else {
       console.error('Server returned an error:', response.status, response.statusText);
       Alert.alert('Error', `Server error: ${response.statusText}`);
@@ -952,12 +1002,12 @@ useEffect(() => {
             setConsignorId(data.JobList[0].ConsignorId)
             setConsigneeId(data.JobList[0].ConsigneeId)
             setMaterialId(data.JobList[0].MaterialId)
-            console.log('Loading Point:', LoadingPoint);
-            console.log('loading id',loadingPointId);
-            console.log('unloading id',unloadingPointId)
-            console.log('consignor id',consignorId)
-            console.log('consignee id',consigneeId)
-            console.log('material id',materialId)
+            // console.log('Loading Point:', LoadingPoint);
+            // console.log('loading id',loadingPointId);
+            // console.log('unloading id',unloadingPointId)
+            // console.log('consignor id',consignorId)
+            // console.log('consignee id',consigneeId)
+            // console.log('material id',materialId)
           } else {
             console.log('JobList is empty or missing in the response');
           }
@@ -1109,7 +1159,7 @@ const fetchLoading = async (search) => {
     
        
        <View style={styles.levelContainer}>
-         <SelectButton onSelect={setSelected} isFirstSelected={selected} />
+         {/* <SelectButton onSelect={setSelected} isFirstSelected={selected} /> */}
           <Text style={styles.levelText}>
            Challan No <Text style={{color: 'red'}}>*</Text>
          </Text>
@@ -1129,24 +1179,30 @@ const fetchLoading = async (search) => {
            />
          </View>
          </View>
-             <View style={styles.levelContainer}>
+       {loadingDetails ? (
+     <>
+       <ActivityIndicator size="large" color={darkBlue} style={{marginTop:20}} />
+       <Text style={{marginTop:10,fontSize:16,color:darkBlue,fontWeight:'bold'}}>Loading Details...</Text>  
+     </>
+       ):(
+              <View style={styles.levelContainer}>
          <View style={{marginTop:10}}>
          <CardType2
          heading='VEHICLE DETAILS'
          title='VEHICLE NO'
-         value='MH12AB1234'
+         value={VEHICLENO? VEHICLENO : 'N/A'}
          borderTopLeftRadius={15}
          borderTopRightRadius={15}
          />
               <CardType2
          
          title='Verification'
-         value='Yes'
+         value='N/A'
          />
               <CardType2
          
          title='Validity'
-         value='25-05-2026'
+         value='N/A'
          borderBottomLeftRadius={16}
          borderBottomRightRadius={16}
          />
@@ -1156,112 +1212,126 @@ const fetchLoading = async (search) => {
             <Searching/>
           ):(
             <>
-          <CardType2
-          heading='OWNER DETAILS'
-          title='Name'
-          value='Dummy Name'
-               borderTopLeftRadius={15}
-         borderTopRightRadius={15}
-          />
-            <CardType2
-        title="Address"
-        value="123, Dummy Street, Test City, 567890"
-      />
-      <CardType2
-        title="Primary Contact"
-        value="9876543210"
-        isNVerify={true}
-      />
-      <CardType2
-        title="Secondary Contact"
-        value="9123456789"
-          isNVerify={true}
-      />
-      <CardType2
-  heading="BANK DETAILS"
-  title="Account Number"
-  value="123451234"
-/>
-<CardType2
-  title="IFSC Code"
-  value="HDFC0001234"
-/>
-<CardType2
-  title="Bank Name"
-  value="HDFC Bank"
+        <CardType2
+  heading="OWNER DETAILS"
+  title="Name"
+  value={ownerData?.OwnerName || "N/A"}
+  borderTopLeftRadius={15}
+  borderTopRightRadius={15}
 />
 
-      <CardType2
-        title="PAN No"
-        value="ABCDE1234F"
-          borderBottomLeftRadius={16}
-         borderBottomRightRadius={16}
-      />
+<CardType2
+  title="Address"
+  value={ownerData?.Address || "N/A"}
+/>
+
+<CardType2
+  title="Primary Contact"
+  value={ownerData?.PrimaryMobileNo || "N/A"}
+  isNVerify={true}
+/>
+
+<CardType2
+  title="Secondary Contact"
+  value={ownerData?.SecondaryNo || "N/A"}
+  isNVerify={true}
+/>
+
+<CardType2
+  heading="BANK DETAILS"
+  title="Account Number"
+  value={ownerData?.AccountNo || "N/A"}
+/>
+
+<CardType2
+  title="IFSC Code"
+  value={ownerData?.IFSCCode || "N/A"}
+/>
+
+<CardType2
+  title="Bank Name"
+  value={ownerData?.BankNameName || "N/A"}
+/>
+
+<CardType2
+  title="PAN No"
+  value={ownerData?.PanNo || "N/A"}
+  borderBottomLeftRadius={16}
+  borderBottomRightRadius={16}
+/>
+
+
     </> )}
          </View>
          <View style={{marginTop:10,marginBottom:10}}>
-          <CardType2
-  heading="DRIVER DETAILS"
-  title="Name"
-  value="John Doe"
-        borderTopLeftRadius={15}
-         borderTopRightRadius={15}
-/>
-<CardType2
-  title="Primary Contact"
-  value="9876543210"
-  isNVerify={true}
-/>
-<CardType2
-  title="Secondary Contact"
-  value="9123456789"
-  isNVerify={true}
-/>
-<CardType2
-  title="Address"
-  value="123 Transport Lane, Test City"
-/>
-<CardType2
-  title="DL No"
-  value="DL1234567890"
-          borderBottomLeftRadius={16}
-         borderBottomRightRadius={16}
-/>
+{driverData2 && driverData2.length > 0 && (
+  <>
+    <CardType2
+      heading="DRIVER DETAILS"
+      title="Name"
+      value={driverData2[0]?.DriverName ?? "N/A"}
+      borderTopLeftRadius={15}
+      borderTopRightRadius={15}
+    />
 
+    <CardType2
+      title="Primary Contact"
+      value={driverData2[0]?.PrimaryContact ?? "N/A"}
+    />
+
+    <CardType2
+      title="Secondary Contact"
+      value={driverData2[0]?.SecondaryContact ?? "N/A"}
+    />
+
+    <CardType2
+      title="Address"
+      value={driverData2[0]?.Address ?? "N/A"}
+    />
+
+    <CardType2
+      title="DL No"
+      value={driverData2[0]?.DlNumber ?? "N/A"}
+      borderBottomLeftRadius={16}
+      borderBottomRightRadius={16}
+    />
+  </>
+)}
          </View>
          <View style={{marginTop:10,marginBottom:20}}>
           <CardType2
   heading="JOB DETAILS"
   title="Loading"
-  value={JobDetails?.LoadingPoint? JobDetails.LoadingPoint : 'N/A'}
+  value={jobDetails2?.LoadingPoint? jobDetails2.LoadingPoint : 'N/A'}
           borderTopLeftRadius={15}
          borderTopRightRadius={15}
 />
 
 <CardType2
   title="Unloading"
-  value={JobDetails?.UnloadingPoint? JobDetails.UnloadingPoint :'N/A'}
+  value={jobDetails2?.UnloadingPoint? jobDetails2.UnloadingPoint :'N/A'}
 />
 
 <CardType2
   title="Consignor"
-  value={JobDetails?.ConsignorName? JobDetails.ConsignorName :'N/A'}
+  value={jobDetails2?.ConsignorName? jobDetails2.ConsignorName :'N/A'}
 />
 
 <CardType2
   title="Consignee"
-  value={JobDetails?.ConsigneeName? JobDetails.ConsigneeName : 'N/A'}
+  value={jobDetails2?.ConsigneeName? jobDetails2.ConsigneeName : 'N/A'}
 />
 
 <CardType2
   title="Material"
-  value={JobDetails?.MaterialName? JobDetails.MaterialName :'N/A'}
+  value={jobDetails2?.MaterialName? jobDetails2.MaterialName :'N/A'}
     borderBottomLeftRadius={16}
          borderBottomRightRadius={16}
 />
 
          </View>
         </View>
+       )}
          
              <View style={{flexDirection:'row',justifyContent:'space-between',
           alignItems:'center',gap:130,paddingBottom:50
@@ -1272,10 +1342,18 @@ const fetchLoading = async (search) => {
         <Text style={styles.btntext}>Reset</Text>
       </TouchableOpacity>
 <TouchableOpacity
-  onPress={HandleNext1}
-  style={[styles.btn,{marginBottom:50}]}>
+  onPress={() => {
+    if (!ChallanNo) {
+      Alert.alert("Error","Please create Challan first!");
+    } else {
+      HandleNext1();
+    }
+  }}
+  style={[styles.btn, { marginBottom: 50 }]}
+>
   <Text style={styles.btntext}>Next</Text>
 </TouchableOpacity>
+
 </View>
        </View>
        
@@ -1714,7 +1792,7 @@ const fetchLoading = async (search) => {
        
 
 
-{!jobNo &&    
+{/* {!jobNo &&    
 (
   <>
 <Text style={styles.levelText}>
@@ -1883,7 +1961,7 @@ const fetchLoading = async (search) => {
           />
         </View> 
         </>
-        )}
+        )} */}
           <Text style={styles.levelText}>Gross Weight
           
           </Text>

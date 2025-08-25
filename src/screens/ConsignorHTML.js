@@ -568,7 +568,7 @@ padding-left: 10px;
       <div class="gsttextcontainer" >
         <p class="gstheading">GST PAYABLE BY:  (Consignee <span>     Consignor</span>)</p>
         
-        <p class="gsttext">The Consignment Covered by this set of Special Lorry receipt from shall be stored at the 
+        <p style="font-size:8px;text-align: justify;" class="gsttext">The Consignment Covered by this set of Special Lorry receipt from shall be stored at the 
           Destination under the control of the Transport Operator and shall be delivered to or the order
           of the Consignee Bank whose name is mentioned in the Lorry receipt. It will under no of circumstances be delivered to anyone without the written authority from the Consignee Bank 
           or its order enclosed on the Consignee copy or on a separate letter of Authority
@@ -589,22 +589,22 @@ padding-left: 10px;
     <p style="font-size:8px;text-align: justify;">TERMS AND CONDITIONS
 
 Goods are accepted and carried under the terms and conditions.</p>
-  <p style="font-size:8px;text-align: justify;">
+  <p style="font-size:7px;text-align: justify;">
 01. Subject to order of the company's proper business policy and good will of the company. Anybody carrying, selling, or purchasing if in the name of company, in any form, for the purpose of making profit, without the written consent of the company's board would attract criminal proceedings as per Law of the Country.
 </p>
-  <p style="font-size:8px;text-align: justify;">
+  <p style="font-size:7px;text-align: justify;">
 02. The freight is for the whole consignment. No part load or part payment will be considered for payment and the Balance Payment would be forfeited by the company.
 </p>
-  <p style="font-size:8px;text-align: justify;">
+  <p style="font-size:7px;text-align: justify;">
 03. The freight is accepted for the transport by air, road and rail entirely at the risk and responsibilities of the Consignor.
 </p>
-  <p style="font-size:8px;text-align: justify;">
+  <p style="font-size:7px;text-align: justify;">
 04. The company will not receive or carry goods banned by Law. Transportation of Explosives, inflammable and chemical hazardous items should have proper Permission / Licence from the Government and Way Bill. This type of goods should be properly packed and loaded by proper persons with proper instruments. Weight / measurements of all goods / parcels of goods should be intimated to the company beforehand, so that proper vehicle with necessary carrying licence could be arranged by the company. And if due to any wrong information and concealment of facts by the Consignor, the company suffers from any penalty, loss, damage or confiscation of goods from the State as per the demand of the company, the decision of the Company in this regard is final and binding on the Consignor.
 </p>
-  <p style="font-size:8px;text-align: justify;">
+  <p style="font-size:7px;text-align: justify;">
 05. The company will not be responsible for any loss or damage to the goods arising out of the Act of God, unexpected and unforeseen circumstances, riots, emergencies, riot and civil commotion, theft, robbery, fire, accident and any kind of accident whatsoever.
 </p>
-  <p style="font-size:8px;text-align: justify;">
+  <p style="font-size:7px;text-align: justify;">
 06. All the material loading by the transporter company is always being done in the presence of the owner / driver owner's representative(s) / company's employee(s) appointed by the owner / driver (owner's representative), unanimously certified by the owner / driver (owners representative). In case the said materials found damaged / contaminated / pilferage / mixed with other goods / less amount of materials / less weight of goods / less quantity of goods as per laboratory report / manual comparison to the loading point weight mineral, found with more moisture than the loading point analyzed moisture,
  then the entire loading of the losses including fine, penalty with statutory levy / taxes / GST over the losses as applicable by different central / state govt. agencies / bodies / department and offices from the driver / owner will have to be compensated by the driver / owner from his own account during the period, such losses / damages will be finalized with the appointment of 3rd party surveyor (if satisfied by the owner / driver) and till the period such losses / damages to be paid / compensated by the owner / driver owner's representative(s) in full with the Company's Headquarter (Company) / Branch office (Company) / Sub-Branch office (Company) or 3rd party, the company can take any legal action against the owner / driver (owner's representative) of the vehicle as deemed
   fit in that case to recover the loss. Delay payment of losses includes legal/bank interest.
@@ -612,30 +612,30 @@ Goods are accepted and carried under the terms and conditions.</p>
     </div>
 
     <div>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
      then the entire loading of the losses including fine, penalty with statutory levy / taxes / GST over the losses as applicable by different central / state govt. agencies / bodies / department and offices from the driver / owner will have to be compensated by the driver / owner from his own account during the period, such losses / damages will be finalized with the appointment of 3rd party surveyor (if satisfied by the owner / driver) and till the period such losses / damages to be paid / compensated by the owner / driver owner's representative(s) in full with the Company's Headquarter (Company) / Branch office (Company) / Sub-Branch office (Company) or 3rd party, the company can take any legal action against the owner / driver (owner's representative) of the vehicle as deemed
   fit in that case to recover the loss. Delay payment of losses includes legal/bank interest.</p>
-    <p style="font-size:8px;text-align: justify;">07. During and on timely required E-Way Bill of the loaded materials shall exclusively done by the driver of the vehicle failing which if the vehicle enters into any kind of violations regarding E-Way Bill, the loss caused out of the same reason shall be borne by the driver.
+    <p style="font-size:7px;text-align: justify;">07. During and on timely required E-Way Bill of the loaded materials shall exclusively done by the driver of the vehicle failing which if the vehicle enters into any kind of violations regarding E-Way Bill, the loss caused out of the same reason shall be borne by the driver.
 </p>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
 08. The company reserve the right to itself for cancellation of transport, detention and delay delivery at the destination.
 </p>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
 09. All cases regarding the consignment would be settled only at Bhubaneswar, subject to the company rules, regulations and that is final and binding on the consignor.
 </p>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
 10. Perishable goods are accepted at Consignor's risk.
 </p>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
 11. The employees and the agents of the company are not authorised to alter the above Terms and Conditions in any case.
 </p>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
 12. All the charges applicable / collected by the agencies of the Government, on the way should be paid by the consignee.
 </p>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
 13. The company is not responsible for any leakage and breakage of the goods, whatever the cause may be.
 </p>
-<p style="font-size:8px;text-align: justify;">
+<p style="font-size:7px;text-align: justify;">
 DECLARATION
 
 I................................................................................................................................................................ driver of the Vehicle No........................................ vide valid DL No..................................................... do here by declare that I have read and understood the above mentioned Terms and Condition properly and again hereby promising to be abided myself with all the terms and condition.
