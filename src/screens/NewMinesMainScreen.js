@@ -176,7 +176,7 @@ const NewMinesMainScreen = ({navigation}) => {
           <Text style={styles.text}>Print & Share</Text>
         </TouchableOpacity>
 
-        <View
+        <View                                                                                                                
           style={{
             flexDirection: 'column',
             alignItems: 'center',

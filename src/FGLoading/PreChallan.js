@@ -19,9 +19,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../components/Loading';
 import { Dropdown } from 'react-native-element-dropdown';
 import {  Dimensions } from "react-native";
-import { textColor } from '../components/constant';
+import { inpurtbgcolor2, inputbgColor, textColor } from '../components/constant';
 import { darkBlue } from '../components/constant';
-import SelectButton from '../components/SelectButton';
+import CalendarModal from '../components/Calander';
+;
 const ScreenWidth = Dimensions.get('window').width;
 const OwnerDetails = () => {
   const navigation = useNavigation();
@@ -30,13 +31,13 @@ const OwnerDetails = () => {
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      console.log('Retrieved token:', token);
+    //  console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
       setapiTokenReceived(TokenReceived);
-      console.log('Received token', apiTokenReceived);
-      console.log('Error retrieving token:', error);
+      // console.log('Received token', apiTokenReceived);
+      // console.log('Error retrieving token:', error);
     });
   const [FGLoading, setFGLoading] = useState(null);
   const [errorMessage, setErrorMessage] = useState(''); // Initialize state for error message
@@ -47,7 +48,8 @@ const OwnerDetails = () => {
   const [hasBorder, setHasBorder] = useState(false); // State for border
  const [isFocus, setIsFocus] = useState(false);
    const [jobId,setJobId]=useState('')
-
+const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null); 
     const [jobData,setJobData]=useState([])
     const [vehicleData,setVehicleData]=useState([])
     const [PANNo,setPANNo]=useState('');
@@ -96,99 +98,48 @@ const [DLNo,setDLNo]=useState('');
     // Function to close the alert
     setShowAlert(false);
   };
-  const handleShowDetails = async () => {
-    if (challanNumber.length === 0) {
-      setErrorMessage("Enter Challan Number");
-      handleShowToast();
-      resetInputs();
-    } else {
-      setIsLoading(true); // Set loading state to true
-      try {
-        const url = `https://exim.tranzol.com/api/LoadingChallan/GetFinishGoods?challanNo=${challanNumber}`;
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-          Authorization: `Basic ${apiTokenReceived}`, // You may want to keep this secure
-          },
-          redirect: 'follow',
-        });
-  
-        setIsLoading(false);
-        if (response.ok) {
-          const data = await response.json();
-          console.log('API Response:', data);
-  
-          if (data.apiResult.Result === null) {
-            // Case: No Challan details (Result is null)
-            const errorMessage = 'Invalid Challan Number';
-            setErrorMessage(errorMessage);
-            setShowAlert(true);
-            resetInputs();
-          } else {
-            // Case: Valid Challan details exist (Result is not null)
-            setFGLoading(data); // Store the result in your state
-            navigation.navigate('ShowFGLoadingChalan', {
-              FGLoading: data, // Pass the challan details to the next screen
-            });
-            resetInputs();
-          }
-        } else {
-          // Case: Fetching failed, no response
-          console.log('Error fetching Challan details');
-          setErrorMessage('Challan Number Not Found');
-          handleShowToast();
-          resetInputs();
-        }
-      } catch (error) {
-        // Case: Exception or network failure
-        console.log('An error occurred:', error);
-        setErrorMessage('An error occurred');
-        setShowAlert(true);
-        resetInputs();
-      }
-    }
-  };
+
   useEffect(() => {
     if (searchDriver) {
       fetchDriver(searchDriver);
     }
   }, [searchDriver]);
-  const fetchDriver = async (search) => {
-    try {
-      console.log('Fetching vehicle with search:', search);
-      const encodedSearch = encodeURIComponent(search);
-      const url = `https://exim.tranzol.com/api/DropDown/Driver?search=${encodedSearch}`;
-      console.log('Request URL:', url);
-  
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
+const fetchDriver = async (search) => {
+  try {
+    console.log('Fetching driver with search:', search);
+    const encodedSearch = encodeURIComponent(search);
+    const url = `https://exim.tranzol.com/api/OwnerApi/GetDriverList?name=${encodedSearch}`;
+    console.log('Request URL:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
         Authorization: `Basic ${apiTokenReceived}`,
-        },
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API Response:', data);
-  
-        if (data.DriverList) {
-          // Corrected to use VehicleNoList
-          const driverData = data.DriverList.map((Driver) => ({
-            label: Driver.PartyName,
-            value: Driver.Id,
-            
-          }));
-          setDriverData(driverData);
-        } else {
-          console.log('DriverList missing in the response');
-        }
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Driver API Response:', data);
+
+      if (data.apiResult?.Result) {
+        const driverData = data.apiResult.Result.map((driver) => ({
+           label: `${driver.DriverName} (${driver.DlNumber ?? ''})`,
+          value: driver.Id,           // 👈 Correct field
+          DlNumber: driver.DlNumber ?? '',
+        }));
+        setDriverData(driverData);
       } else {
-        console.log('Error in fetching DriverList no:', response.status);
+        console.log('Driver list missing in the response');
       }
-    } catch (error) {
-      console.log('Error in fetching DriverList no:', error);
+    } else {
+      console.log('Error fetching Driver list:', response.status);
     }
-  };
+  } catch (error) {
+    console.log('Error fetching Driver list:', error);
+  }
+};
+
   useEffect(() => {
     if (searchVehicle) {
       fetchVehicle(searchVehicle);
@@ -215,7 +166,7 @@ const [DLNo,setDLNo]=useState('');
         if (data.VehicleNoList) {
           // Corrected to use VehicleNoList
           const vehicleData = data.VehicleNoList.map((vehicle) => ({
-            label: vehicle.VehicleNo,
+            label: vehicle.VehicleNo + " " + vehicle.PANNumber??'' ,
             value: vehicle.VehicleId,
             PANNumber:vehicle.PANNumber??'',
           }));
@@ -382,14 +333,30 @@ const [DLNo,setDLNo]=useState('');
   const handleSelection = (value) => {
     setSelected(value);
   };
-  const handleGenerateChallan=()=>{
-    if(jobNo.length===0 && vehicleNo.length===0 && driverName.length===0){
-     Alert.alert('Please select all fields','Job No, Vehicle No and Driver are required')
-      handleShowToast()
-    }else{
-      navigation.navigate('NewChalan',{JobDetails:JobDetails,VEHICLENO:vehicleNo,VEHICLEID:vehicleId,DLNo:DLNo,PANNo:PANNo})
+const handleGenerateChallan = () => {
+  if (
+    (!jobNo || jobNo.length === 0) ||
+    (!vehicleNo || vehicleNo.length === 0) ||
+    (!driverName || driverName.length === 0) ||
+    (!selectedDate || selectedDate.length === 0)
+  ) {
+    Alert.alert(
+      'Please select all fields',
+      'Job No, Vehicle No, Allotment Date and Driver are required'
+    );
+    handleShowToast();
+  } else {
+    navigation.navigate('preChallan', {
+      JobDetails: JobDetails,
+      VEHICLENO: vehicleNo,
+      VEHICLEID: vehicleId,
+      DLNo: DLNo,
+      PANNo: PANNo,
+      selectedDate:selectedDate,
+    });
   }
-}
+};
+
   return (
         <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -402,14 +369,14 @@ const [DLNo,setDLNo]=useState('');
           style={{
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: '30%',
+            marginTop: '10%',
             marginBottom: 20,
           }}>
          
           <View
             style={{
               height: 200,
-              width: '50%',
+              width: '60%',
               alignItems: 'center',
               borderRadius: 10,
               shadowColor: 'black', // Set shadow color to blue
@@ -417,6 +384,7 @@ const [DLNo,setDLNo]=useState('');
               shadowOpacity: 0.5,
               shadowRadius: 3,
               elevation: 10, // This is for Android
+              marginBottom:20
             }}>
             <Image
               source={require('../assets/FG-loading.png')}
@@ -429,19 +397,11 @@ const [DLNo,setDLNo]=useState('');
               resizeMode="contain"
             />
           </View>
-           <SelectButton 
-           isFirstSelected={selected}
-              button1Text="Entry"
-        button2Text="Check Details"
-           onSelect={handleSelection} />
-           {selected? (
             <>
            <View>
    <Text style={styles.levelText}>
           Job No <Text style={{color: 'red'}}>*</Text>
         </Text>
-       
-        
         <Dropdown
   style={styles.dropdown}
   placeholderStyle={styles.placeholderStyle}
@@ -527,87 +487,64 @@ const [DLNo,setDLNo]=useState('');
   onChange={item => {
     setDriverId(item.value),
     setDriverName(item.value)
+    setDLNo(item.DlNumber??'')
     setIsFocus(false);
   }}
   onChangeText={text => {
     setSearchDriver(text);
   }}
 />
+<Text style={styles.levelText}>Alloment Date
+<Text style={{color: 'red'}}> *</Text></Text>    
+<View
+  style={[
+    styles.inputContainer,
+    {
+      borderWidth: hasBorder ? 0.9 : 0,
+      borderColor: hasBorder ? 'red' : 'transparent',
+    },
+  ]}
+>
+
+  {/* Display the selected date in the TextInput */}
+  <TextInput
+    placeholderTextColor={'#6c6f73'}
+    style={{
+      color: 'black',
+      fontSize: 15,
+      width: '85%',
+      marginRight: 20,
+    }}
+    value={selectedDate}  // Bind selected date to TextInput value
+    placeholder={'DD-MM-YYYY'}  // Default placeholder
+    autoCorrect={false}
+    editable={false}  // Non-editable since date is selected via the calendar
+  />
+
+  {/* Calendar icon to trigger the modal */}
+  <TouchableOpacity onPress={() => setModalVisible(true)}>
+    <Image
+      style={styles.rightIcon}
+      source={require('../assets/calendar.png')}
+    />
+  </TouchableOpacity>
+</View>
+
+{/* CalendarModal Component */}
+<CalendarModal
+  visible={modalVisible}
+  onClose={() => setModalVisible(false)}
+  onSelect={(date, convDate) => {
+    setSelectedDate(convDate);  // Set the formatted date (YYYY-MM-DD)
+    setModalVisible(false);
+  }}
+/>
   <TouchableOpacity style={styles.button} onPress={handleGenerateChallan}>
-            <Text style={styles.text}>Generate Challan</Text>
+            <Text style={styles.text}>Check Details</Text>
           </TouchableOpacity>
 </View>
+
 </>
-):(
-  <>
-          <View
-            style={[
-              styles.inputContainer,
-              {
-                borderWidth: hasBorder ? 0.9 : 0,
-                borderColor: hasBorder ? 'red' : 'transparent',
-                backgroundColor: hasBorder ? 'red' : '#9894e6',
-              },
-            ]}>
-            <Image
-              style={styles.leftIcon}
-              source={require('../assets/id-card.png')}
-            />
-            <TextInput
-              placeholderTextColor={'black'}
-              style={{
-                paddingTop: 13,
-                paddingLeft: 30,
-                letterSpacing: 0.5,
-                color: 'black',
-                fontSize: 15,
-                width: 250,
-                fontFamily: 'PoppinsSemiBold',
-              }}
-              value={challanNumber}
-              placeholder={'Enter Challan Number'}
-              autoCorrect={false}
-              onChangeText={text => setchallanNumber(text)}
-            />
-          </View>
-   
-
-
-          <TouchableOpacity style={styles.button} onPress={handleShowDetails}>
-            <Text style={styles.text}>Show Challan Details</Text>
-          </TouchableOpacity>
-          </>
-)}
-          {/* <View
-            style={{
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                color: 'black',
-                fontSize: 18,
-                fontFamily: 'PoppinsMedium',
-              }}>
-              For New Challan Entry !{' '}
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('NewChalan');
-              }}>
-              <Text
-                style={{
-                  color: darkBlue,
-                  fontSize: 18,
-                  // fontWeight: '500',
-                  fontFamily: 'PoppinsBold',
-                  fontWeight:'bold'
-                }}>
-                Click Here.
-              </Text>
-            </TouchableOpacity>
-          </View> */}
-      
         </View>
       )}
       <CustomAlert
@@ -615,12 +552,7 @@ const [DLNo,setDLNo]=useState('');
         message={errorMessage}
         onClose={closeAlert}
       />
-      {/* {showToast && (
-        <Animated.View
-          style={[styles.toastContainer, {opacity: fadeAnim, zIndex: 999}]}>
-          <Text style={styles.toastText}>{errorMessage}</Text>
-        </Animated.View>
-      )} */}
+    
     </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -665,12 +597,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
   },
+    levelText: {
+    alignItems: 'flex-start',
+    padding: 5,
+    marginLeft: '5%',
+    color: 'black',
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
+  },
   toastContainer: {
     borderRadius: 5,
     position: 'absolute',
     bottom: '17%', // Center vertically
     left: '26%', // Center horizontally
     transform: [{translateX: -50}, {translateY: -50}], // Center both horizontally and vertically
+  },
+   inputContainer: {
+    height: 50,
+    width: ScreenWidth * 0.8,
+    backgroundColor: '#9894e6',
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderColor: 'black',
+    alignSelf: 'center',
   },
   toastText: {
     color: 'red',
@@ -715,6 +666,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'PoppinsMedium',
     textAlign:'left'
+  },
+    rightIcon: {
+    height: 30,
+    width: 30,
   },
 });
 

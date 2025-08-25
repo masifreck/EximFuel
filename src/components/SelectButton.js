@@ -48,6 +48,7 @@ const SelectButton = ({ isFirstSelected, onSelect, button1Text = 'E-Challan', bu
           </Text>
         </TouchableOpacity>
       </Animated.View>
+      
     </View>
   );
 };

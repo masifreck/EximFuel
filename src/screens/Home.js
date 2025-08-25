@@ -60,7 +60,7 @@ const Home = () => {
     {text: 'Driver', image: require('../assets/truck-driver.png'), screen: 'Driver'},
     {text: 'Vehicle', image: require('../assets/Truck.png'), screen: 'Vehicle'},
     {text: 'Raw Material', image: require('../assets/mine-loading.png'), screen: 'minesmainScreen'},
-    {text: 'FG Loading', image: require('../assets/FG-loading.png'), screen: 'FGLoading'},
+    {text: 'FG Loading', image: require('../assets/FG-loading.png'), screen: 'FGNavigation'},
     {text: 'Unloading', image: require('../assets/unloading.png'), screen: 'Unloading'},
     {text: 'Print Challan', image: require('../assets/gg.png'), screen: 'PrintChallan'},
   ];

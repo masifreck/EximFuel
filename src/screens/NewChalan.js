@@ -18,20 +18,38 @@ import StepIndicator from '../FGLoading/StepIndicator';
 import SelectButton from '../components/SelectButton';
 import CardType2 from '../FGLoading/CardType2';
 import { is } from 'date-fns/locale';
+import Searching from '../components/Searching';
 
 
-const NewChalan = () => {
- 
+const NewChalan = ({navigation,route}) => {
+   const [apiTokenReceived, setapiTokenReceived] = useState(null);
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+    //  console.log('Retrieved token:', token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+      // console.log('Received token', apiTokenReceived);
+      // console.log('Error retrieving token:', error);
+    });
 
-  const navigation = useNavigation();
-  const route = useRoute();
-  const {JOBNO}=route?.params? route.params :''
-console.log('job no from route',JOBNO)
-  useEffect(()=>{
-if(JOBNO){
-  setJobNo(JOBNO)
-}
-  },[JOBNO])
+  
+ const { params: { JobDetails, VEHICLENO, VEHICLEID, DLNo, PANNo } = {} } = useRoute();
+
+console.log("Job Details from route:", JobDetails);
+console.log("Vehicle No:", VEHICLENO);
+console.log("Vehicle ID:", VEHICLEID);
+console.log("DL No:", DLNo);
+console.log("PAN No:", PANNo);
+
+console.log('job no from route',JobDetails.label + '' , 'JOBID' ,JobDetails.value)
+//   useEffect(()=>{
+// if(JOBNO){
+//   setJobNo(JOBNO)
+// }
+//   },[JOBNO])
   // State variables
   const [data1, setData1] = useState({});
   const [data2, setData2] = useState({});
@@ -151,6 +169,52 @@ const [truckSource,setTruckSource]=useState('')
   };
 
   
+ const [ownerData, setOwnerData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+ useEffect(() => {
+  if (PANNo  && apiTokenReceived) {
+    const fetchOwnerDetails = async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(
+          `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",   // ✅ correct for GET
+              Authorization: `Basic ${apiTokenReceived}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Owner API Response:", data);
+
+        if (data?.apiResult?.StatusCode === 200 && data.apiResult.Result) {
+          setOwnerData(data.apiResult.Result);
+        } else {
+          Alert.alert("Error", data?.apiResult?.Error || "No owner details found.");
+        }
+      } catch (error) {
+        console.error("Error fetching owner details:", error);
+        Alert.alert("Error", "Failed to fetch owner details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOwnerDetails();
+  }
+}, [PANNo,]);
+
+
+
 
 
 const convertDateFormat = (dateString) => {
@@ -433,7 +497,7 @@ const HandleSubmit = async () => {
       body: formData,
       headers: {
         'Content-Type': 'multipart/form-data', // Ensure this for FormData
-        'Authorization': `Basic YWRtaW46YWRtaW5AMDc=`,
+        Authorization: `Basic ${apiTokenReceived}`,
  
       },
     });
@@ -582,7 +646,7 @@ const fetchPump = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -624,7 +688,7 @@ const fetchAssociation = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -664,7 +728,7 @@ const fetchBroker = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -705,7 +769,7 @@ const fetchDriver = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -745,7 +809,7 @@ const fetchVehicle = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -785,7 +849,7 @@ useEffect(() => {
         const response = await fetch(url, {
           method: 'GET',
           headers: {
-            Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+            Authorization: `Basic ${apiTokenReceived}`,
           },
         });
 
@@ -824,7 +888,7 @@ const fetchJob = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -868,7 +932,7 @@ useEffect(() => {
         const response = await fetch(url, {
           method: 'GET',
           headers: {
-            Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+            Authorization: `Basic ${apiTokenReceived}`,
           },
         });
 
@@ -933,7 +997,7 @@ const fetchMaterial = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -968,7 +1032,7 @@ const fetchUnLoading = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -1004,7 +1068,7 @@ const fetchLoading = async (search) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Basic YWRtaW46YWRtaW5AMDc=',
+        Authorization: `Basic ${apiTokenReceived}`,
       },
     });
 
@@ -1088,6 +1152,10 @@ const fetchLoading = async (search) => {
          />
          </View>
          <View style={{marginTop:10,elevation:4}}>
+            {loading? (
+            <Searching/>
+          ):(
+            <>
           <CardType2
           heading='OWNER DETAILS'
           title='Name'
@@ -1129,7 +1197,7 @@ const fetchLoading = async (search) => {
           borderBottomLeftRadius={16}
          borderBottomRightRadius={16}
       />
-    
+    </> )}
          </View>
          <View style={{marginTop:10,marginBottom:10}}>
           <CardType2
@@ -1165,29 +1233,29 @@ const fetchLoading = async (search) => {
           <CardType2
   heading="JOB DETAILS"
   title="Loading"
-  value="Warehouse A"
+  value={JobDetails?.LoadingPoint? JobDetails.LoadingPoint : 'N/A'}
           borderTopLeftRadius={15}
          borderTopRightRadius={15}
 />
 
 <CardType2
   title="Unloading"
-  value="Warehouse B"
+  value={JobDetails?.UnloadingPoint? JobDetails.UnloadingPoint :'N/A'}
 />
 
 <CardType2
   title="Consignor"
-  value="ABC Corporation"
+  value={JobDetails?.ConsignorName? JobDetails.ConsignorName :'N/A'}
 />
 
 <CardType2
   title="Consignee"
-  value="XYZ Enterprises"
+  value={JobDetails?.ConsigneeName? JobDetails.ConsigneeName : 'N/A'}
 />
 
 <CardType2
   title="Material"
-  value="Electronics"
+  value={JobDetails?.MaterialName? JobDetails.MaterialName :'N/A'}
     borderBottomLeftRadius={16}
          borderBottomRightRadius={16}
 />

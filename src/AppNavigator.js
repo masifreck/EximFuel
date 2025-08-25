@@ -49,6 +49,8 @@ import LoadingRowDetails from './screens/MinesLoadingDetails';
 import UpdateMinesLoading from './screens/updateMinesLoading';
 import PrintMines from './screens/PrintMines';
 import { MinesQRCode } from './components/MinesQRCode';
+import FGNavigation from './FGLoading/FGNavigation';
+import SubmitPreChallan from './FGLoading/SubmitPreChallan';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -230,7 +232,12 @@ const AppNavigator = () => {
         {/* fg loading=============== */}
         <Stack.Screen
           name="FGLoading"
-          component={FGLoading}
+          component={FGNavigation}
+          options={getScreenOptions('FG Loading')}
+        />
+           <Stack.Screen
+          name="FGNavigation"
+          component={FGNavigation}
           options={getScreenOptions('FG Loading')}
         />
         <Stack.Screen
@@ -238,7 +245,11 @@ const AppNavigator = () => {
           component={ShowFGLoadingChalan}
           options={getScreenOptions('Show FGLoading Challan')}
         />
-
+<Stack.Screen
+name='preChallan'
+component={SubmitPreChallan}
+options={getScreenOptions('Submit Pre Challan')}
+/>
         <Stack.Screen
           name="Step1"
           component={Step1}
