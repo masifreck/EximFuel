@@ -5,7 +5,7 @@ import { darkBlue, inputbgColor, textColor } from './constant';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const ScreenWidth=Dimensions.get('window').width
-const CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width,imageData}) => {
+const   CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width,imageData}) => {
 
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -136,19 +136,19 @@ const CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,wi
                             style={styles.imageChangeButton}
                             onPress={pickImageFromLibrary}
                         >
-                            <Text style={styles.buttonText}>Pick from Gallery</Text>
+                            <Text style={styles.buttonText}>🖼️ Pick from Gallery</Text>
                         </Pressable>
                         <Pressable
                             style={styles.imageChangeButton}
                             onPress={takePhotoWithCamera}
                         >
-                            <Text style={styles.buttonText}>Take Photo</Text>
+                            <Text style={styles.buttonText}>📷 Take Photo</Text>
                         </Pressable>
                         <Pressable
                             style={styles.cancelButton}
                             onPress={() => setModalVisible(false)}
                         >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                            <Text style={styles.cancelButtonText}>❌ Cancel</Text>
                         </Pressable>
                     </SafeAreaView>
                 </View>
@@ -216,6 +216,7 @@ height:50,margin:10,paddingHorizontal:20
     },
     buttonText: {
         fontSize: 18,
+        color: textColor
     },
     cancelButtonText: {
         fontSize: 18,

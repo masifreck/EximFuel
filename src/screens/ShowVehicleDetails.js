@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  Alert,ActivityIndicator,Linking,Platform
 } from 'react-native';
 import {
   buttonColor,
@@ -14,7 +15,7 @@ import {
   inputbgColor,
   textColor,
 } from '../components/constant';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const TableRow = ({title, value, color}) => (
   <View style={styles.tableRow}>
     <View style={styles.leftColumn}>
@@ -41,8 +42,21 @@ const FetchOwnerDetails = {};
 const ShowVehicleDetails = ({route, navigation}) => {
   // Retrieve the vehicleDetails parameter from the route
   const {vehicleDetails} = route.params;
+    const [apiTokenReceived, setapiTokenReceived] = useState(null);
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+    });
+  
   const [IsOwnerVisible, setIsOwnerVisible] = useState(false);
   const FetchVehicleDetails = vehicleDetails.apiResult.Result;
+   // console.log('vehicle details',FetchVehicleDetails)
+  const [ownerData,setOwnerData]=useState([])
+  const [isownerLoading,setIsownerLoading]=useState(false)
 
   const [isBlackList, setIsBlackList] = useState(null); // Initialize as null
   useEffect(() => {
@@ -53,13 +67,113 @@ const ShowVehicleDetails = ({route, navigation}) => {
       setIsBlackList(false); // Set to false if not verified
     }
   }, [vehicleDetails]); // Re-run the effect whenever vehicleDetails changes
-  const handleOwnerVisiblity = () => {
-    setIsOwnerVisible(!IsOwnerVisible);
-  };
+const handleOwnerVisiblity = async () => {
+  
+
+  if (!FetchVehicleDetails?.VehicleNo) {
+    Alert.alert("Error", "Vehicle number not found");
+    return;
+  }
+
+  try {
+    setIsownerLoading(true); // start loading
+   const vehicleResponse = await fetch(
+  `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${FetchVehicleDetails?.VehicleNo}`,
+  {
+    method: 'GET',
+    headers: {
+      Authorization: `Basic ${apiTokenReceived}`,
+      'Content-Type': 'application/json',
+    },
+  }
+);
+ console.log( `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${FetchVehicleDetails?.VehicleNo}`)
+    if (!vehicleResponse.ok) {
+      console.log('vehicle api response',vehicleResponse.json())
+      Alert.alert("Error", "Failed to fetch vehicle info");
+      return;
+    }
+
+    const vehicleData = await vehicleResponse.json();
+    console.log("VehicleNo API Response:", vehicleData);
+
+    const panNumber = vehicleData?.VehicleNoList?.[0]?.PANNumber;
+
+    if (!panNumber) {
+      Alert.alert("Error", "PAN Number not found for this vehicle");
+      return;
+    }
+
+    // 2️⃣ Call Owner API with extracted PANNumber
+
+    const response = await fetch(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${panNumber}`,
+       {
+    method: 'GET',
+    headers: {
+      Authorization: `Basic ${apiTokenReceived}`,
+      'Content-Type': 'application/json',
+    },
+  }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      //console.log("Owner API Response:", data);
+
+      if (data.error) {
+        Alert.alert(data.error);
+        Alert.alert("API Response Error", data.error);
+      } else {
+        const ownerResult = data?.apiResult?.Result;
+console.log("Owner API Response:", ownerResult);
+        if (!ownerResult) {
+          Alert.alert("Error", "Owner not found with this PAN Number");
+        } else {
+          setOwnerData(ownerResult);
+          setIsOwnerVisible(!IsOwnerVisible);
+        }
+      }
+    } else {
+      Alert.alert("Error", "Failed to fetch owner details");
+    }
+  } catch (error) {
+    console.log("Network Error:", error);
+    Alert.alert("Error", "Network Error. Please try again.");
+  } finally {
+    setIsownerLoading(false); // stop loading
+  }
+};
+
+
+const openDialScreen = async (number) => {
+  console.log('phone', number);
+
+  // Validate 10-digit number
+  if (!number || !/^\d{10}$/.test(number)) {
+  //  Alert.alert();
+    Alert.alert('Error','Invalid Number Please enter a valid 10-digit phone number.')
+    return;
+  }
+
+  // Format the dial URL depending on the platform
+  const dialURL = Platform.OS === 'ios' ? `telprompt:${number}` : `tel:${number}`;
+
+  try {
+    const canOpen = await Linking.canOpenURL(dialURL);
+    if (canOpen) {
+      await Linking.openURL(dialURL);
+    } else {
+      Alert.alert('Error', 'Dialer not supported on this device.');
+    }
+  } catch (error) {
+   // console.error('Dialer Error:', error);
+    Alert.alert('Error', 'Something went wrong while trying to open the dialer.');
+  }
+};
   return (
     <ScrollView>
       <View style={{flexDirection:'row',justifyContent:'space-evenly'}}>
-      <Text style={styles.levelText}>Vehicle Details</Text>
+      <Text style={styles.levelText}>🚛 Vehicle Details</Text>
       <TouchableOpacity style={{position:'absoulte',top:10,right:10}} onPress={()=>navigation.navigate('UpdateVehicle',{vehicleDetails:vehicleDetails})}>
       <Image style={{width:50,height:50}} source={require('../assets/edit.png')}/>
       </TouchableOpacity>
@@ -268,7 +382,8 @@ const ShowVehicleDetails = ({route, navigation}) => {
       </ScrollView>
       <View style={styles.inputContainer}>
         <TableRow title="VehicleNo" value={FetchVehicleDetails.VehicleNo} />
-        <TableRow title="TyreNo" value={FetchVehicleDetails.TyreNo} />
+        {/* 
+         */}
         {/* <TableRow title="OwnerName" value={FetchVehicleDetails.OwnerName} /> */}
         <TableRow title="ChassicNo" value={FetchVehicleDetails.ChassicNo} />
         <TableRow title="EngineNo" value={FetchVehicleDetails.EngineNo} />
@@ -287,43 +402,44 @@ const ShowVehicleDetails = ({route, navigation}) => {
         />
       </View>
       <View style={{padding: 10, alignItems: 'center'}}>
-        {IsOwnerVisible ? (
-          <TouchableOpacity onPress={handleOwnerVisiblity}>
-            <Image
-              style={{width: 60, height: 60}}
-              source={require('../assets/closepng.png')}
-            />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={handleOwnerVisiblity}
-            style={{
-              backgroundColor: darkBlue,
-              padding: 10,
-              borderRadius: 10,
-              elevation: 4,
-              width: 200,
-              height: 50,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text style={{fontWeight: 'bold', color: '#fff', fontSize: 15}}>
-              GET OWNER DETAILS
-            </Text>
-          </TouchableOpacity>
-        )}
+       {IsOwnerVisible ? (
+  <TouchableOpacity onPress={handleOwnerVisiblity}>
+    <Image
+      style={{ width: 60, height: 60 }}
+      source={require('../assets/closepng.png')}
+    />
+  </TouchableOpacity>
+) : (
+  <TouchableOpacity
+    onPress={handleOwnerVisiblity}
+    style={{
+      backgroundColor: darkBlue,
+      padding: 10,
+      borderRadius: 10,
+      elevation: 4,
+      width: 200,
+      height: 50,
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+    {isownerLoading ? (
+      <ActivityIndicator size="small" color="#fff" />
+    ) : (
+      <Text style={{ fontWeight: 'bold', color: '#fff', fontSize: 15 }}>
+        GET OWNER DETAILS
+      </Text>
+    )}
+  </TouchableOpacity>
+)}
+
       </View>
       {IsOwnerVisible && (
         <ScrollView>
           <View style={styles.view1}>
             {/* <Image style={styles.img} source={require('../assets/profile.png')} /> */}
           </View>
-          {/* <ScrollView horizontal={true}>
-                <PanCard />
-                <AdharCard />
-              </ScrollView> */}
 
           <View
             style={{
@@ -340,29 +456,31 @@ const ShowVehicleDetails = ({route, navigation}) => {
                 textAlign: 'center',
                 fontFamily: 'PoppinsBold',
               }}>
-              Owner Details
+            👤 Owner Details
             </Text>
             <View style={styles.inputContainer}>
               <Text style={styles.nameTxt}>
-                {FetchOwnerDetails?.OwnerName
-                  ? FetchVehicleDetails.OwnerName
-                  : 'Dummy Name'}
+                {ownerData?.OwnerName
+                  ? ownerData.OwnerName
+                  : ''}
               </Text>
               <Text style={styles.emailTxt}>
-                {FetchOwnerDetails?.EmailAddress
-                  ? FetchOwnerDetails.EmailAddress
-                  : 'Dummyemailgmail.com'}
+                {ownerData?.EmailAddress
+                  ? ownerData.EmailAddress
+                  : ''}
               </Text>
               <View style={styles.row}>
                 <Text style={styles.label}>Mobile Number :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.PrimaryMobileNo
-                    ? FetchVehicleDetails.PrimaryMobileNo
+                  {ownerData?.PrimaryMobileNo
+                    ? ownerData.PrimaryMobileNo
                     : ''}
                 </Text>
                 <TouchableOpacity
                   style={{marginRight: 30}}
-                  // onPress={() => openDialScreen(primaryContact)}
+                   onPress={() => openDialScreen(ownerData?.PrimaryMobileNo
+                    ? ownerData.PrimaryMobileNo
+                    : '')}
                 >
                   <Image
                     style={{width: 35, height: 35, marginRight: 20}}
@@ -374,13 +492,15 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <View style={styles.row}>
                 <Text style={styles.label}>Secondary Number :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.SecondaryNo
-                    ? FetchVehicleDetails.SecondaryNo
+                  {ownerData?.SecondaryNo
+                    ? ownerData.SecondaryNo
                     : ''}
                 </Text>
                 <TouchableOpacity
                   style={{marginRight: 30}}
-                  // onPress={() => openDialScreen(primaryContact)}
+                   onPress={() => openDialScreen(ownerData?.SecondaryNo
+                    ? ownerData.SecondaryNo
+                    : '')}
                 >
                   <Image
                     style={{width: 35, height: 35, marginRight: 20}}
@@ -388,12 +508,19 @@ const ShowVehicleDetails = ({route, navigation}) => {
                   />
                 </TouchableOpacity>
               </View>
-
+  <View style={styles.row}>
+                <Text style={styles.label}>PAN No :</Text>
+                <Text style={styles.value}>
+                  {ownerData?.PanNo
+                    ? ownerData.PanNo
+                    : ''}
+                </Text>
+              </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Date Of Birth :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.DobOwner1
-                    ? FetchVehicleDetails.DobOwner1
+                  {ownerData?.DobOwner
+                    ? ownerData.DobOwner.split('T')[0]
                     : ''}
                 </Text>
               </View>
@@ -401,8 +528,8 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <View style={styles.row}>
                 <Text style={styles.label}>Address :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.Address
-                    ? FetchVehicleDetails.Address
+                  {ownerData?.Address
+                    ? ownerData.Address
                     : ''}
                 </Text>
               </View>
@@ -410,8 +537,8 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <View style={styles.row}>
                 <Text style={styles.label}>TDS Type Name:</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.TDSTypeName
-                    ? FetchVehicleDetails.TDSTypeName
+                  {ownerData?.TDSTypeName
+                    ? ownerData.TDSTypeName
                     : ''}
                 </Text>
               </View>
@@ -428,15 +555,15 @@ const ShowVehicleDetails = ({route, navigation}) => {
                   fontFamily: 'PoppinsBold',
                   textAlign: 'center',
                 }}>
-                Bank Details
+              🏦 Bank Details
               </Text>
             </View>
             <View style={styles.inputContainer}>
               <View style={styles.row}>
                 <Text style={styles.label}>Account Number :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.AccountNo
-                    ? FetchVehicleDetails.AccountNo
+                  {ownerData?.AccountNo
+                    ? ownerData.AccountNo
                     : ''}
                 </Text>
               </View>
@@ -444,8 +571,8 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <View style={styles.row}>
                 <Text style={styles.label}>Bank Name :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.BankNameName
-                    ? FetchVehicleDetails.BankNameName
+                  {ownerData?.BankNameName
+                    ? ownerData.BankNameName
                     : ''}
                 </Text>
               </View>
@@ -453,8 +580,8 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <View style={styles.row}>
                 <Text style={styles.label}>Account Type :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.BankTypeName
-                    ? FetchVehicleDetails.BankTypeName
+                  {ownerData?.BankTypeName
+                    ? ownerData.BankTypeName
                     : ''}
                 </Text>
               </View>
@@ -462,21 +589,21 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <View style={styles.row}>
                 <Text style={styles.label}>IFSC Code :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.IFSCCode
-                    ? FetchVehicleDetails.IFSCCode
+                  {ownerData?.IFSCCode
+                    ? ownerData.IFSCCode
                     : ''}
                 </Text>
               </View>
             </View>
 
-            <Text style={styles.sectionHeader}>Other Details</Text>
+            <Text style={styles.sectionHeader}>📋 Other Details</Text>
 
             <View style={styles.inputContainer}>
               <View style={styles.row}>
                 <Text style={styles.label}>Total No Vehicle :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.TotalNoVehicle
-                    ? FetchVehicleDetails.TotalNoVehicle
+                  {ownerData?.TotalNoVehicle
+                    ? ownerData.TotalNoVehicle
                     : ''}
                 </Text>
               </View>
@@ -484,8 +611,8 @@ const ShowVehicleDetails = ({route, navigation}) => {
               <View style={styles.row}>
                 <Text style={styles.label}>Shortage Recovery :</Text>
                 <Text style={styles.value}>
-                  {FetchOwnerDetails?.ShortageRecovery
-                    ? FetchVehicleDetails.ShortageRecovery
+                  {ownerData?.ShortageRecovery
+                    ? ownerData.ShortageRecovery
                     : ''}
                 </Text>
               </View>

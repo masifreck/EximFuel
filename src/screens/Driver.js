@@ -75,98 +75,80 @@ const OwnerDetails = () => {
   };
 
   const handleShowDriverDetails = async redirectpage => {
-    if (dlNumber.length !== 0) {
-      if (dlNumber.length === 15 || dlNumber.length === 16) {
-        setIsLoading(true); // Set loading state to true
-        // console.log('entered if');
-        try {
-         // console.log('entered try');
-          const {url, requestOptions} = CustomRequestOptionsAdmin(
-            `https://Exim.Tranzol.com/api/OwnerApi/GetDriver?licenseNo=${dlNumber}`,
-            apiTokenReceived,
-          );
-          const response = await fetch(url, requestOptions);
-          setIsLoading(false);
-          if (response.ok) {
-            const data = await response.json();
-            //console.log('driver fetch main api',data);
-            if (data.error) {
-              const errorMessage = data.error;
-              console.log('API Response Error:', errorMessage);
-              setErrorMessage(errorMessage);
-              setShowAlert(true);
-              resetInputs();
-            } else {
-              if (data.apiResult.Result === null) {
-                 Alert.alert(
-                   'Driver Not Registered',
-                   'This Driver is not registered. Do you want to register it?',
-                   [
-                     {
-                       text: 'No',
-                       style: 'cancel',
-                     },
-                     {
-                       text: 'Yes',
-                       onPress: () => {
-                         navigation.navigate('RegisterDriver', {
-                           DLNumber: dlNumber,
-                         });
-                       },
-                     },
-                   ],
-                   { cancelable: false }
-                 );
-              } else if (data.apiResult.Result.DLNumber === null) {
-                  Alert.alert(
-                   'Driver Not Registered',
-                   'This Driver is not registered. Do you want to register it?',
-                   [
-                     {
-                       text: 'No',
-                       style: 'cancel',
-                     },
-                     {
-                       text: 'Yes',
-                       onPress: () => {
-                         navigation.navigate('RegisterDriver', {
-                           DLNumber: dlNumber,
-                         });
-                       },
-                     },
-                   ],
-                   { cancelable: false }
-                 );
-              } else {
-                navigation.navigate(redirectpage, {
-                  driverDetails: data,
-                });
-                resetInputs();
-              }
-            }
-          } else {
-            console.log('Error fetching driver details');
-            const errorMessage = 'Error fetching driver details';
-            setErrorMessage(errorMessage);
-            setShowAlert(true);
-            resetInputs();
-          }
-        } catch (error) {
-          console.log('An error occurred:', error);
-          setErrorMessage('An error occurred');
-          setShowAlert(true);
-          resetInputs();
-        }
-      } else {
-        setErrorMessage('Invalid DL Number');
-        handleShowToast();
-      }
-    } else {
-      setErrorMessage('Enter DL Number');
-      handleShowToast();
+  if (dlNumber.length === 0) {
+    setErrorMessage('Enter DL Number');
+    handleShowToast();
+    return;
+  }
+
+  if (dlNumber.length !== 15 && dlNumber.length !== 16) {
+    setErrorMessage('Invalid DL Number');
+    handleShowToast();
+    return;
+  }
+
+  try {
+    setIsLoading(true);
+
+    const {url, requestOptions} = CustomRequestOptionsAdmin(
+      `https://Exim.Tranzol.com/api/OwnerApi/GetDriver?licenseNo=${dlNumber}`,
+      apiTokenReceived,
+    );
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      console.log('Error fetching driver details');
+      setErrorMessage('Error fetching driver details');
+      setShowAlert(true);
+      resetInputs();
+      return;
     }
+
+    const data = await response.json();
+    // console.log('Driver API Response:', data);
+
+    if (data.error) {
+      console.log('API Response Error:', data.error);
+      setErrorMessage(data.error);
+      setShowAlert(true);
+      resetInputs();
+      return;
+    }
+
+    const driverResult = data?.apiResult?.Result;
+
+    if (!driverResult || !driverResult.DLNumber) {
+      Alert.alert(
+        'Driver Not Registered',
+        'This Driver is not registered. Do you want to register it?',
+        [
+          { text: 'No', style: 'cancel' },
+          { text: 'Yes', onPress: () => navigation.navigate('RegisterDriver', { DLNumber: dlNumber }) }
+        ],
+        { cancelable: false }
+      );
+    } else {
+      navigation.navigate(redirectpage, {
+        driverDetails: data,
+      });
+      resetInputs();
+    }
+
+  } catch (error) {
+    console.log('An error occurred:', error);
+    Alert.alert(
+      'Error',
+      'An error occurred while fetching driver details. Please Try Again',
+      [{ text: 'OK' }],
+      { cancelable: false }
+    );
+  } finally {
+    setIsLoading(false);
     setDLNumber('');
-  };
+  }
+};
+
 
   return (
     <>

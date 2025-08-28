@@ -27,7 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomCheckbox from '../components/CustomeCheckBox';
 import CustomOTPVerify from '../components/CustomOTPVerify';
 import Toast from 'react-native-toast-message';
-import {darkBlue, inputbgColor} from '../components/constant';
+import {darkBlue, inputbgColor, Width} from '../components/constant';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import { Alert, Platform } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
@@ -789,9 +789,10 @@ const HadleSendOTP2 = async () => {
  <View
                       style={{
                         flexDirection: 'row',
-                        gap: -5,
-                        justifyContent: 'center',
+                        gap: 0,
+                        justifyContent: 'space-between',
                         alignItems: 'center',
+                        width:Width
                       }}>
                       <CustomInput
                         labelText="Primary Contact Number"
@@ -801,17 +802,17 @@ const HadleSendOTP2 = async () => {
                         stringlength={10}
                         keyboardTypename="numeric"
                         isMandatory={true}
-                        isIcon={true}
+                      // isIcon={true}
                       />
                       <TouchableOpacity
-                        style={{position: 'absolute', right: 95, top: 20}}
+                        style={{position: 'absolute', right: 65, top: 15}}
                         onPress={() => openDialScreen(primaryContact)}>
                         <Image
-                          style={{width: 35, height: 35, marginTop: 22}}
+                          style={{width: 40, height: 40, marginTop: 22}}
                           source={require('../assets/phonecall.png')}
                         />
                       </TouchableOpacity>
-                      {Pverified ? (
+                      {/* {Pverified ? (
                         <Image
                           source={require('../assets/check-mark.png')}
                           style={{width: 50, height: 50, marginTop: 20}}
@@ -842,16 +843,16 @@ const HadleSendOTP2 = async () => {
                               GET OTP
                             </Text>
                           )}
-                          {/* <Text style={{color:'white',fontWeight:'bold',fontSize:12}}>OTP</Text> */}
+                        
                         </TouchableOpacity>
-                      )}
+                      )} */}
                     </View>
-                    {primaryOTPUI && (
+                    {/* {primaryOTPUI && (
                       <CustomOTPVerify
                         onVerify={handleOtpSubmit1}
                         onResend={HandldeSendOTP1}
                       />
-                    )}
+                    )} */}
 
             <CustomCheckbox
               label="I Call and Verify the Primary No."
@@ -861,9 +862,10 @@ const HadleSendOTP2 = async () => {
            <View
                       style={{
                         flexDirection: 'row',
-                        gap: -5,
-                        justifyContent: 'center',
+                        gap: 0,
+                        justifyContent: 'space-between',
                         alignItems: 'center',
+                        width:Width
                       }}>
                       <CustomInput
                         labelText="Secondary Contact Number"
@@ -871,18 +873,18 @@ const HadleSendOTP2 = async () => {
                         onChangeText={text => setSecondaryContact(text)}
                         stringlength={10}
                         keyboardTypename="numeric"
-                        isIcon={true}
+                       // isIcon={true}
                       />
 
                       <TouchableOpacity
-                        style={{position: 'absolute', right: 95, top: 20}}
+                        style={{position: 'absolute', right: 65, top: 15}}
                         onPress={() => openDialScreen(primaryContact)}>
                         <Image
-                          style={{width: 35, height: 35, marginTop: 22}}
+                          style={{width: 40, height: 40, marginTop: 22}}
                           source={require('../assets/phonecall.png')}
                         />
                       </TouchableOpacity>
-                      {Sverified ? (
+                      {/* {Sverified ? (
                         <Image
                           source={require('../assets/check-mark.png')}
                           style={{width: 50, height: 50, marginTop: 20}}
@@ -914,15 +916,15 @@ const HadleSendOTP2 = async () => {
                             </Text>
                           )}
                         </TouchableOpacity>
-                      )}
+                      )} */}
                     </View>
 
-                    {secondaryOTPUI && (
+                    {/* {secondaryOTPUI && (
                       <CustomOTPVerify
                         onVerify={handleOtpSubmit2}
                         onResend={HadleSendOTP2}
                       />
-                    )}
+                    )} */}
           <CustomCheckbox
             label="I Call and Verify the Secondary No."
             value={isSCVerified}

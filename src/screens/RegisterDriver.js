@@ -32,6 +32,8 @@ import SmsSending from '../components/SmsSending';
 import Loading from '../components/Loading';
 import Searching from '../components/Searching';
 import Geolocation from 'react-native-geolocation-service';
+import RNFS from 'react-native-fs';
+
 import {
   check,
   request,

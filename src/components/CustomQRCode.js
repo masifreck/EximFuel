@@ -1,19 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Keyboard,
-  Platform,
-  ScrollView,
   Dimensions,
-  Image,
-  Modal,
-  Button,
-  Alert, PermissionsAndroid,
+  Alert,
+  PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {
@@ -24,20 +17,19 @@ import {
 } from 'react-native-vision-camera';
 
 import RNRestart from 'react-native-restart';
+import LottieView from 'lottie-react-native';
+
 const wW = Dimensions.get('screen').width;
 const wH = Dimensions.get('screen').height;
-import LottieView from 'lottie-react-native';
-const isFine = wW < 400;
 
-const CustomQRCode = ({route}) => {
+const CustomQRCode = ({ route }) => {
   const navigation = useNavigation();
   const [cameraActive, setCameraActive] = useState(true);
-  const [ScannedData, setScannedData] = useState('')
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [ScannedData, setScannedData] = useState('');
+  const [torchOn, setTorchOn] = useState(false); // ✅ torch state
 
   const device = useCameraDevice('back');
   const { hasPermission } = useCameraPermission();
-
 
   const showAlert = () => {
     Alert.alert(
@@ -49,27 +41,19 @@ const CustomQRCode = ({route}) => {
           onPress: () => checkAndRequestCameraPermission(),
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
-  async function checkAndRequestCameraPermission() {
-    console.log('restart kindly===========================================');
-    console.log(
-      PermissionsAndroid.RESULTS.GRANTED,
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-    );
 
+  async function checkAndRequestCameraPermission() {
     try {
-      // Check if the permission is already granted
       const granted = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.CAMERA,
       );
 
       if (granted) {
-        console.log('Camera permission already granted');
         return PermissionsAndroid.RESULTS.GRANTED;
       } else {
-        // If permission is not granted, request it
         const requestResult = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.CAMERA,
           {
@@ -83,25 +67,14 @@ const CustomQRCode = ({route}) => {
 
         if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
           RNRestart.restart();
-          console.log('Camera permission granted');
-          console.log(
-            'restart kindly===========================================',
-          );
-          console.log(
-            PermissionsAndroid.RESULTS.GRANTED,
-            PermissionsAndroid.PERMISSIONS.CAMERA,
-          );
         } else {
-          console.log('Camera permission denied');
-          // Optionally, you can show an alert to inform the user
           Alert.alert(
             'Permission Denied',
             'You denied camera access. This app requires camera access to function properly.',
-            [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-            {cancelable: false},
+            [{ text: 'OK' }],
+            { cancelable: false },
           );
         }
-
         return requestResult;
       }
     } catch (error) {
@@ -110,135 +83,127 @@ const CustomQRCode = ({route}) => {
     }
   }
 
-  const codeScanner = useCodeScanner({
-    codeTypes: ['qr'],
-    onCodeScanned: codes => {
-      const scannedValue = codes[0].value;
-      console.log('QR CODE:', scannedValue);
-  
-      // Log the field number from route.params
-      console.log('Field No:', route.params.field);
-  
-      setCameraActive(false);
-      setScannedData(scannedValue);
-  
-      let params = {};
-      switch (route.params.field) {
-        case 1:
-          params = { scannedEwayBillNo: scannedValue };
-          break;
-        case 2:
-          params = { scannedClientInvoice1: scannedValue };
-          break;
-        case 3:
-          params = { scannedClientInvoice2: scannedValue };
-          break;
-        case 4:
-          params = { scannedClientInvoice3: scannedValue };
-          break;
-          case 5:
-          params = { scannedEwayBillNo2: scannedValue };
-          break;
-          case 6:
-          params = { scannedEwayBillNo3: scannedValue };
-          break;
-          case 7:
-            params = {scannedValue:scannedValue}
-            navigation.navigate('Unloading',params);
-            break;
-            case 8:
-            params = {scannedValue:scannedValue}
-            navigation.navigate('NewMinesLoading',params);
-            break;
-        default:
-          console.log('Invalid field value');
-          break;
-      }
-  Alert.alert(
-        'Scanned Value',
-        `Scanned value is: ${scannedValue}`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Optionally, you can navigate to another screen here
-              // navigation.navigate('SomeScreen', params);
-            },
-          },
-        ],
-        {cancelable: false},
-      );
-  
-      // Optionally, you can navigate to another screen with the scanned value
-      // For example:
-     // navigation.navigate('NewChalan', params);
-    },
-  });
-  
-  const NoCameraErrorView = () => (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text
-        style={{
-          color: '#276A76',
-          textAlign: 'center',
-          fontSize: 15,
+  // ✅ Scanner
+const codeScanner = useCodeScanner({
+  codeTypes: ['qr'],
+  onCodeScanned: codes => {
+    const scannedValue = codes[0].value;
+    console.log('QR CODE:', scannedValue);
+    console.log('Field No:', route.params.field);
 
-          textTransform: 'uppercase',
-          fontFamily: 'PoppinsBold',
-          marginTop: 5,
-          letterSpacing: 1,
-        }}>
-        Allow Camera Permission
-      </Text>
-      <TouchableOpacity style={{}} onPress={showAlert}>
-        <Text style={{color:'black'}}>Allow</Text>
+    setCameraActive(false);
+    setScannedData(scannedValue);
+
+    let params = {};
+    switch (route.params.field) {
+      case 1:
+        params = { scannedEwayBillNo: scannedValue };
+        navigation.navigate('NewChalan', params);
+        break;
+      case 2:
+        params = { scannedClientInvoice1: scannedValue };
+        navigation.navigate('NewChalan', params);
+        break;
+      case 7:
+        params = { scannedValue: scannedValue };
+        navigation.navigate('Unloading', params);
+        break;
+      default:
+        console.log('Invalid field value');
+        Alert.alert(
+          'Error',
+          'Invalid field value provided',
+          [{ text: 'OK' }],
+          { cancelable: false },
+        );
+        break;
+    }
+  },
+});
+
+
+  const NoCameraErrorView = () => (
+    <View style={styles.centerView}>
+      <Text style={styles.permissionText}>Allow Camera Permission</Text>
+      <TouchableOpacity onPress={showAlert}>
+        <Text style={{ color: 'black' }}>Allow</Text>
       </TouchableOpacity>
     </View>
   );
+
   if (!hasPermission) {
-    // Handle permission denied case
-    console.log('Permission denied');
     return <NoCameraErrorView />;
   }
 
   if (device === null) {
-    // Handle no camera device found case
-    console.log('No camera device found');
     return <NoCameraErrorView />;
   }
 
-  return ( 
+  return (
+    <View style={{ flex: 1 }}>
+      <Camera
+        style={[StyleSheet.absoluteFill, { flex: 1, width: wW, height: wH, zIndex: 10 }]}
+        device={device}
+        isActive={cameraActive}
+        codeScanner={codeScanner}
+        torch={torchOn ? 'on' : 'off'} // ✅ torch control
+      />
 
-      <View style={{flex:1}}> 
-  <Camera
-              style={[StyleSheet.absoluteFill,{flex:1,width:wW,
-                height:wH,zIndex:10
-              }]}
-              device={device}
-              isActive={cameraActive}
-              codeScanner={codeScanner}
-            /> 
-              <LottieView
-        source={require('../assets/scanning.json')} // your Lottie file
+      {/* ✅ Torch Toggle Button */}
+      <TouchableOpacity
+        style={styles.torchButton}
+        onPress={() => setTorchOn(prev => !prev)}>
+        <Text style={styles.torchText}>{torchOn ? 'Torch Off' : 'Torch On'}</Text>
+      </TouchableOpacity>
+
+      <LottieView
+        source={require('../assets/scanning.json')}
         autoPlay
         loop
         style={styles.lottieOverlay}
       />
-      </View>
-     
-
+    </View>
   );
 };
-const styles=StyleSheet.create({
-    lottieOverlay: {
+
+const styles = StyleSheet.create({
+  lottieOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     width: wW,
     height: wH,
-    zIndex: 20, // ensure it's above the camera
+    zIndex: 20,
   },
-})
-
+  torchButton: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    backgroundColor: '#000000aa',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    zIndex: 30,
+  },
+  torchText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  centerView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  permissionText: {
+    color: '#276A76',
+    textAlign: 'center',
+    fontSize: 15,
+    textTransform: 'uppercase',
+    fontFamily: 'PoppinsBold',
+    marginTop: 5,
+    letterSpacing: 1,
+  },
+});
 
 export default CustomQRCode;

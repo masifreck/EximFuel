@@ -1,6 +1,6 @@
 import {ElBase64} from '../components/Elbase';
 
-export const ConsignorHTML = (data, qrData) => {
+export const ConsignorHTML = (data, qrData,type) => {
   console.log('qr data ON consignee html', qrData);
   return `
       <!DOCTYPE html>
@@ -43,7 +43,7 @@ export const ConsignorHTML = (data, qrData) => {
     }
     h1 {
       text-align: center;
-      font-size: 20px;
+      font-size: 18px;
       margin-bottom: 0;
       font-weight: bold;
       margin-bottom: 7px;
@@ -297,7 +297,7 @@ padding-left: 10px;
       <div>
      
   <img src="${ElBase64}" alt="Flowers in Chania" width="70" height="70" margin-left="20">
-  
+   <p class="challan">Challan No.:${data.ChallanNo}</p>
    
 </div>
   <div class="exim">
@@ -310,9 +310,9 @@ padding-left: 10px;
   
 </div>
 <div class="qr">
-<img src="data:image/png;base64,${qrData}" alt="QR Code" width="30" height="30" >
- <p class="challantype">CONSIGNOR COPY</p>
- <p class="challan">Challan No.:${data.ChallanNo}</p>
+<img src="data:image/png;base64,${qrData}" alt="QR Code" width="80" height="80" >
+ <p class="challantype">${type}</p>
+
 </div>
 </div>
 <div class="secondblock" >
@@ -583,7 +583,7 @@ padding-left: 10px;
      </div>
     
     </div>
-    <p class="systemgen">**SYSTEM GENERATED**</p>
+    
     <div style="display:flex; flex-drirection:row; justify-content:center; gap:10px;padding:5px">
     <div style="text-align: justify;">
     <p style="font-size:8px;text-align: justify;">TERMS AND CONDITIONS

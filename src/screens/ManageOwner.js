@@ -16,6 +16,7 @@ import CustomCheckbox from '../components/CustomeCheckBox';
 import ImageViewing from 'react-native-image-viewing';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { is, se } from 'date-fns/locale';
 
 //   {
 //     Id: null,
@@ -145,14 +146,15 @@ try {
     setSingleLoader(false)
   }
 }
- const FetchOwnerData = async () => {
+ const FetchOwnerData = async (search) => {
   setIsLoading(true);
     try {
-      const response = await fetch('https://Exim.Tranzol.com/api/FetchDataApi/GetOwnerPendingApprove?search=');
+      const response = await fetch(`https://Exim.Tranzol.com/api/FetchDataApi/GetOwnerPendingApprove?search=${search}`);
+      console.log('Fetch URL:', `https://Exim.Tranzol.com/api/FetchDataApi/GetOwnerPendingApprove?search=${search}`);
       const data = await response.json();
       if (data?.Entities) {
         setOwnerList(data.Entities);
-       // console.log('Owner data fetched successfully:', data.Entities);
+        console.log('Owner data fetched successfully:', data.Entities);
       } else {
         console.warn('Unexpected response format', data);
         setOwnerList([]);
@@ -165,21 +167,20 @@ try {
     }
   };
 
-  useEffect(() => {
-    FetchOwnerData();
-  }, []);
+useEffect(() => {
+  const handler = setTimeout(() => {
+    FetchOwnerData(search || '');
+  }, 500); // waits 500ms after user stops typing
+
+  return () => clearTimeout(handler);
+}, [search]);
+
 const imageList = [
   require('../assets/adhar_BACK.png'),
   require('../assets/delivery-truck.png'),
   require('../assets/frontphoto.png'),
 ];
 
-
-  const filteredOwners = ownerList.filter(
-    item =>
-      item.OwnerName?.toLowerCase().includes(search.toLowerCase()) ||
-      item.PanNo?.toLowerCase().includes(search.toLowerCase())
-  );
 
   const openDetails = item => {
     FetchSingleOnwer(item.PanNo)
@@ -191,10 +192,11 @@ const imageList = [
   <View style={styles.container}>
     {/* Search Bar */}
     <TextInput
-      placeholder="Search by PAN or Owner Name"
+      placeholder="Search by PAN No"
       style={styles.searchBar}
       value={search}
       onChangeText={setSearch}
+      autoCapitalize='characters'
     />
 
     {/* Horizontal Scrollable Table */}
@@ -207,9 +209,11 @@ const imageList = [
           <Text style={[styles.cell, styles.headerCell]}>Status</Text>
         </View>
 
-        {/* FlashList for Rows */}
+      {isLoading ? (
+  <ActivityIndicator size="large" color={darkBlue} style={{ marginTop: 50 }} />
+) :  (
      <FlashList
-  data={filteredOwners}
+  data={ownerList}
   keyExtractor={(item, index) => index.toString()}
   estimatedItemSize={50}
   renderItem={({ item, index }) => ( // include index here
@@ -232,7 +236,7 @@ const imageList = [
     </Pressable>
   )}
 />
-
+)}
       </View>
     </ScrollView>
 
@@ -356,7 +360,7 @@ const imageList = [
   )
 )}
 
-<View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
+{/* <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
   <TouchableOpacity onPress={() => {
     setCurrentImageIndex(0);
     setImageViewerVisible(true);
@@ -389,7 +393,7 @@ const imageList = [
       resizeMode="cover"
     />
   </TouchableOpacity>
-</View>
+</View> */}
 
             {/* Action Buttons */}
             
@@ -446,11 +450,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: darkBlue,
     borderRadius: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingVertical: 8,
     marginBottom: 10,
     elevation:4,
-    backgroundColor:'#edf2f4'
+    backgroundColor:'#edf2f4',
+    fontSize:16,
+    color:textColor
   },
   
   row: {

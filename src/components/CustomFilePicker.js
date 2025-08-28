@@ -77,11 +77,11 @@ useEffect(() => {
       )}
 
       {/* Display file details if available and showFileDetails is true */}
-      {imageFile && showFileDetails && (
+      {/* {imageFile && showFileDetails && (
         <Text style={styles.fileDetails}>
           {`File: ${imageFile}`}
         </Text>
-      )}
+      )} */}
     </View>
   );
 };

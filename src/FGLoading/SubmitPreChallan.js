@@ -17,16 +17,13 @@ const SubmitPreChallan = ({ route,navigation }) => {
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
       setapiTokenReceived(TokenReceived);
-      // console.log('Received token', apiTokenReceived);
-      // console.log('Error retrieving token:', error);
     });
   const { JobDetails, VEHICLENO, VEHICLEID, DLNo, PANNo ,selectedDate, driverId,driverName,ownerId} = route.params;
-console.log('owner id',ownerId)
+console.log('owner id',ownerId, VEHICLENO)
  
   const [ownerData, setOwnerData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,40 +32,42 @@ console.log('owner id',ownerId)
 
   useEffect(() => {
     if (PANNo && apiTokenReceived) {
-      const fetchOwnerDetails = async () => {
-        try {
-          setLoading(true);
-console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`)
-          const response = await fetch(
-            `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Basic ${apiTokenReceived}`,
-              },
-            }
-          );
+    const fetchOwnerDetails = async () => {
+  try {
+    setLoading(true);
+    console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`);
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+    const response = await fetch(
+      `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${apiTokenReceived}`,
+        },
+      }
+    );
 
-          const data = await response.json();
-          console.log("Owner API Response:", data);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
 
-          if (data?.VehicleNoList && data.VehicleNoList.length > 0) {
-            setOwnerData(data.VehicleNoList);
-          } else {
-            Alert.alert("Error", "No owner details found.");
-          }
-        } catch (error) {
-          console.error("Error fetching owner details:", error);
-          Alert.alert("Error", "Failed to fetch owner details. Please try again.");
-        } finally {
-          setLoading(false);
-        }
-      };
+    const data = await response.json();
+    console.log("Owner API Response:", data);
+
+    if (data?.apiResult?.Result) {
+      setOwnerData(data.apiResult.Result); // <-- set the actual owner details
+    } else {
+      Alert.alert("Error", "No owner details found.");
+    }
+  } catch (error) {
+    console.error("Error fetching owner details:", error);
+    Alert.alert("Error", "Failed to fetch owner details. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
       fetchOwnerDetails();
     }
@@ -100,6 +99,7 @@ console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`)
     body: JSON.stringify(payload),
   }
 );
+console.log('pre loading payload',payload)
 
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
@@ -121,107 +121,108 @@ console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`)
     }
   };
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Submit Pre-Challan</Text>
+    <View style={[styles.container,{paddingBottom:10}]}>
 
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={{ marginTop: 20 }} />
       ) : (
-        <ScrollView>
-          {ownerData.map((item, index) => (
-            <View key={index} style={styles.card}>
-              <View style={styles.row}>
-                <Text style={styles.key}>Owner Name:</Text>
-                <Text style={styles.value}>{item.OwnerName}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.key}>Owner ID:</Text>
-                <Text style={styles.value}>{item.OwnerId}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.key}>Vehicle No:</Text>
-                <Text style={styles.value}>{item.VehicleNo}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.key}>Vehicle ID:</Text>
-                <Text style={styles.value}>{item.VehicleId}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.key}>PAN No:</Text>
-                <Text style={styles.value}>{item.PANNumber}</Text>
-              </View>
-            </View>
-          ))}
-                 <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Alloment Date</Text>
-        <Text style={styles.detailValue}>{selectedDate||''}</Text>
-      </View>
-            <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Vehicle No</Text>
-        <Text style={styles.detailValue}>{VEHICLENO || '-'}</Text>
-      </View>
+      <ScrollView  contentContainerStyle={{ paddingBottom: 0 }}>
+  {/* Owner Details */}
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Owner Details</Text>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Owner Name</Text>
+      <Text style={styles.detailValue}>{ownerData?.OwnerName ?? "N/A"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>PAN</Text>
+      <Text style={styles.detailValue}>{ownerData?.PanNo ?? "N/A"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Mobile</Text>
+      <Text style={styles.detailValue}>{ownerData?.PrimaryMobileNo ?? "N/A"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Account No</Text>
+      <Text style={styles.detailValue}>{ownerData?.AccountNo ?? "N/A"}</Text>
+    </View>
+  </View>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Vehicle Id</Text>
-        <Text style={styles.detailValue}>{VEHICLEID || '-'}</Text>
-      </View>
+  {/* Driver Details */}
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Driver Details</Text>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Driver Name</Text>
+      <Text style={styles.detailValue}>{driverName ? driverName.split("(")[0] : "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>DL No</Text>
+      <Text style={styles.detailValue}>{DLNo || "-"}</Text>
+    </View>
+  </View>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>DL No</Text>
-        <Text style={styles.detailValue}>{DLNo || '-'}</Text>
-      </View>
+  {/* Vehicle Details */}
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Vehicle Details</Text>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Vehicle No</Text>
+      <Text style={styles.detailValue}>{VEHICLENO?VEHICLENO.split(' ')[0] : "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Vehicle Id</Text>
+      <Text style={styles.detailValue}>{VEHICLEID || "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Alltmnt Date</Text>
+      <Text style={styles.detailValue}>{selectedDate || "-"}</Text>
+    </View>
+  </View>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>PAN No</Text>
-        <Text style={styles.detailValue}>{PANNo || '-'}</Text>
-      </View>
-
-      {/* Job Details */}
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Consignor</Text>
-        <Text style={styles.detailValue}>{JobDetails?.ConsignorName || '-'}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Consignee</Text>
-        <Text style={styles.detailValue}>{JobDetails?.ConsigneeName || '-'}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Loading P.</Text>
-        <Text style={styles.detailValue}>{JobDetails?.LoadingPoint || '-'}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Unloading P.</Text>
-        <Text style={styles.detailValue}>{JobDetails?.UnloadingPoint || '-'}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Material</Text>
-        <Text style={styles.detailValue}>{JobDetails?.MaterialName || '-'}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Job No</Text>
-        <Text style={styles.detailValue}>{JobDetails?.label || '-'}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Job Id</Text>
-        <Text style={styles.detailValue}>{JobDetails?.value || '-'}</Text>
-      </View>
-        </ScrollView>
-      )}
-
-      {/* Submit button */}
-      <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={submitting}>
+  {/* Job Details */}
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Job Details</Text>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Consignor</Text>
+      <Text style={styles.detailValue}>{JobDetails?.ConsignorName || "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Consignee</Text>
+      <Text style={styles.detailValue}>{JobDetails?.ConsigneeName || "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Loading Point</Text>
+      <Text style={styles.detailValue}>{JobDetails?.LoadingPoint || "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Unloading Point</Text>
+      <Text style={styles.detailValue}>{JobDetails?.UnloadingPoint || "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Material</Text>
+      <Text style={styles.detailValue}>{JobDetails?.MaterialName || "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Job No</Text>
+      <Text style={styles.detailValue}>{JobDetails?.label || "-"}</Text>
+    </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Job Id</Text>
+      <Text style={styles.detailValue}>{JobDetails?.value || "-"}</Text>
+    </View>
+  </View>
+   <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={submitting}>
         {submitting ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
           <Text style={styles.buttonText}>Submit</Text>
         )}
       </TouchableOpacity>
+</ScrollView>
+
+      )}
+
+      {/* Submit button */}
+     
 
     </View>
   );
@@ -304,5 +305,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
   },
+  section: {
+  backgroundColor: "#f9f9f9",
+  borderRadius: 10,
+  padding: 12,
+  marginBottom: 15,
+  shadowColor: "#000",
+  shadowOpacity: 0.05,
+  shadowOffset: { width: 0, height: 2 },
+  shadowRadius: 4,
+  elevation: 2,
+},
+sectionTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  marginBottom: 8,
+  color: darkBlue,
+  borderBottomWidth: 1,
+  borderBottomColor: "#ddd",
+  paddingBottom: 4,
+  textAlign: "center",
+},
+
 
 });

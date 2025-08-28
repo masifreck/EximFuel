@@ -11,7 +11,6 @@ const PrintMines = ({ navigation ,route }) => {
 const handlePrint = () => {
   navigation.navigate('minesQRCode', {
     qrValue: `${rowData.TpNo}`, 
-    // |${data.apiResult.Result.LoadDate}|${data.apiResult.Result.VehicleNo}
     fetchedData: rowData,
     selectedPrint: selectedPrint,
   });
@@ -42,7 +41,7 @@ const handlePrint = () => {
 
 
       <TouchableOpacity style={styles.button}
-     // onPress={handlePrint}
+     onPress={handlePrint}
       >
         <Text style={styles.text}>
             PRINT

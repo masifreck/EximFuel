@@ -65,77 +65,80 @@ const Vehicle = () => {
     setShowToast(false);
   };
 
- const handleShowDetails = async redirectpage => {
-  if (vehicleNo.length !== 0) {
-    if (vehicleNo.length > 8 && vehicleNo.length < 13) {
-      setIsSearching(true);
-      try {
-        const { url, requestOptions } = CustomRequestOptionsAdmin(
-          `https://Exim.Tranzol.com/api/VehicleApi/GetVehicleByNo?vehicleNo=${vehicleNo}`,
-          apiTokenReceived
-        );
+const handleShowDetails = async redirectpage => {
+  if (vehicleNo.length === 0) {
+    Alert.alert(
+      'Missing Vehicle Number',
+      'Please enter a vehicle number',
+      [{ text: 'OK' }],
+      { cancelable: false }
+    );
+    return;
+  }
 
-        const response = await fetch(url, requestOptions);
-        if (response.ok) {
-          const data = await response.json();
-          console.log('API Response:', data);
+  if (vehicleNo.length < 9 || vehicleNo.length > 12) {
+    Alert.alert(
+      'Invalid Vehicle Number',
+      'Vehicle number must be between 9 and 12 characters',
+      [{ text: 'OK' }],
+      { cancelable: false }
+    );
+    return;
+  }
 
-          if (data.error) {
-            setErrorMessage(data.error);
-            setShowAlert(true);
-          } else {
-            const result = data.apiResult?.Result;
+  setIsSearching(true);
+  try {
+    const { url, requestOptions } = CustomRequestOptionsAdmin(
+      `https://Exim.Tranzol.com/api/VehicleApi/GetVehicleByNo?vehicleNo=${vehicleNo}`,
+      apiTokenReceived
+    );
 
-        if (result === null || result?.VehicleNo === null) {
-  Alert.alert(
-    'Vehicle Not Registered',
-    'This vehicle is not registered. Do you want to register it?',
-    [
-      {
-        text: 'No',
-        style: 'cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: () => {
-          navigation.navigate('RegisterVehicle', {
-            vehicleNo: vehicleNo,
-          });
-        },
-      },
-    ],
-    { cancelable: false }
-  );
+    const response = await fetch(url, requestOptions);
+    if (response.ok) {
+      const data = await response.json();
+      console.log('API Response:', data);
 
-            } else {
-              // Vehicle found, navigate to the given redirect page
-              navigation.navigate(redirectpage, {
-                vehicleDetails: data,
-              });
-            }
-          }
-        } else {
-          console.log('Error fetching vehicle details');
-          setErrorMessage('Error fetching vehicle details');
-          setShowAlert(true);
-        }
-      } catch (error) {
-        console.log('An error occurred:', error);
-        setErrorMessage('An error occurred');
+      if (data.error) {
+        setErrorMessage(data.error);
         setShowAlert(true);
-      }finally{
-        setIsSearching(false)
+      } else {
+        const result = data.apiResult?.Result;
+
+        if (!result || !result.VehicleNo) {
+          Alert.alert(
+            'Vehicle Not Registered',
+            'This vehicle is not registered. Do you want to register it?',
+            [
+              { text: 'No', style: 'cancel' },
+              {
+                text: 'Yes',
+                onPress: () => {
+                  navigation.navigate('RegisterVehicle', { vehicleNo });
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          // Vehicle found, navigate to the given redirect page
+          navigation.navigate(redirectpage, { vehicleDetails: data });
+        }
       }
     } else {
-      setErrorMessage('Enter Min 9 characters');
-      handleShowToast();
+      console.log('Error fetching vehicle details');
+      setErrorMessage('Error fetching vehicle details');
+      setShowAlert(true);
     }
-  } else {
-    setErrorMessage('Enter Vehicle Number');
-    handleShowToast();
+  } catch (error) {
+    console.log('An error occurred:', error);
+    setErrorMessage('An error occurred');
+    setShowAlert(true);
+  } finally {
+    setIsSearching(false);
+    setVehicleNo('');
   }
-  setVehicleNo('');
 };
+
 
   const closeAlert = () => {
     // Function to close the alert

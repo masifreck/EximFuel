@@ -23,13 +23,10 @@ const OwnerDetails = () => {
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
       setapiTokenReceived(TokenReceived);
-      console.log('Received token', apiTokenReceived);
-      console.log('Error retrieving token:', error);
     });
   // ===============================
   const navigation = useNavigation();

@@ -56,11 +56,11 @@ const ShowFGLoadingChalan = () => {
         <TableRow title="Job No" value={FetchminesDetails.JobNo} />
         <TableRow title="Freight Rate" value={FetchminesDetails.FreightRate} />
         <TableRow title="Eway Bill 1" value={FetchminesDetails.EwayBillNo1} />
-        <TableRow title="Eway Bill 2" value={FetchminesDetails.EwayBillNo2} />
-        <TableRow title="Eway Bill 3" value={FetchminesDetails.EwayBillNo3} />
+        {/* <TableRow title="Eway Bill 2" value={FetchminesDetails.EwayBillNo2} />
+        <TableRow title="Eway Bill 3" value={FetchminesDetails.EwayBillNo3} /> */}
         <TableRow title="Client Invoice 1" value={FetchminesDetails.ClientInvoiceNo1} />
-        <TableRow title="Client Invoice 2" value={FetchminesDetails.ClientInvoiceNo2} />
-        <TableRow title="Client Invoice 3" value={FetchminesDetails.ClientInvoiceNo3} />
+        {/* <TableRow title="Client Invoice 2" value={FetchminesDetails.ClientInvoiceNo2} />
+        <TableRow title="Client Invoice 3" value={FetchminesDetails.ClientInvoiceNo3} /> */}
         <TableRow title="GPS No" value={FetchminesDetails.GPSNo} />
         <TableRow title="Cash" value={FetchminesDetails.Cash} />
         <TableRow title="Bank Amount" value={FetchminesDetails.BankAmount} />

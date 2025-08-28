@@ -68,6 +68,7 @@ const [DLNo,setDLNo]=useState('');
       const [vehicleNo,setVehicleNo]=useState('');
       const [driverName,setDriverName]=useState('')
       const [JobDetails,setJobDetails]=useState({});
+    
   const handleShowToast = () => {
     setShowToast(true);
 
@@ -163,12 +164,12 @@ const fetchDriver = async (search) => {
   
       if (response.ok) {
         const data = await response.json();
-        console.log('vehicle API Response:', data);
+       // console.log('vehicle API Response:', data);
   
         if (data.VehicleNoList) {
           // Corrected to use VehicleNoList
           const vehicleData = data.VehicleNoList.map((vehicle) => ({
-            label: vehicle.VehicleNo + " " + vehicle.PANNumber??'' ,
+            label: vehicle.VehicleNo ,
             value: vehicle.VehicleId,
             PANNumber:vehicle.PANNumber??'',
             OwnerId:vehicle.OwnerId??'',
@@ -352,7 +353,7 @@ const handleGenerateChallan = () => {
   } else {
     navigation.navigate('preChallan', {
       JobDetails: JobDetails,
-      VEHICLENO: vehicleNo,
+      VEHICLENO: selectedVehicleNo,
       VEHICLEID: vehicleId,
       DLNo: DLNo,
       PANNo: PANNo,
@@ -489,12 +490,12 @@ const handleGenerateChallan = () => {
   labelField="label"
   valueField="value"
   placeholder={'Select Driver'}
-  value={driverName}
+  value={driverId}
   onFocus={() => setIsFocus(true)}
   onBlur={() => setIsFocus(false)}
   onChange={item => {
     setDriverId(item.value),
-    setDriverName(item.value)
+    setDriverName(item.label)
     setDLNo(item.DlNumber??'')
     setIsFocus(false);
   }}

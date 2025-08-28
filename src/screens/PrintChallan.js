@@ -12,19 +12,11 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import {HTMLContent} from './HTMLContent';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import { FreightMemo } from './FeightMemo';
-import { FuelSlip } from './FuelSlip';
-import RNPrint from 'react-native-print';
 import CustomAlert from '../components/CustomAlert';
 import { styles } from './PrintChallanStyle';
 import { Dropdown } from 'react-native-element-dropdown';
 import { dropdownData } from '../components/DropDownData';
-import QRCode from 'react-native-qrcode-svg';
-import { ConsignorHTML } from './ConsignorHTML';
-import { ConsigneeHTML } from './ConsigneeHTML';
-import { DriverHTML } from './DriverHTML';
+
 
 const PrintChallan = ({navigation}) => {
 
@@ -160,77 +152,77 @@ navigation.navigate('qrcode', {
   // }, [fetchedData]);
 
 
-  const handleViewButtonPress = async () => {
+  // const handleViewButtonPress = async () => {
     
-    try {
-      let htmlToPrint = '';
+  //   try {
+  //     let htmlToPrint = '';
   
-      // Check the selected print option and assign the appropriate HTML content
-      if (selectedPrint === '1') {
-        // Print combined HTML (HTMLContent + FreightMemo with page break)
-        htmlToPrint = `
-          ${HTMLContent(fetchedData,qrData)} 
-          <div style="page-break-after: always;"></div>
-          ${ConsignorHTML(fetchedData, qrData)} 
-           <div style="page-break-after: always;"></div>
-           ${ConsigneeHTML(fetchedData,qrData)}
-            <div style="page-break-after: always;"></div> 
-            ${DriverHTML(fetchedData,qrData)}
-            `;
-      } else if (selectedPrint === '2') {
-        // Print only HTMLContent
-        htmlToPrint = `${FreightMemo(fetchData)}`;
-      } else if (selectedPrint === '3') {
-        // Print only FreightMemo
-        htmlToPrint = `${FuelSlip(fetchedData)}`;
-      }
+  //     // Check the selected print option and assign the appropriate HTML content
+  //     if (selectedPrint === '1') {
+  //       // Print combined HTML (HTMLContent + FreightMemo with page break)
+  //       htmlToPrint = `
+  //         ${HTMLContent(fetchedData,qrData)} 
+  //         <div style="page-break-after: always;"></div>
+  //         ${ConsignorHTML(fetchedData, qrData)} 
+  //          <div style="page-break-after: always;"></div>
+  //          ${ConsigneeHTML(fetchedData,qrData)}
+  //           <div style="page-break-after: always;"></div> 
+  //           ${DriverHTML(fetchedData,qrData)}
+  //           `;
+  //     } else if (selectedPrint === '2') {
+  //       // Print only HTMLContent
+  //       htmlToPrint = `${FreightMemo(fetchData)}`;
+  //     } else if (selectedPrint === '3') {
+  //       // Print only FreightMemo
+  //       htmlToPrint = `${FuelSlip(fetchedData)}`;
+  //     }
      
-      else if (selectedPrint === '4'){
-        htmlToPrint =  `${HTMLContent(fetchedData,qrData)}`
-      }
-      else if (selectedPrint === '5'){
-        htmlToPrint =  `${DriverHTML(fetchedData,qrData)}`
-      }
-      else if (selectedPrint === '6'){
-        htmlToPrint =  `${ConsigneeHTML(fetchedData,qrData)}`
-      }
-      else if (selectedPrint === '7'){
-        htmlToPrint =  `${ConsignorHTML(fetchedData,qrData)}`
-      }
-      else if (selectedPrint === '8'){
-        htmlToPrint =  `${FuelSlip(fetchedData)}
-        ${FreightMemo(fetchedData)}`
-      }
-      else {
-        seterrorMessage('Invalid selection');
-        setShowAlert(true);
-        return; // Exit if an invalid option is selected
-      } 
+  //     else if (selectedPrint === '4'){
+  //       htmlToPrint =  `${HTMLContent(fetchedData,qrData)}`
+  //     }
+  //     else if (selectedPrint === '5'){
+  //       htmlToPrint =  `${DriverHTML(fetchedData,qrData)}`
+  //     }
+  //     else if (selectedPrint === '6'){
+  //       htmlToPrint =  `${ConsigneeHTML(fetchedData,qrData)}`
+  //     }
+  //     else if (selectedPrint === '7'){
+  //       htmlToPrint =  `${ConsignorHTML(fetchedData,qrData)}`
+  //     }
+  //     else if (selectedPrint === '8'){
+  //       htmlToPrint =  `${FuelSlip(fetchedData)}
+  //       ${FreightMemo(fetchedData)}`
+  //     }
+  //     else {
+  //       seterrorMessage('Invalid selection');
+  //       setShowAlert(true);
+  //       return; // Exit if an invalid option is selected
+  //     } 
   
-      // Convert the selected HTML content to PDF
-      const { filePath } = await RNHTMLtoPDF.convert({
-        html: htmlToPrint, // Use the selected HTML content
-        fileName: `${ChallanNo}challan.pdf`,
-        directory: 'Documents',
-      });
+  //     // Convert the selected HTML content to PDF
+  //     const { filePath } = await RNHTMLtoPDF.convert({
+  //       html: htmlToPrint, // Use the selected HTML content
+  //       fileName: `${ChallanNo}challan.pdf`,
+  //       directory: 'Documents',
+  //     });
   
-      // Print the generated PDF
-      if (Platform.OS === 'ios') {
-        await RNPrint.print({
-          filePath: filePath,
-        });
-      } else {
-        await RNPrint.print({
-          filePath: filePath,
-          jobName: 'Challan',
-        });
-      }
-    } catch (error) {
-      console.log('Error printing PDF: ', error);
-      seterrorMessage('Error printing PDF:');
-      setShowAlert(true);
-    }
-  };
+  //     // Print the generated PDF
+  //     if (Platform.OS === 'ios') {
+  //       await RNPrint.print({
+  //         filePath: filePath,
+  //       });
+  //     } else {
+  //       await RNPrint.print({
+  //         filePath: filePath,
+  //         jobName: 'Challan',
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log('Error printing PDF: ', error);
+  //     seterrorMessage('Error printing PDF:');
+  //     setShowAlert(true);
+  //   }
+  // };
   
   const handleSubmit = () => {
     if (ChallanNo.length === 0) {

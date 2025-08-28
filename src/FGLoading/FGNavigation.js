@@ -37,13 +37,13 @@ const FGNavigation = () => {
             bottom: 10,
             left: 20,
             right: 20,
-            elevation: 8,
-            backgroundColor: "#ffffffd3",
+           // elevation: 8,
+            backgroundColor: "#ffffffe2",
             borderRadius: 20,
             height: 60,
             paddingBottom: 6,
             paddingTop: 6,
-            ...styles.shadow,
+            //...styles.shadow,
           },
           isKeyboardVisible ? { display: "none" } : null, // 👈 Hide when keyboard is open
         ],
@@ -106,3 +106,4 @@ const styles = StyleSheet.create({
 });
 
 export default FGNavigation;
+ 

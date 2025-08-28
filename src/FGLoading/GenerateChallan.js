@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import { darkBlue, textColor } from "../components/constant";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlashList } from "@shopify/flash-list";
-
+import { useFocusEffect } from "@react-navigation/native";
 const COL_WIDTH = 120; // 🔒 Fixed width for ALL columns
 
 const AllotmentList = ({ navigation }) => {
@@ -22,20 +22,6 @@ const AllotmentList = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   // Get token then fetch data
-  useEffect(() => {
-    const fetchTokenAndData = async () => {
-      try {
-        const token = await AsyncStorage.getItem("Token");
-        setApiTokenReceived(token);
-        if (token) fetchAllotments(token);
-      } catch (error) {
-        console.log("Error retrieving token:", error);
-      }
-    };
-    fetchTokenAndData();
-  }, []);
-
-  // Fetch API data
   const fetchAllotments = async (token) => {
     try {
       setLoading(true);
@@ -53,6 +39,7 @@ const AllotmentList = ({ navigation }) => {
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       const result = await response.json();
+     // console.log("PreLoading API Response:", result);
       setAllotments(Array.isArray(result?.data) ? result.data : []);
     } catch (error) {
       console.error("Error fetching PreLoading data:", error);
@@ -61,6 +48,20 @@ const AllotmentList = ({ navigation }) => {
       setLoading(false);
     }
   };
+useFocusEffect(
+    useCallback(() => {
+      const fetchTokenAndData = async () => {
+        try {
+          const token = await AsyncStorage.getItem("Token");
+          if (token) fetchAllotments(token);
+        } catch (error) {
+          console.log("Error retrieving token:", error);
+        }
+      };
+
+      fetchTokenAndData();
+    }, [])
+  );
 
   const normalized = (v) => (v ?? "").toString();
 
@@ -76,7 +77,7 @@ const AllotmentList = ({ navigation }) => {
   const handleRowClick = (item) => {
     Alert.alert(
       "Confirm",
-      "Are you sure to generate challan against these details?",
+      `Are you sure to generate challan against Job No. ${item.JobNo} Vehicle No. ${item.VehicleNo}?`,
       [
         { text: "Cancel", style: "cancel" },
         {

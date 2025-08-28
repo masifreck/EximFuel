@@ -39,12 +39,12 @@ const CustomDrawerContent = (props) => {
       </View>
       
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+        {/* <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Icon name="logout" size={25} color="#fff" />
           <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Text style={styles.footerText}>Powered by Tranzol</Text>
-        <Text style={styles.versionText}>Version 0.0.1</Text>
+        <Text style={styles.versionText}>Version 0.0.2</Text>
       </View>
     </DrawerContentScrollView>
   );
@@ -107,7 +107,7 @@ const DrawerNavigation = () => {
           )
         }}
       />
-      <Drawer.Screen name="FGLoading" component={FGLoading}
+      {/* <Drawer.Screen name="FGLoading" component={FGLoading}
         options={{
           title: 'FG Loading',
           headerShown: false,
@@ -115,7 +115,7 @@ const DrawerNavigation = () => {
             <Icon name="package-variant-closed" color={color} size={size} />
           )
         }}
-      />
+      /> */}
       <Drawer.Screen name="Unloading" component={Unloading}
         options={{
           title: 'Unloading',

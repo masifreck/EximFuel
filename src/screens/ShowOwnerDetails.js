@@ -67,7 +67,7 @@ const ShowOwnerDetails = () => {
 
       <View style={styles.row}>
         <Text style={styles.label}>Date Of Birth :</Text>
-        <Text style={styles.value}>{FetchOwnerDetails.DobOwner1}</Text>
+        <Text style={styles.value}>{FetchOwnerDetails.DobOwner? FetchOwnerDetails.DobOwner.split('T')[0] : ''}</Text>
       </View>
 
       <View style={styles.row}>
@@ -255,8 +255,8 @@ const PanCard = () => {
         style={{
           color: 'black',
           position: 'absolute',
-          top: 30,
-          left: 15,
+          top: 32,
+          left: 13,
           fontSize: 10,
           fontWeight: '700',
           width:'70%'
@@ -272,7 +272,7 @@ const PanCard = () => {
           fontSize: 10,
           fontWeight: '700',
         }}>
-        {FetchOwnerDetails.DobOwner1}
+        {FetchOwnerDetails.DobOwner? FetchOwnerDetails.DobOwner.split('T')[0] : ''}
       </Text>
        <Text
         style={{
@@ -347,7 +347,7 @@ const PanCard = () => {
           fontSize: 11,
           fontWeight: '700',
         }}>
-       DOB: {FetchOwnerDetails.DobOwner1}
+       DOB: {FetchOwnerDetails.DobOwner? FetchOwnerDetails.DobOwner.split('T')[0] : ''}
       </Text>
        <Text
         style={{

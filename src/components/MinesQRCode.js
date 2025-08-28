@@ -1,15 +1,13 @@
 import { useRoute } from '@react-navigation/native';
 import React, { useRef, useEffect, useState } from 'react';
 import QRCode from 'react-native-qrcode-svg';
-import { HTMLContent } from '../screens/HTMLContent';
-import { ConsigneeHTML } from '../screens/ConsigneeHTML';
-import { ConsignorHTML } from '../screens/ConsignorHTML';
-import { DriverHTML } from '../screens/DriverHTML';
 import { FuelSlip } from '../screens/FuelSlip';
 import { FreightMemo } from '../screens/FeightMemo';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNPrint from 'react-native-print';
 import { Text,View } from 'react-native';
+import { textColor } from './constant';
+import { ConsignorHTML } from '../screens/ConsignorHTML';
 export const MinesQRCode = ({data}) => {
 
   const [qrData,setQrData]=useState('')
@@ -17,9 +15,9 @@ export const MinesQRCode = ({data}) => {
   const route = useRoute();
   const { qrValue, fetchedData, selectedPrint } = route.params;
   
-  console.log('QR Value:', qrValue);
-  console.log('Fetched Data:', fetchedData);
-  console.log('Selected Print:', selectedPrint);
+  // console.log('QR Value:', qrValue);
+  // console.log('Fetched Data:', fetchedData);
+  // console.log('Selected Print:', selectedPrint);
   
 
   const getDataURL = () => {
@@ -49,33 +47,26 @@ export const MinesQRCode = ({data}) => {
   
       if (selectedPrint === '1') {
         htmlToPrint = `
-          ${HTMLContent(fetchedData, qrData)} 
+          ${ConsignorHTML(fetchedData, qrData,type="Book Copy")} 
           <div style="page-break-after: always;"></div>
-          <div style="margin-top: 20px;">${ConsignorHTML(fetchedData, qrData)}</div>
+          <div style="margin-top: 20px;">${ConsignorHTML(fetchedData, qrData, type="Consignor Copy")}</div>
           
           <div style="page-break-after: always;"></div>
-          <div style="margin-top: 20px;">${ConsigneeHTML(fetchedData, qrData)}</div>
+         <div style="margin-top: 20px;">${ConsignorHTML(fetchedData, qrData, type="Consignee Copy")}</div>
           
           <div style="page-break-after: always;"></div> 
-          <div style="margin-top: 20px;">${DriverHTML(fetchedData, qrData)}</div>
+          <div style="margin-top: 20px;">${ConsignorHTML(fetchedData, qrData, type="Driver Copy")}</div>  
         `;
-      } else if (selectedPrint === '2') {
-        htmlToPrint = `${FreightMemo(fetchedData)}`;
-      } else if (selectedPrint === '3') {
+      }  else if (selectedPrint === '3') {
         htmlToPrint = `${FuelSlip(fetchedData)}`;
+      } else if (selectedPrint === '2') {
+        htmlToPrint = `${ConsignorHTML(fetchedData, qrData,type="Book Copy")}`;
+      } else if (selectedPrint === '3') {
+        htmlToPrint = `${ConsignorHTML(fetchedData, qrData,type="Driver Copy")}`;
       } else if (selectedPrint === '4') {
-        htmlToPrint = `${HTMLContent(fetchedData, qrData)}`;
+        htmlToPrint = `${ConsignorHTML(fetchedData, qrData,type="Consignee Copy")}`;
       } else if (selectedPrint === '5') {
-        htmlToPrint = `${DriverHTML(fetchedData, qrData)}`;
-      } else if (selectedPrint === '6') {
-        htmlToPrint = `${ConsigneeHTML(fetchedData, qrData)}`;
-      } else if (selectedPrint === '7') {
-        htmlToPrint = `${ConsignorHTML(fetchedData, qrData)}`;
-      } else if (selectedPrint === '8') {
-        htmlToPrint = `
-          ${FuelSlip(fetchedData)}
-          <div style="margin-top: 20px;">${FreightMemo(fetchedData)}</div>
-        `;
+        htmlToPrint = `${ConsignorHTML(fetchedData, qrData,type="Consignor Copy")}`;
       } else {
         seterrorMessage('Invalid selection');
         setShowAlert(true);
@@ -111,15 +102,13 @@ export const MinesQRCode = ({data}) => {
     <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
       <>
         {qrValue ? (
-            <>
+          <>
           <QRCode
             value={qrValue}
             getRef={(c) => (svgRef.current = c)} // Set reference to svgRef
           />
-          <Text style={{ marginTop: 10, fontSize: 16 }}>
-            Please Wait while we generate the PDF...
-            </Text>
-            </>
+          <Text style={{color:textColor,marginTop:20,fontSize:16}}>Generating PDF...</Text>
+          </>
         ) : (
           <Text>QR code data not available</Text>
         )}

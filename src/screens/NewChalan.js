@@ -17,55 +17,46 @@ import CustomImagePicker from '../components/CustomFilePicker';
 import StepIndicator from '../FGLoading/StepIndicator';
 import SelectButton from '../components/SelectButton';
 import CardType2 from '../FGLoading/CardType2';
-import { is } from 'date-fns/locale';
 import Searching from '../components/Searching';
-
+import { decode as atob, encode as btoa } from 'base-64';
+import LoadingIndicator from '../components/LoadingIndicator';
+import Loading from '../components/Loading';
 
 const NewChalan = ({navigation,route}) => {
    const [apiTokenReceived, setapiTokenReceived] = useState(null);
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-    //  console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
       setapiTokenReceived(TokenReceived);
-      // console.log('Received token', apiTokenReceived);
-      // console.log('Error retrieving token:', error);
     });
+if (!global.atob) {
+  global.atob = atob;
+}
+if (!global.btoa) {
+  global.btoa = btoa;
+}
 
   
  const { params: { JobDetails, VEHICLENO, VEHICLEID, DLNo,} = {} } = useRoute();
 
 //console.log("Job Details from route:", JobDetails);
-console.log("Vehicle No:", VEHICLENO);
-console.log("Vehicle ID:", VEHICLEID);
-console.log("DL No:", DLNo);
+// console.log("Vehicle No:", VEHICLENO);
+// console.log("Vehicle ID:", VEHICLEID);
+// console.log("DL No:", DLNo);
 
 
-//console.log('job no from route',JobDetails.label + '' , 'JOBID' ,JobDetails.value)
-//   useEffect(()=>{
-// if(JOBNO){
-//   setJobNo(JOBNO)
-// }
-//   },[JOBNO])
-  // State variables
+
   const [data1, setData1] = useState({});
-  const [data2, setData2] = useState({});
-  const [showAlert, setShowAlert] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  
- 
-  
+
   const [isStep1Visible, setIsStep1Visible]=useState(false);
   const [isFirstStep,setFirstSetp]=useState(true)
   const [isStep3,setIsStep3]=useState(false)
-  const[delNo2,setDelNo2]=useState('')
+
 
   const [ChallanNo, setChallanNo] = useState('');
- // const [EwayBillNo, setEwayBillNo] = useState('');
- const [ewayBillNo,setEwayBillNo]=useState('')
  
   const [GpsNo, setGpsNo] = useState('');
   const [SlipNo, setSlipNo] = useState('');
@@ -87,8 +78,6 @@ console.log("DL No:", DLNo);
   const [clientInvoice1,setClientInvoice1]=useState('');
   const [clientInvoice2,setClientInvoice2]=useState('');
   const [clientInvoice3,setClientInvoice3]=useState('');
-  const [inputVisible2,setInputVisible2]=useState(false);
-  const [inputVisible3,setInputVisible3]=useState(false);
   const [isVisibleEWaybill2,setIsVisibleEWaybill2]=useState(false);
   const [isVisibleEWaybill3,setIsVisibleEWaybill3]=useState(false);
 
@@ -97,18 +86,11 @@ console.log("DL No:", DLNo);
  
   const [openQRScanner1,setOpenQRScanner1]=useState(false);
 
-
-
-  const [jobNo,setJobNo]=useState('');
-  const [vehicleNo,setVehicleNo]=useState('');
-  const [driverName,setDriverName]=useState('')
   const [brokerName,setBrokerName]=useState('')
   const [associationName,setAssociationName]=useState('')
   const [jobId,setJobId]=useState('')
   const [ownerId,setOwnerId]=useState('')
 const [truckSource,setTruckSource]=useState('')
-  const [selectedJobNo,setSelectedJobNo]=useState('')
-  const [selectedVehicleNo,setSelectedVehicleNo]=useState('');
   const [loadingPointId,setLoadingPointId]=useState('')
   const [unloadingPointId,setUnLoadingPointId]=useState('')
   const [vehicleId, setVehicleId] = useState('');
@@ -117,16 +99,8 @@ const [truckSource,setTruckSource]=useState('')
   const [associationId, setAssociationId] = useState('');
   const [consigneeId, setConsigneeId] = useState(null);
   const [consignorId, setConsignorId] = useState(null);
-  const [IsGps, setIsGps] = useState('');
   const [VehicleType, setVehicleType] = useState('');
-  const [driverType,setDriverType]=useState('');
-  const [brokerType, setBrokerType]=useState('');
-  const [associationType,setAssociationType]=useState('');
-  const [consignorType,setConsignorType]=useState('');
-  const [consigneeType,setConsigneeType]=useState('');
   const [hasBorder, setHasBorder] = useState(false);
- const [loadingPoint,setLoadingPoint]=useState('');
-  const [unLoadingPoint,setUnLoadingPoint]=useState('');
   const [grossWt,setGrossWt]=useState('');
   const [tierWt,setTierWt]=useState('');
   const [netWt,setNetWt]=useState('');
@@ -134,12 +108,9 @@ const [truckSource,setTruckSource]=useState('')
   const [materialValue,setMaterialValue]=useState('');
   const [remarks,setRemarks]=useState('');
   const [attachment,setAttachment]=useState('');
-  const [materialType,setMaterialType]=useState('')
   const [materialId,setMaterialId]=useState('')
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null); //27/02/2024
-  const [ConvSelectedStartDate, setConvSelectedStartDate] = useState(null); //2024-02-29
-  const [ownerName,setOwnerName]=useState('')
   const [guaranteewt,setGuaranteeWt]=useState('')
 
   const [ewayBillNo1,setEwayBillNo1]=useState('')
@@ -149,31 +120,22 @@ const [truckSource,setTruckSource]=useState('')
   const [InvoiceDoc,setInvoiceDoc]=useState();
 
    const [isOtherAccount, setIsOtherAccount] = useState(false);
-  const HandleInput2=()=>{
-    setInputVisible2(!inputVisible2)
-    setClientInvoice2('')
-  }
-  const HandleInput3=()=>{
-    setInputVisible3(!inputVisible3)
-    setClientInvoice3('')
-  }
-  const HandleEwaybill2 = () => {
-    setIsVisibleEWaybill2(prevState => !prevState);
-  };
+
+
+
   useEffect(() => {
 
   }, [isVisibleEWaybill2]);
   
-  const HandleEwaybill3 = () => {
-    setIsVisibleEWaybill3(prevState => !prevState); 
-  };
+
 
   
  const [ownerData, setOwnerData] = useState(null);
   const [loading, setLoading] = useState(false);
 const [jobDetails2,setJobDetails2]=useState({})
 const [driverData2,setDriverData2]=useState({});
-
+const [IsCommercial,setIsCommercial]=useState(false)
+const [IsVerified,setIsVerified]=useState(false);
 const [loadingDetails,setLoadingDetails]=useState(false);
 useEffect(() => {
   const fetchAllDetails = async () => {
@@ -183,39 +145,75 @@ useEffect(() => {
       setLoadingDetails(true);
 
       // ================= VEHICLE → OWNER DETAILS =================
-      if (VEHICLENO) {
-        const encodedSearch = encodeURIComponent(VEHICLENO);
-        const vehicleUrl = `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${encodedSearch}`;
-        const vehicleRes = await fetch(vehicleUrl, {
-          method: "GET",
-          headers: { Authorization: `Basic ${apiTokenReceived}` },
-        });
+if (VEHICLENO) {
+  try {
+    const encodedVehicle = encodeURIComponent(VEHICLENO);
 
-        if (vehicleRes.ok) {
-          const vehicleData = await vehicleRes.json();
-          if (vehicleData?.VehicleNoList?.length > 0) {
-            const vehicle = vehicleData.VehicleNoList[0];
-            if (vehicle?.PANNumber) {
-              const ownerUrl = `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${vehicle.PANNumber}`;
-              const ownerRes = await fetch(ownerUrl, {
-                method: "GET",
-                headers: { Authorization: `Basic ${apiTokenReceived}` },
-              });
+    // --------- 1. Get vehicle details (verification & commercial) ---------
+    const vehicleUrl1 = `https://Exim.Tranzol.com/api/VehicleApi/GetVehicleByNo?vehicleNo=${encodedVehicle}`;
+    const vehicleRes1 = await fetch(vehicleUrl1, {
+      method: "GET",
+      headers: { Authorization: `Basic ${apiTokenReceived}` },
+    });
 
-              if (ownerRes.ok) {
-                const ownerDataRes = await ownerRes.json();
-                if (ownerDataRes?.apiResult?.Result) {
-                  setOwnerData(ownerDataRes.apiResult.Result);
-                }
-              }
-            }
-          }
-        }
+    let vehicle1Data = null;
+
+    if (vehicleRes1.ok) {
+      const vehicleData1 = await vehicleRes1.json();
+      const vehicleList1 = vehicleData1?.apiResult?.Result || [];
+      if (vehicleList1.length > 0) {
+        vehicle1Data = vehicleList1[0];
+        // Set verification & commercial status
+        setIsVerified(vehicle1Data.IsVerified);
+        setIsCommercial(vehicle1Data.IsCommercial);
       }
+    }
+
+    // --------- 2. Always call second Vehicle API for PAN number ---------
+    const vehicleUrl2 = `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${encodedVehicle}`;
+    const vehicleRes2 = await fetch(vehicleUrl2, {
+      method: "GET",
+      headers: { Authorization: `Basic ${apiTokenReceived}` },
+    });
+
+    let PANNumber = null;
+
+    if (vehicleRes2.ok) {
+      const vehicleData2 = await vehicleRes2.json();
+      //console.log("Vehicle Data 2:", vehicleData2);
+      const vehicleList2 = vehicleData2?.VehicleNoList || [];
+      if (vehicleList2.length > 0) {
+        PANNumber = vehicleList2[0]?.PANNumber;
+        setVehicleId(vehicleList2[0]?.VehicleId)
+        setOwnerId(vehicleList2[0]?.OwnerId);
+      }
+    }
+
+    // --------- 3. Call Owner API if PANNumber exists ---------
+    if (PANNumber) {
+      const ownerUrl = `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNumber}`;
+      const ownerRes = await fetch(ownerUrl, {
+        method: "GET",
+        headers: { Authorization: `Basic ${apiTokenReceived}` },
+      });
+
+      if (ownerRes.ok) {
+        const ownerData = await ownerRes.json();
+       // console.log("Owner Data:", ownerData);
+        setOwnerData(ownerData?.apiResult?.Result || {});
+      }
+    }
+
+  } catch (error) {
+    console.error("Error fetching vehicle/owner details:", error);
+    Alert.alert("Error", "Failed to fetch vehicle or owner details.");
+  }
+}
+
 
       // ================= JOB DETAILS =================
       if (JobDetails) {
-        setJobId(JobDetails.value);
+        
         const jobUrl = `https://exim.tranzol.com/api/DropDown/Jobno?search=${JobDetails.label}`;
         const jobRes = await fetch(jobUrl, {
           method: "GET",
@@ -227,8 +225,10 @@ useEffect(() => {
 
         if (jobRes.ok) {
           const jobData = await jobRes.json();
+          //console.log("Job Data:", jobData);
           if (jobData?.JobList?.length > 0) {
             const job = jobData.JobList[0];
+            setJobId(job.JobId);
             setJobDetails2(job);
             setLoadingPointId(job.LoadingPointId);
             setUnLoadingPointId(job.UnloadingPointId);
@@ -242,7 +242,7 @@ useEffect(() => {
       // ================= DRIVER DETAILS =================
       if (DLNo) {
         const encodedSearch = encodeURIComponent(DLNo);
-        const driverUrl = `https://exim.tranzol.com/api/OwnerApi/GetDriverList?name=${encodedSearch}`;
+        const driverUrl = `https://exim.tranzol.com/api/OwnerApi/GetDriver?licenseNo=${encodedSearch}`;
         const driverRes = await fetch(driverUrl, {
           method: "GET",
           headers: { Authorization: `Basic ${apiTokenReceived}` },
@@ -251,7 +251,10 @@ useEffect(() => {
         if (driverRes.ok) {
           const driverData = await driverRes.json();
           if (driverData?.apiResult?.Result) {
+            
             setDriverData2(driverData.apiResult.Result);
+            setDriverId(driverData.apiResult.Result.Id);
+         //  console.log("Driver Data:", driverData2);
           }
         }
       }
@@ -272,55 +275,58 @@ const convertDateFormat = (dateString) => {
   return `${year}-${month}-${day}`;  // Rearrange to "YYYY-MM-DD"
 };
 
+  useEffect(() => {
+    if (grossWt && tierWt) {
+      let net = parseFloat(grossWt) - parseFloat(tierWt);
+      if (!isNaN(net)) {
+        setNetWt(net.toFixed(3)); // ✅ keep only 3 digits after decimal
+      } else {
+        setNetWt("");
+      }
+    } else {
+      setNetWt("");
+    }
+  }, [grossWt, tierWt]);
 
 useEffect(() => {
   try {
+  if (route.params?.scannedClientInvoice1) {
+    const token = route.params.scannedClientInvoice1;
+
+    // ✅ Check format before decoding
+    if (token.split('.').length !== 3) {
+      Alert.alert('Invalid QR Code', 'Scanned QR code is incomplete.');
+      console.log('⚠️ Invalid JWT format:', token);
+      return;
+    }
+
+    try {
+      console.log('Decoding JWT:', token);
+      const clientInvoice1 = jwtDecode(token);
+
+      if (!clientInvoice1?.data) {
+        Alert.alert('Invalid QR Code', 'No data field inside JWT payload.');
+        return;
+      }
+
+      const lm = JSON.parse(clientInvoice1.data);
+      const formattedDate = convertDateFormat(lm.DocDt);
+
+      setClientInvoice1(lm.DocNo);
+      setSelectedDate(formattedDate);
+      setMaterialValue(String(lm.TotInvVal));
+
+    } catch (error) {
+      Alert.alert('Invalid QR Code', 'Unable to decode JWT.');
+      console.log('Error decoding JWT:', error);
+    }
+  }
+
+
     if (route.params?.scannedEwayBillNo) {
-      const ewayBillNo1 = route.params.scannedEwayBillNo.split('/')[0]; // Extract value before '/'
-      setEwayBillNo1(ewayBillNo1);
-    }
-
-    if (route.params?.scannedClientInvoice1) {
-      try {
-        const clientInvoice1 = jwtDecode(route.params.scannedClientInvoice1);
-        const lm = JSON.parse(clientInvoice1.data);
-        const formattedDate = convertDateFormat(lm.DocDt);  
-        setClientInvoice1(lm.DocNo);
-        setSelectedDate(formattedDate);
-        setMaterialValue(String(lm.TotInvVal));
-      } catch (error) {
-        Alert.alert('Invalid QR Code', 'The scanned QR code for Client Invoice 1 is not a valid JWT.');
-      }
-    }
-
-    if (route.params?.scannedClientInvoice2) {
-      try {
-        const clientInvoice2 = jwtDecode(route.params.scannedClientInvoice2);
-        const lm = JSON.parse(clientInvoice2.data);
-        setClientInvoice2(lm.DocNo);
-      } catch (error) {
-        Alert.alert('Invalid QR Code', 'The scanned QR code for Client Invoice 2 is not a valid JWT.');
-      }
-    }
-
-    if (route.params?.scannedClientInvoice3) {
-      try {
-        const clientInvoice3 = jwtDecode(route.params.scannedClientInvoice3);
-        const lm = JSON.parse(clientInvoice3.data);
-        setClientInvoice3(lm.DocNo);
-      } catch (error) {
-        Alert.alert('Invalid QR Code', 'The scanned QR code for Client Invoice 3 is not a valid JWT.');
-      }
-    }
-
-    if (route.params?.scannedEwayBillNo2) {
-      const ewayBillNo2 = route.params.scannedEwayBillNo2.split('/')[0]; // Extract value before '/'
-      setEwayBillNo2(ewayBillNo2);
-    }
-
-    if (route.params?.scannedEwayBillNo3) {
-      const ewayBillNo3 = route.params.scannedEwayBillNo3.split('/')[0]; // Extract value before '/'
-      setEwayBillNo3(ewayBillNo3);
+      console.log('Scanned Eway Bill No:', route.params.scannedEwayBillNo);
+      const ewayBillNo = route.params.scannedEwayBillNo.split('/')[0]; // Extract value before '/'
+      setEwayBillNo1(ewayBillNo);
     }
   } catch (error) {
     console.error('Error decoding JWT or processing QR code:', error);
@@ -329,74 +335,12 @@ useEffect(() => {
 }, [
   route.params?.scannedEwayBillNo,
   route.params?.scannedClientInvoice1,
-  route.params?.scannedClientInvoice2,
-  route.params?.scannedClientInvoice3,
-  route.params?.scannedEwayBillNo2,
-  route.params?.scannedEwayBillNo3
 ]);
 
-  
-
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchVehicle,setSearchVehicle]=useState('')
-  const [searchDriver,setSearchDriver]=useState('')
   const [searchBroker,setSearchBroker]=useState('')
   const [searchAssociation,setSearchAssociation]=useState('')
-  const [searchLoading,setSearchLoading]=useState('');
-  const [searchUnloading,setSearchUnloading]=useState('');
-  const [searchMaterial,setSearchMaterial]=useState('')
-
-  const [jobData,setJobData]=useState([])
-  const [vehicleData,setVehicleData]=useState([])
-  const [driverData,setDriverData]=useState([])
   const [brokerData,setBrokerData]=useState([])
   const [associationData,setAssociationData]=useState([])
-  const [loadingData,setLoadingData]=useState([]);
-    const [unloadingData,setUnloadingData]=useState([]);
-    const [materialData,setMaterialDate]=useState([])
-     const [selected, setSelected] = useState(true);
-  
-  const onPaymentStepComplete = async () => {
-
-    const postData1 = {
-      ChallanNo: ChallanNo.toString(),
-      ewayBillNo1,
-      ewayBillNo2,
-      ewayBillNo3,
-      clientInvoiceNo1: clientInvoice1,
-      clientInvoiceNo2: clientInvoice2,
-      clientInvoiceNo3: clientInvoice3,
-      gpsNo: GpsNo,
-      SlipNo,
-      StoNo,
-      delNo: DelNo,
-      freightTigerNo: FreightTigerNo || 0,
-      freightRate: FreightRate || parseInt(FreightRate),
-      cash: parseInt(Cash),
-      bankAmount: parseInt(BankAmount),
-      hsd: HSD || 0,
-      detention: detention || 0,
-      pumpId: PumpId || 0,
-      accountholderName: acName,
-      ifscCode: Ifsc,
-      otherExpense: otherExpence,
-    };
-
-    setData1(postData1);
-  };
-  const imageSource = inputVisible2 
-  ? require('../assets/removedel.png') 
-  : require('../assets/add.png');
-  const imageSource2 = inputVisible3
-  ? require('../assets/removedel.png') 
-  : require('../assets/add.png');
-  const imageSource3 = isVisibleEWaybill2 
-  ? require('../assets/removedel.png') 
-  : require('../assets/add.png');
-  const imageSource4 = isVisibleEWaybill3
-  ? require('../assets/removedel.png') 
-  : require('../assets/add.png');
 const [searchPump,setSearchPump]=useState('');
   
 
@@ -404,10 +348,6 @@ const onSubmitSteps = () => {
   // Perform all validation checks
   if (!jobId) {
     Alert.alert('Validation Error', 'Please Select Job No');
-    return false;
-  }
-  if (!vehicleId) {
-    Alert.alert('Validation Error', 'Please Select Vehicle No');
     return false;
   }
   if (!netWt) {
@@ -422,59 +362,17 @@ const onSubmitSteps = () => {
     Alert.alert('Validation Error', 'Please Truck Source');
     return false;
   }
-  if (!selectedDate) {
-    Alert.alert('Validation Error', 'Please Select Load Date');
-    return false;
-  }
-
-  // Prepare the postData2 object
-  const postData2 = {
-    vehicleId: vehicleId ? parseInt(vehicleId, 10) : null,
-    driverId: driverId ? parseInt(driverId, 10) : null,
-    brokerId: brokerId ? parseInt(brokerId, 10) : null,
-    associationId: associationId ? parseInt(associationId, 10) : null,
-    consigneeId: consigneeId ? parseInt(consigneeId, 10) : null,
-    consignorId: consignorId ? parseInt(consignorId, 10) : null,
-    loadType: loadType || '',  // Assuming it's a string
-    VehicleType: VehicleType || '',  // Assuming it's a string
-    jobId: jobId ? parseInt(jobId, 10) : null,
-    loadDate: selectedDate || null,
-    materialValues: materialValue || '',
-    tareWt: tierWt ? parseFloat(tierWt) : 0,
-    grossWt: grossWt ? parseFloat(grossWt) : 0,
-    netWt: netWt ? parseFloat(netWt) : 0,
-    truckSource: truckSource || '',  // Assuming it's a string
-    ownerId: ownerId ? parseInt(ownerId, 10) : null,
-    loadingPointId: loadingPointId ? parseInt(loadingPointId, 10) : null,
-    unloadingPointId: unloadingPointId ? parseInt(unloadingPointId, 10) : null,
-    materialId: materialId ? parseInt(materialId, 10) : null,
-  };
-
-  // Set the data2 state with the prepared postData2 object
-  setData2(postData2);
-
-  // Merge data1 and data2 using spread operator
-  setTimeout(() => {
-    const mergedData = {
-      ...data1,   // Existing data1
-      ...postData2 // New data2 (postData2)
-    };
-
-    console.log('Merged data:', mergedData); // Log the merged data
-    // You can now use this merged data as required for further operations
-  }, 100);
 
   return true; // Return true if all validations pass
 };
 const HandleSubmit = async () => {
+  const isValid = onSubmitSteps();
+  if (!isValid) return; // Stop if validation fails
+  setIsLoading(true)
   const postData = {
     ChallanNo: ChallanNo ? ChallanNo.toString() : '',
     EwayBillNo1: ewayBillNo1 || '',
-    EwayBillNo2: ewayBillNo2 || '',
-    EwayBillNo3: ewayBillNo3 || '',
     ClientInvoiceNo1: clientInvoice1 || '',
-    ClientInvoiceNo2: clientInvoice2 || '',
-    ClientInvoiceNo3: clientInvoice3 || '',
     GPSNo: GpsNo || '',
     DelNo: DelNo || '',
     FreightTigerNo: FreightTigerNo ? FreightTigerNo.toString() : '',
@@ -520,7 +418,7 @@ const HandleSubmit = async () => {
     }
   });
   
-  // Append documents if they exist
+  //Append documents if they exist
   // if (ChallanDoc) {
   //   formData.append('ChallanDoc', {
   //     uri: ChallanDoc.uri,
@@ -553,20 +451,27 @@ const HandleSubmit = async () => {
     });
 console.log('Api Response',response)
     if (response.ok) {
-      const responseText = await response.text(); // Get raw response text
-      console.log('Server Response:', responseText); // Log the success message
-      Alert.alert('Success', responseText); // Show an alert with the server's message
-      //navigation.navigate('FGLoading')
-    } else {
-      console.error('Server returned an error:', response.status, response.statusText);
-      Alert.alert('Error', `Server error: ${response.statusText}`);
-    }
+  const responseText = await response.text(); // Get raw response text
+  console.log('Server Response:', responseText);
+
+  if (responseText.includes("Successfully insert")) {
+    Alert.alert('Success', responseText.replace(/"/g, "")); // remove double quotes if any
+     navigation.goBack();
+  } else {
+    Alert.alert('Error', responseText.replace(/"/g, ""));
+  }
+} else {
+  console.error('Server returned an error:', response.status, response.statusText);
+  Alert.alert('Error', `Server error: ${response.statusText}`);
+}
+
   } catch (error) {
     console.error('Error submitting data:', error);
     Alert.alert('Error', 'Failed to submit data');
+  }finally{
+    setIsLoading(false)
   }
 };
-
 
 const HandleNext1 = async () => {
   try {
@@ -580,8 +485,12 @@ const HandleNext1 = async () => {
 
 const HandleNext = async () => {
   // Perform validation before proceeding
-  if (!ChallanNo) {
-    Alert.alert('Validation Error', 'Challan No is Mandatory');
+   if (!vehicleId) {
+    Alert.alert('Validation Error', 'Please Select Vehicle No');
+    return false;
+  }
+  if (!selectedDate) {
+    Alert.alert('Validation Error', 'Load Date is Mandatory');
     return;
   }
 
@@ -589,10 +498,7 @@ const HandleNext = async () => {
     Alert.alert('Validation Error', 'Freight Rate is Mandatory');
     return;
   }
- {/* if (!selectedDate) {
-    Alert.alert('Validation Error', 'Please Select Load Date');
-    return false;
-  }*/}
+
 
   const postData1 = {
     ChallanNo: ChallanNo ? ChallanNo.toString() : null,
@@ -627,13 +533,7 @@ const HandleNext = async () => {
   console.log('data1',data1)
 };
 
-  const closeAlert = () => {
-    setShowAlert(false);
-  };
 //////////////Next page Method /////////////////////////////////////////////////////////////////////
-
-
-
 
 const HandlePrevious = async () => {
   try {
@@ -732,7 +632,7 @@ const fetchAssociation = async (search) => {
   try {
     console.log('Fetching Association with search:', search);
     const encodedSearch = encodeURIComponent(search);
-    const url = `https://exim.tranzol.com/api/DropDown/Association?search=${encodedSearch}`;
+    const url = `https://exim.tranzol.com/api/DropDown/association?search=${encodedSearch}`;
     console.log('Request URL:', url);
 
     const response = await fetch(url, {
@@ -803,346 +703,6 @@ const fetchBroker = async (search) => {
     console.log('Error in fetching broker no:', error);
   }
 };
-
-useEffect(() => {
-  if (searchDriver) {
-    fetchDriver(searchDriver);
-  }
-}, [searchDriver]);
-const fetchDriver = async (search) => {
-  try {
-    console.log('Fetching vehicle with search:', search);
-    const encodedSearch = encodeURIComponent(search);
-    const url = `https://exim.tranzol.com/api/DropDown/Driver?search=${encodedSearch}`;
-    console.log('Request URL:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Basic ${apiTokenReceived}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('API Response:', data);
-
-      if (data.DriverList) {
-        // Corrected to use VehicleNoList
-        const driverData = data.DriverList.map((Driver) => ({
-          label: Driver.PartyName,
-          value: Driver.Id,
-        }));
-        setDriverData(driverData);
-      } else {
-        console.log('DriverList missing in the response');
-      }
-    } else {
-      console.log('Error in fetching DriverList no:', response.status);
-    }
-  } catch (error) {
-    console.log('Error in fetching DriverList no:', error);
-  }
-};
-useEffect(() => {
-  if (searchVehicle) {
-    fetchVehicle(searchVehicle);
-  }
-}, [searchVehicle]);
-const fetchVehicle = async (search) => {
-  try {
-    console.log('Fetching vehicle with search:', search);
-    const encodedSearch = encodeURIComponent(search);
-    const url = `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${encodedSearch}`;
-    console.log('Request URL:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Basic ${apiTokenReceived}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('API Response:', data);
-
-      if (data.VehicleNoList) {
-        // Corrected to use VehicleNoList
-        const vehicleData = data.VehicleNoList.map((vehicle) => ({
-          label: vehicle.VehicleNo,
-          value: vehicle.VehicleId,
-        }));
-        setVehicleData(vehicleData);
-      } else {
-        console.log('VehicleNoList is missing in the response');
-      }
-    } else {
-      console.log('Error in fetching vehicle no:', response.status);
-    }
-  } catch (error) {
-    console.log('Error in fetching vehicle no:', error);
-  }
-};
-
-useEffect(() => {
-  if (selectedVehicleNo) {
-    console.log('in useEffect', jobNo, selectedVehicleNo);
-
-    const fetchOwnerName = async () => {
-      try {
-        console.log('Fetching JobOther:', selectedVehicleNo);
-        const encodedSearch = encodeURIComponent(selectedVehicleNo);
-        const url = `https://exim.tranzol.com/api/DropDown/VehicleNo?search=${encodedSearch}`;
-        console.log('Request URL:', url);
-
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            Authorization: `Basic ${apiTokenReceived}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('API Response:', data);
-
-          if (data.VehicleNoList && data.VehicleNoList.length > 0) {
-            
-          setOwnerName(data.VehicleNoList[0].OwnerName)
-          setOwnerId(data.VehicleNoList[0].OwnerId)
-            console.log('ownerId:', data.VehicleNoList[0].OwnerId);
-          } else {
-            console.log('vehicle ownerlist is empty or missing in the response');
-          }
-        } else {
-          console.log('Error in fetching owner name no:', response.status);
-        }
-      } catch (error) {
-        console.log('Error in fetching owner name no:', error);
-      }
-    };
-
-    fetchOwnerName(); // Call the function to fetch job details
-  }
-}, [selectedVehicleNo]);
-
-// Function to fetch job numbers based on search input
-const fetchJob = async (search) => {
-  try {
-    console.log('Fetching jobs with search:', search);
-    const encodedSearch = encodeURIComponent(search);
-    const url = `https://exim.tranzol.com/api/DropDown/Jobno?search=${encodedSearch}`;
-    console.log('Request URL:', url);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Basic ${apiTokenReceived}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('API Response:', data);
-      
-      if (data.JobList) {
-        const jobData = data.JobList.map((job) => ({
-          label: job.JobNo,
-          value: job.JobId,
-        }));
-        setJobData(jobData);
-         
-      } else {
-        console.log('JobList is missing in the response');
-      }
-    } else {
-      console.log('Error in fetching Job no:', response.status);
-    }
-  } catch (error) {
-    console.log('Error in fetching job no:', error);
-  }
-};
-useEffect(() => {
-  if (searchTerm) {
-    fetchJob(searchTerm);
-  }
-}, [searchTerm]);
-useEffect(() => {
-  if (selectedJobNo) {
-    console.log('in useEffect', jobNo, selectedJobNo);
-
-    const fetchJobOthers = async () => {
-      try {
-        console.log('Fetching JobOther:', selectedJobNo);
-        const encodedSearch = encodeURIComponent(selectedJobNo);
-        const url = `https://exim.tranzol.com/api/DropDown/Jobno?search=${encodedSearch}`;
-        console.log('Request URL:', url);
-
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            Authorization: `Basic ${apiTokenReceived}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('API Response:', data);
-
-          if (data.JobList && data.JobList.length > 0) {
-            const { LoadingPoint } = data.JobList[0]; // Get the first job's LoadingPoint
-            setLoadingPoint(LoadingPoint);
-            setUnLoadingPoint(data.JobList[0].UnloadingPoint)
-            setMaterialType(data.JobList[0].MaterialName)
-            setConsigneeType(data.JobList[0].ConsigneeName)
-            setConsignorType(data.JobList[0].ConsignorName)
-            setLoadingPointId(data.JobList[0].LoadingPointId)
-            setUnLoadingPointId(data.JobList[0].UnloadingPointId)
-            setConsignorId(data.JobList[0].ConsignorId)
-            setConsigneeId(data.JobList[0].ConsigneeId)
-            setMaterialId(data.JobList[0].MaterialId)
-            // console.log('Loading Point:', LoadingPoint);
-            // console.log('loading id',loadingPointId);
-            // console.log('unloading id',unloadingPointId)
-            // console.log('consignor id',consignorId)
-            // console.log('consignee id',consigneeId)
-            // console.log('material id',materialId)
-          } else {
-            console.log('JobList is empty or missing in the response');
-          }
-        } else {
-          console.log('Error in fetching Job no:', response.status);
-        }
-      } catch (error) {
-        console.log('Error in fetching job no:', error);
-      }
-    };
-
-    fetchJobOthers(); // Call the function to fetch job details
-  }
-}, [selectedJobNo]);
-useEffect(() => {
-  if (searchLoading) {
-    fetchLoading(searchLoading);
-  }
-}, [searchLoading]);
-useEffect(() => {
-  if (searchUnloading) {
-    fetchUnLoading(searchUnloading);
-  }
-}, [searchUnloading]);
-useEffect(() => {
-  if (searchMaterial) {
-    fetchMaterial(searchMaterial);
-  }
-}, [searchMaterial]);
-const fetchMaterial = async (search) => {
-  try {
-    console.log('Fetching loading with search:', search);
-    const encodedSearch = encodeURIComponent(search);
-    const url = `https://exim.tranzol.com/api/DropDown/Material?search=${encodedSearch}`;
-    console.log('Request URL:', url);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Basic ${apiTokenReceived}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('API Response:', data);
-      
-      if (data.MaterialList) {
-        const loadData = data.MaterialList.map((load) => ({
-          label: load.MaterialName,
-          value: load.Id,
-        }));
-        setMaterialDate(loadData);
-         
-      } else {
-        console.log('JobList is missing in the response');
-      }
-    } else {
-      console.log('Error in fetching Job no:', response.status);
-    }
-  } catch (error) {
-    console.log('Error in fetching job no:', error);
-  }
-};
-const fetchUnLoading = async (search) => {
-  try {
-    console.log('Fetching loading with search:', search);
-    const encodedSearch = encodeURIComponent(search);
-    const url = `https://exim.tranzol.com/api/DropDown/UnloadingPoint?search=${encodedSearch}`;
-    console.log('Request URL:', url);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Basic ${apiTokenReceived}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('API Response:', data);
-      
-      if (data.UnloadingPoints) {
-        const loadData = data.UnloadingPoints.map((load) => ({
-          label: load.Unloading,
-          value: load.Id,
-        }));
-        setUnloadingData(loadData);
-         
-      } else {
-        console.log('JobList is missing in the response');
-      }
-    } else {
-      console.log('Error in fetching Job no:', response.status);
-    }
-  } catch (error) {
-    console.log('Error in fetching job no:', error);
-  }
-};
-
-const fetchLoading = async (search) => {
-  try {
-    console.log('Fetching loading with search:', search);
-    const encodedSearch = encodeURIComponent(search);
-    const url = `https://exim.tranzol.com/api/DropDown/LoadingPoint?search=${encodedSearch}`;
-    console.log('Request URL:', url);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Basic ${apiTokenReceived}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('API Response:', data);
-      
-      if (data.LoadingPoints) {
-        const loadData = data.LoadingPoints.map((load) => ({
-          label: load.Loading,
-          value: load.Id,
-        }));
-        setLoadingData(loadData);
-         
-      } else {
-        console.log('JobList is missing in the response');
-      }
-    } else {
-      console.log('Error in fetching Job no:', response.status);
-    }
-  } catch (error) {
-    console.log('Error in fetching job no:', error);
-  }
-};
   const toggleSwitch = () => setIsOtherAccount(prev => !prev);
   return (
     <ScrollView style={{backgroundColor: 'white',paddingVertical:30,width:'100%'}}>
@@ -1181,8 +741,7 @@ const fetchLoading = async (search) => {
          </View>
        {loadingDetails ? (
      <>
-       <ActivityIndicator size="large" color={darkBlue} style={{marginTop:20}} />
-       <Text style={{marginTop:10,fontSize:16,color:darkBlue,fontWeight:'bold'}}>Loading Details...</Text>  
+      <Loading/> 
      </>
        ):(
               <View style={styles.levelContainer}>
@@ -1190,22 +749,23 @@ const fetchLoading = async (search) => {
          <CardType2
          heading='VEHICLE DETAILS'
          title='VEHICLE NO'
-         value={VEHICLENO? VEHICLENO : 'N/A'}
+         value={VEHICLENO? VEHICLENO : ' '}
          borderTopLeftRadius={15}
          borderTopRightRadius={15}
          />
-              <CardType2
-         
-         title='Verification'
-         value='N/A'
-         />
-              <CardType2
-         
-         title='Validity'
-         value='N/A'
-         borderBottomLeftRadius={16}
-         borderBottomRightRadius={16}
-         />
+   <CardType2
+  title="Verification"
+  value={IsVerified ? "Yes" : "No"}
+/>
+
+<CardType2
+  title="Commercial"
+  value={IsCommercial ? "Yes" : "No"}
+  borderBottomLeftRadius={16}
+  borderBottomRightRadius={16}
+/>
+
+
          </View>
          <View style={{marginTop:10,elevation:4}}>
             {loading? (
@@ -1215,47 +775,47 @@ const fetchLoading = async (search) => {
         <CardType2
   heading="OWNER DETAILS"
   title="Name"
-  value={ownerData?.OwnerName || "N/A"}
+  value={ownerData?.OwnerName || " "}
   borderTopLeftRadius={15}
   borderTopRightRadius={15}
 />
 
 <CardType2
   title="Address"
-  value={ownerData?.Address || "N/A"}
+  value={ownerData?.Address || " "}
 />
 
 <CardType2
   title="Primary Contact"
-  value={ownerData?.PrimaryMobileNo || "N/A"}
-  isNVerify={true}
+  value={ownerData?.PrimaryMobileNo || " "}
+//  isNVerify={true}
 />
 
 <CardType2
   title="Secondary Contact"
-  value={ownerData?.SecondaryNo || "N/A"}
-  isNVerify={true}
+  value={ownerData?.SecondaryNo || " "}
+//  isNVerify={true}
 />
 
 <CardType2
   heading="BANK DETAILS"
   title="Account Number"
-  value={ownerData?.AccountNo || "N/A"}
+  value={ownerData?.AccountNo || " "}
 />
 
 <CardType2
   title="IFSC Code"
-  value={ownerData?.IFSCCode || "N/A"}
+  value={ownerData?.IFSCCode || " "}
 />
 
 <CardType2
   title="Bank Name"
-  value={ownerData?.BankNameName || "N/A"}
+  value={ownerData?.BankNameName || " "}
 />
 
 <CardType2
   title="PAN No"
-  value={ownerData?.PanNo || "N/A"}
+  value={ownerData?.PanNo || " "}
   borderBottomLeftRadius={16}
   borderBottomRightRadius={16}
 />
@@ -1264,76 +824,79 @@ const fetchLoading = async (search) => {
     </> )}
          </View>
          <View style={{marginTop:10,marginBottom:10}}>
-{driverData2 && driverData2.length > 0 && (
-  <>
-    <CardType2
-      heading="DRIVER DETAILS"
-      title="Name"
-      value={driverData2[0]?.DriverName ?? "N/A"}
-      borderTopLeftRadius={15}
-      borderTopRightRadius={15}
-    />
 
-    <CardType2
-      title="Primary Contact"
-      value={driverData2[0]?.PrimaryContact ?? "N/A"}
-    />
+<>
+  <CardType2
+    heading="DRIVER DETAILS"
+    title="Name"
+    value={driverData2?.DriverName ?? " "}
+    borderTopLeftRadius={15}
+    borderTopRightRadius={15}
+  />
 
-    <CardType2
-      title="Secondary Contact"
-      value={driverData2[0]?.SecondaryContact ?? "N/A"}
-    />
+  <CardType2
+    title="Primary Contact"
+    value={driverData2?.PrimaryContactNo ?? " "}
+  />
 
-    <CardType2
-      title="Address"
-      value={driverData2[0]?.Address ?? "N/A"}
-    />
+  <CardType2
+    title="Secondary Contact"
+    value={driverData2?.SecondaryContactNo ?? " "}
+  />
 
-    <CardType2
-      title="DL No"
-      value={driverData2[0]?.DlNumber ?? "N/A"}
-      borderBottomLeftRadius={16}
-      borderBottomRightRadius={16}
-    />
-  </>
-)}
+  <CardType2
+    title="Address"
+    value={driverData2?.DriverAddress ?? " "}
+  />
+
+  <CardType2
+    title="DL No"
+    value={driverData2?.DLNumber ?? " "}
+    borderBottomLeftRadius={16}
+    borderBottomRightRadius={16}
+  />
+</>
+
+
          </View>
          <View style={{marginTop:10,marginBottom:20}}>
-          <CardType2
+               <CardType2
   heading="JOB DETAILS"
-  title="Loading"
-  value={jobDetails2?.LoadingPoint? jobDetails2.LoadingPoint : 'N/A'}
+  title="Job No"
+  value={JobDetails?.label?   JobDetails.label : ' '}
           borderTopLeftRadius={15}
          borderTopRightRadius={15}
 />
+          <CardType2
+  title="Loading"
+  value={jobDetails2?.LoadingPoint? jobDetails2.LoadingPoint : ' '}
+/>
+   
 
 <CardType2
   title="Unloading"
-  value={jobDetails2?.UnloadingPoint? jobDetails2.UnloadingPoint :'N/A'}
+  value={jobDetails2?.UnloadingPoint? jobDetails2.UnloadingPoint :' '}
 />
 
 <CardType2
   title="Consignor"
-  value={jobDetails2?.ConsignorName? jobDetails2.ConsignorName :'N/A'}
+  value={jobDetails2?.ConsignorName? jobDetails2.ConsignorName :' '}
 />
 
 <CardType2
   title="Consignee"
-  value={jobDetails2?.ConsigneeName? jobDetails2.ConsigneeName : 'N/A'}
+  value={jobDetails2?.ConsigneeName? jobDetails2.ConsigneeName : ' '}
 />
 
 <CardType2
   title="Material"
-  value={jobDetails2?.MaterialName? jobDetails2.MaterialName :'N/A'}
+  value={jobDetails2?.MaterialName? jobDetails2.MaterialName :' '}
     borderBottomLeftRadius={16}
          borderBottomRightRadius={16}
 />
 
          </View>
-        </View>
-       )}
-         
-             <View style={{flexDirection:'row',justifyContent:'space-between',
+                      <View style={{flexDirection:'row',justifyContent:'space-between',
           alignItems:'center',gap:130,paddingBottom:50
         }}>
         <TouchableOpacity
@@ -1342,19 +905,27 @@ const fetchLoading = async (search) => {
         <Text style={styles.btntext}>Reset</Text>
       </TouchableOpacity>
 <TouchableOpacity
-  onPress={() => {
-    if (!ChallanNo) {
-      Alert.alert("Error","Please create Challan first!");
-    } else {
-      HandleNext1();
-    }
-  }}
+onPress={() => {
+  if (!ChallanNo) {
+    Alert.alert("Error", "Please create Challan first!");
+  } else if (!IsVerified) {
+    Alert.alert("Error", "Verification is required before proceeding!");
+  } else if (!IsCommercial) {
+    Alert.alert("Error", "This action is only allowed for Commercial entries!");
+  } else {
+    HandleNext1();
+  }
+}}
+
   style={[styles.btn, { marginBottom: 50 }]}
 >
   <Text style={styles.btntext}>Next</Text>
 </TouchableOpacity>
-
 </View>
+        </View>
+       )}
+         
+
        </View>
        
       ) :
@@ -1396,8 +967,7 @@ const fetchLoading = async (search) => {
                color: 'black',
                fontSize: 15,
                width: '60%',
-               marginRight: 20,
-               
+               marginRight: 20, 
              }}
              placeholder={'Enter E-Way Bill No 1'}
              autoCorrect={false}
@@ -1749,7 +1319,7 @@ const fetchLoading = async (search) => {
              autoCorrect={false}
              onChangeText={text => setAccountNo(text)}
              value={AccountNo}
-             
+             keyboardType='numeric'
            />
          </View>
          <Text style={styles.levelText}>IFSC Code</Text>
@@ -1789,179 +1359,6 @@ const fetchLoading = async (search) => {
           }}>
           Other Details
         </Text>
-       
-
-
-{/* {!jobNo &&    
-(
-  <>
-<Text style={styles.levelText}>
-        Loading Point
-        </Text>
-       
-        
-        <Dropdown
-  style={styles.dropdown}
-  placeholderStyle={{color:'black'}}
-  selectedTextStyle={styles.selectedTextStyle}
-  inputSearchStyle={styles.inputSearchStyle}
-  itemTextStyle={{color: 'black'}}
-  
-  data={loadingData}  // Updated job data from API
-  
-  search
-  maxHeight={300}
-  labelField="label"  // Field for displaying label in dropdown
-  valueField="value"  // Field for value in dropdown
-  
-  placeholder={loadingPoint}
-  
-  // This ensures the dropdown shows the value from the server or user selection
-  value={loadingPoint}  // Value from the server or selected
-  
-  onFocus={() => setIsFocus(true)}
-  onBlur={() => setIsFocus(false)}
-  
-  onChange={item => {
-    
-    setLoadingPointId(item.value);  // Set the selected loading point ID
-    setLoadingPoint(item.value);  // Update loadingPoint state with selected value
-    
-    console.log('Selected Loading ID:', item.value);
-    setIsFocus(false);
-  }}
-
-  // If you want to handle search input
-  onChangeText={text => {
-    setSearchLoading(text);  // Update search term if needed
-  }}
-/>
-<Text style={styles.levelText}>
-        Unloading Point
-        </Text>
-       
-        
-        <Dropdown
-  style={styles.dropdown}
-  placeholderStyle={{color:'black'}}
-  selectedTextStyle={styles.selectedTextStyle}
-  inputSearchStyle={styles.inputSearchStyle}
-  itemTextStyle={{color: 'black'}}
-  
-  data={unloadingData}  // Updated job data from API
-  
-  search
-  maxHeight={300}
-  labelField="label"  // Field for displaying label in dropdown
-  valueField="value"  // Field for value in dropdown
-  
-  placeholder={unLoadingPoint}
-  
-  // This ensures the dropdown shows the value from the server or user selection
-  value={loadingPoint}  // Value from the server or selected
-  
-  onFocus={() => setIsFocus(true)}
-  onBlur={() => setIsFocus(false)}
-  
-  onChange={item => {
-    setJobNo(item.value);  // Set the selected job number
-    setUnLoadingPointId(item.value);  // Set the selected loading point ID
-    setUnLoadingPoint(item.value);  // Update loadingPoint state with selected value
-    
-    console.log('Selected UnLoading ID:', item.value);
-    setIsFocus(false);
-  }}
-
-  // If you want to handle search input
-  onChangeText={text => {
-    setSearchUnloading(text);  // Update search term if needed
-  }}
-/>
-        
-<Text style={styles.levelText}>
-        Material
-        </Text>
-       
-        
-        <Dropdown
-  style={styles.dropdown}
-  placeholderStyle={{color:'black'}}
-  selectedTextStyle={styles.selectedTextStyle}
-  inputSearchStyle={styles.inputSearchStyle}
-  itemTextStyle={{color: 'black'}}
-  
-  data={materialData}  // Updated job data from API
-  
-  search
-  maxHeight={300}
-  labelField="label"  // Field for displaying label in dropdown
-  valueField="value"  // Field for value in dropdown
-  
-  placeholder={materialType}
-  
-  // This ensures the dropdown shows the value from the server or user selection
-  value={materialType}  // Value from the server or selected
-  
-  onFocus={() => setIsFocus(true)}
-  onBlur={() => setIsFocus(false)}
-  
-  onChange={item => {
-//setJobNo(item.value);  // Set the selected job number
-    setMaterialId(item.value);  // Set the selected loading point ID
-    setMaterialType(item.value);  // Update loadingPoint state with selected value
-    
-    console.log('Selected Material ID:', item.value);
-    setIsFocus(false);
-  }}
-
-  // If you want to handle search input
-  onChangeText={text => {
-    setSearchMaterial(text);  // Update search term if needed
-  }}
-/>
-        <Text style={styles.levelText}>Consignor
-          <Text style={{color: 'red'}}> *</Text>
-          </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholderTextColor={'#6c6f73'}
-            style={{
-              color: 'black',
-              fontSize: 15,
-              width: '80%',
-              marginRight: 20,
-            }}
-            value={consignorType}
-            placeholder={'Consignor'}
-            
-            autoCorrect={false}
-            //onChangeText={text => setGrossWt(text)}
-            editable={false}
-          />
-        </View>
-    
-        <Text style={styles.levelText}>Consignee
-          <Text style={{color: 'red'}}> *</Text>
-          </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholderTextColor={'#6c6f73'}
-            style={{
-              color: 'black',
-              fontSize: 15,
-              width: '80%',
-              marginRight: 20,
-            }}
-        
-            placeholder={'Consignee '}
-            value={consigneeType}
-            autoCorrect={false}
-            onChangeText={text => setGrossWt(text)}
-            editable={false}
-          />
-        </View> 
-        </>
-        )} */}
           <Text style={styles.levelText}>Gross Weight
           
           </Text>
@@ -2144,22 +1541,22 @@ const fetchLoading = async (search) => {
           }}
           />
 
-<Text style={styles.levelText}>Attachments</Text>
+{/* <Text style={styles.levelText}>Attachments</Text> */}
 
 {/* Custom file picker for InvoiceDoc */}
 
-<CustomImagePicker 
+{/* <CustomImagePicker 
   title='Choose Client Invoice'
   onFileSelected={(file) => setInvoiceDoc(file)} // Set the file in state
   showFileDetails={true} // Show file details
 />
 
-{/* Custom file picker for ChallanDoc */}
+
 <CustomImagePicker
   title='Choose Challan'
   onFileSelected={(file) => setChallanDoc(file)} // Set the file in state
   showFileDetails={true} 
-/>
+/> */}
   <Text style={styles.levelText}>Remarks</Text>
         <View style={[styles.inputContainer,{height:100}]}>
           <TextInput
