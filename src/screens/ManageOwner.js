@@ -110,18 +110,15 @@ const [singleLoader,setSingleLoader]=useState(false)
   AsyncStorage.getItem('Token')
     .then(token => {
       setapiTokenReceived(token);
-      // console.log('Retrieved token:', token);
     })
     .catch(error => {
       const TokenReceived = useApiToken();
       setapiTokenReceived(TokenReceived);
-      console.log('Received token', apiTokenReceived);
-      console.log('Error retrieving token:', error);
     });
   const FetchSingleOnwer = async(id)=>{
 setSingleLoader(true)
 try {
-  const response =await fetch(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${id}`,
+  const response =await fetch(`https://Exim.Tranzol.com/api/FetchDataApi/GetAppOwnerById?id=${id}`,
     {
           method: 'GET',
           headers: {
@@ -131,8 +128,8 @@ try {
         });
   const data =await response.json();
   console.log('Single Owner Data:', data);
-  if(data.apiResult?.Result){
-    setSelectedOwner(data.apiResult.Result)  
+  if(data?.owner){
+    setSelectedOwner(data.owner)  
     
   }else{
     Alert.alert("No Data Found")
@@ -150,11 +147,11 @@ try {
   setIsLoading(true);
     try {
       const response = await fetch(`https://Exim.Tranzol.com/api/FetchDataApi/GetOwnerPendingApprove?search=${search}`);
-      console.log('Fetch URL:', `https://Exim.Tranzol.com/api/FetchDataApi/GetOwnerPendingApprove?search=${search}`);
+      //console.log('Fetch URL:', `https://Exim.Tranzol.com/api/FetchDataApi/GetOwnerPendingApprove?search=${search}`);
       const data = await response.json();
       if (data?.Entities) {
         setOwnerList(data.Entities);
-        console.log('Owner data fetched successfully:', data.Entities);
+       // console.log('Owner data fetched successfully:', data.Entities);
       } else {
         console.warn('Unexpected response format', data);
         setOwnerList([]);
@@ -170,7 +167,7 @@ try {
 useEffect(() => {
   const handler = setTimeout(() => {
     FetchOwnerData(search || '');
-  }, 500); // waits 500ms after user stops typing
+  }, 700); // waits 500ms after user stops typing
 
   return () => clearTimeout(handler);
 }, [search]);
@@ -183,7 +180,7 @@ const imageList = [
 
 
   const openDetails = item => {
-    FetchSingleOnwer(item.PanNo)
+    FetchSingleOnwer(item.Id)
     // setSelectedOwner(item);
     setModalVisible(true);
   };
@@ -295,11 +292,6 @@ const imageList = [
         <Text style={styles.detailKey}>P. Mobile No</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 2 }}>
           <Text style={styles.detailValue}>{selectedOwner.PrimaryMobileNo} </Text>
-          <Icon
-            name={selectedOwner.isPCVerified ? 'check-circle' : 'times-circle'}
-            size={18}
-            color={selectedOwner.isPCVerified ? 'green' : 'red'}
-          />
         </View>
       </View>
 
@@ -307,11 +299,6 @@ const imageList = [
         <Text style={styles.detailKey}>S. Mobile No</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 2 }}>
           <Text style={styles.detailValue}>{selectedOwner.SecondaryNo} </Text>
-          <Icon
-            name={selectedOwner.isSCVerified ? 'check-circle' : 'times-circle'}
-            size={18}
-            color={selectedOwner.isSCVerified ? 'green' : 'red'}
-          />
         </View>
       </View>
      <View style={styles.detailRow}>
@@ -333,11 +320,6 @@ const imageList = [
       </View>
 
       <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Bank ID</Text>
-        <Text style={styles.detailValue}>{selectedOwner.BankId}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
         <Text style={styles.detailKey}>Account</Text>
         <Text style={styles.detailValue}>{selectedOwner.Account}</Text>
       </View>
@@ -350,11 +332,6 @@ const imageList = [
       <View style={styles.detailRow}>
         <Text style={styles.detailKey}>Address</Text>
         <Text style={styles.detailValue}>{selectedOwner.ZipCode}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Status</Text>
-        <Text style={styles.detailValue}>{selectedOwner.ApproveStatus}</Text>
       </View>
     </>
   )

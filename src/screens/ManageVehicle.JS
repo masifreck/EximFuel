@@ -15,11 +15,20 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import ImageViewing from 'react-native-image-viewing';
 import CustomCheckbox from '../components/CustomeCheckBox'; // Ensure this exists or adjust
 import { darkBlue } from '../components/constant'; // Update according to your theme/colors
-//import dummyDrivers from '../data/dummyDrivers'; // Dummy data file
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 const ManageVehicle = () => {
+    const [apiTokenReceived, setapiTokenReceived] = useState();
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+    });
   const [search, setSearch] = useState('');
   const [selectedVehicle, setSelectedDriver] = useState(null);  
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,10 +37,41 @@ const ManageVehicle = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [vehicleList,setVehicleList]=useState([]);
   const [isLoading, setIsLoading] = useState(false);
- const FetchVehicleData = async () => {
+  const [vehicleData,setVehicleData]=useState([]);
+const [singleLoader,setSingleLoader]=useState(false);
+
+   const FetchSingleVehicle = async(id)=>{
+  setSingleLoader(true)
+  try {
+    const response =await fetch(`https://Exim.Tranzol.com/api/FetchDataApi/GetAppVehicleById?id=${id}`,
+      {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Basic ${apiTokenReceived}`,
+            },
+          });
+    const data =await response.json();
+   // console.log('Single vehicle Data:', data);
+    if(data?.vehicle){
+      setVehicleData(data.vehicle)  
+      
+    }else{
+      Alert.alert("No Data Found")
+    }
+  
+  }catch(error){
+    console.error('Error fetching single owner data:', error);
+    Alert.alert("Error fetching data")  
+  
+    }finally{
+      setSingleLoader(false)
+    }
+  }
+ const FetchVehicleData = async (search) => {
   setIsLoading(true);
     try {
-      const response = await fetch('https://Exim.Tranzol.com/api/FetchDataApi/GetVehiclePendingApprove?search=');
+      const response = await fetch(`https://Exim.Tranzol.com/api/FetchDataApi/GetVehiclePendingApprove?search=${search}`);
       const data = await response.json();
       if (data?.Entities) {
         setVehicleList(data.Entities);
@@ -49,49 +89,48 @@ const ManageVehicle = () => {
   };
 
   useEffect(() => {
-    FetchVehicleData();
-  }, []);
+    const handler=setTimeout(()=>{
+    FetchVehicleData( search || '');
+    },700)
+    return()=>clearTimeout(handler)
+  }, [search]);
   const imageList = [
     require('../assets/truckleft.png'),
     require('../assets/rcfrontnew.png'),
     require('../assets/driver.png'),
   ];
 
-  const filteredDrivers = vehicleList.filter(
-    item =>
-      item.VehicleNo?item.VehicleNo.toLowerCase().includes(search.toLowerCase()) :'' ||
-      item.EngineNo?item.EngineNo.toLowerCase().includes(search.toLowerCase()) :''
-  );
-
   const openDetails = item => {
-    setSelectedDriver(item);
+FetchSingleVehicle(item.Id)
     setModalVisible(true);
   };
-  if (isLoading) {
-    return <ActivityIndicator size="large" color="blue" />;
-  }
+  
   return (
     <View style={styles.container}>
       {/* Search Bar */}
       <TextInput
-        placeholder="Search by Vehicle No or Engine No"
+        placeholder="Search by Vehicle No"
         style={styles.searchBar}
         value={search}
         onChangeText={setSearch}
+        autoCapitalize='characters'
       />
 
-      {/* Table */}
+      {isLoading? (
+        <ActivityIndicator size={"Large"} color={darkBlue} />
+      ) : (
+   
       <ScrollView horizontal>
         <View>
           <View style={[styles.row, styles.headerRow]}>
-            <Text style={[styles.cell, styles.headerCell]}>Vehicle No</Text>
+            <Text style={[styles.cell, styles.headerCell,{paddingLeft:10}]}>Vehicle No</Text>
             <Text style={[styles.cell, styles.headerCell]}>Engine No.</Text>
             <Text style={[styles.cell, styles.headerCell]}>Status</Text>
              <Text style={[styles.cell, styles.headerCell]}>Created By</Text>
           </View>
 
           <FlashList
-            data={filteredDrivers}
+            data={vehicleList}
             keyExtractor={(item, index) => index.toString()}
             estimatedItemSize={50}
             renderItem={({ item, index }) => (
@@ -102,7 +141,7 @@ const ManageVehicle = () => {
                     { backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#fff' },
                   ]}
                 >
-                  <Text style={styles.cell}>{item.VehicleNo}</Text>
+                  <Text style={[styles.cell,{paddingLeft:10}]}>{item.VehicleNo}</Text>
                   <Text style={styles.cell}>{item.EngineNo}</Text>
                   <Text
                     style={[
@@ -119,7 +158,7 @@ const ManageVehicle = () => {
           />
         </View>
       </ScrollView>
-
+   )}
       {/* Modal */}
       <Modal
         visible={modalVisible}
@@ -134,24 +173,24 @@ const ManageVehicle = () => {
 
           <View style={styles.modalContent}>
             <ScrollView showsVerticalScrollIndicator={false}>
-              {selectedVehicle && (
+              {vehicleData && (
                 <>
               {[
-  ['ID', selectedVehicle.Id],
-  ['Vehicle No', selectedVehicle.VehicleNo],
-  ['RC No', selectedVehicle.EngineNo],
-  ['Chassis No.', selectedVehicle.chasisNo],
-  ['State Permit No', selectedVehicle.statePermitNo],
-  ['Owner Name', selectedVehicle.ownerName],
-  ['Owner\'s Father', selectedVehicle.ownerFatherName],
-  ['Owner\'s Address', selectedVehicle.ownerAddress],
-  ['Model', selectedVehicle.model],
-  ['Color', selectedVehicle.color],
-  ['Mfg. Month/Year', selectedVehicle.manufacturingMonthYear],
-  ['Registration Date', selectedVehicle.registrationDate],
-  ['Insurance Validity', selectedVehicle.insuranceValidTill],
-  ['Status', selectedVehicle.Status],
-  ['Created By', selectedVehicle.CreatedBy],
+  ['ID', vehicleData.Id],
+  ['Vehicle No', vehicleData.VehicleNo],
+  ['RC No', vehicleData.EngineNo],
+  ['Chassis No.', vehicleData.chasisNo],
+  ['State Permit No', vehicleData.statePermitNo],
+  ['Owner Name', vehicleData.ownerName],
+  ['Owner\'s Father', vehicleData.ownerFatherName],
+  ['Owner\'s Address', vehicleData.ownerAddress],
+  ['Model', vehicleData.model],
+  ['Color', vehicleData.color],
+  ['Mfg. Month/Year', vehicleData.manufacturingMonthYear],
+  ['Registration Date', vehicleData.registrationDate],
+  ['Insurance Validity', vehicleData.insuranceValidTill],
+  ['Status', vehicleData.Status],
+  ['Created By', vehicleData.CreatedBy],
 ].map(([label, value]) => (
   <View key={`${label}-${value}`} style={styles.detailRow}>
     <Text style={styles.detailKey}>{label}</Text>
@@ -159,7 +198,7 @@ const ManageVehicle = () => {
   </View>
 ))}
 
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
+                  {/* <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
                     {imageList.map((img, idx) => (
                       <TouchableOpacity
                         key={idx}
@@ -175,7 +214,7 @@ const ManageVehicle = () => {
                         />
                       </TouchableOpacity>
                     ))}
-                  </View>
+                  </View> */}
 
                   <View style={styles.actionContainer}>
                     <TextInput multiline placeholder="Reason / Remark" style={styles.input} />
@@ -247,9 +286,10 @@ const styles = StyleSheet.create({
   },
   cell: {
     width: 120,
-    paddingHorizontal: 10,
+    paddingHorizontal: 2,
     color: '#023047',
-    fontSize:12 
+    fontSize:13, 
+    paddingVertical:5
   },
   headerCell: {
     fontWeight: 'bold',

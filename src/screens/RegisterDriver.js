@@ -387,7 +387,7 @@ const RegisterDriver = ({route}) => {
       .then(data => {
         setIsLoading(false);
         if (data.apiResult.Result !== null) {
-           Alert.alert('Registration Successful', 'Owner registered successfully!', )
+           Alert.alert('Registration Successful', 'Driver registered successfully!', )
           navigation.goBack();
         } else if (data.apiResult.Result === null) {
           if (

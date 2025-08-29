@@ -14,10 +14,19 @@ import { FlashList } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ImageViewing from 'react-native-image-viewing';
 import CustomCheckbox from '../components/CustomeCheckBox'; // Ensure this exists or adjust
-import { darkBlue } from '../components/constant'; // Update according to your theme/colors
-//import dummyDrivers from '../data/dummyDrivers'; // Dummy data file
+import { darkBlue, textColor } from '../components/constant'; // Update according to your theme/colors
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ManageDriver = () => {
+  const [apiTokenReceived, setapiTokenReceived] = useState();
+  AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+    });
   const [search, setSearch] = useState('');
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -25,19 +34,50 @@ const ManageDriver = () => {
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 const [isLoading,setIsLoading]=useState(false);
-const [driverList, setDriverList] = useState([]); // Replace with actual data fetching logic
+const [driverList, setDriverList] = useState([]); 
+const [driverData,setDriverData]=useState([]);
+const [singleLoader,setSingleLoader]=useState(false);
   const imageList = [
     require('../assets/dlpng.webp'),
     require('../assets/aadhaar.png'),
     require('../assets/driver.png'),
   ];
- const FetchDriverData = async () => {
+    const FetchSingleDriver = async(id)=>{
+  setSingleLoader(true)
+  try {
+    const response =await fetch(`https://Exim.Tranzol.com/api/FetchDataApi/GetAppDriverById?id=${id}`,
+      {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Basic ${apiTokenReceived}`,
+            },
+          });
+    const data =await response.json();
+   // console.log('Single driver Data:', data);
+    if(data?.driver){
+      setDriverData(data.driver)  
+      
+    }else{
+      Alert.alert("No Data Found")
+    }
+  
+  }catch(error){
+    console.error('Error fetching single owner data:', error);
+    Alert.alert("Error fetching data")  
+  
+    }finally{
+      setSingleLoader(false)
+    }
+  }
+ const FetchDriverData = async (search) => {
   setIsLoading(true);
     try {
-      const response = await fetch('https://Exim.Tranzol.com/api/FetchDataApi/GetDriverPendingApprove?search=');
+      const response = await fetch(`https://Exim.Tranzol.com/api/FetchDataApi/GetDriverPendingApprove?search=${search}`);
       const data = await response.json();
       if (data?.Entities) {
         setDriverList(data.Entities);
+
       } else {
         console.warn('Unexpected response format', data);
         setDriverList([]);
@@ -51,43 +91,44 @@ const [driverList, setDriverList] = useState([]); // Replace with actual data fe
   };
 
   useEffect(() => {
-    FetchDriverData();
-  }, []);
-  const filteredDrivers = driverList.filter(
-    item =>
-      item.DriverName?item.DriverName.toLowerCase().includes(search.toLowerCase()) :'' ||
-      item.DLNumber?item.DLNumber.toLowerCase().includes(search.toLowerCase()) :''
-  );
+    const handler=setTimeout(()=>{
+    FetchDriverData(search || '');
+},700)
+return()=>clearTimeout(handler)
+  }, [search]);
+
 
   const openDetails = item => {
-    setSelectedDriver(item);
+FetchSingleDriver(item.Id)
     setModalVisible(true);
   };
-  if (isLoading) {
-    return <ActivityIndicator size="large" color="blue" />;
-  }
+
   return (
     <View style={styles.container}>
       {/* Search Bar */}
       <TextInput
-        placeholder="Search by License No or Driver Name"
+        placeholder="Search by License No......."
         style={styles.searchBar}
         value={search}
         onChangeText={setSearch}
+        autoCapitalize='characters'
       />
 
-      {/* Table */}
+      {isLoading? (
+        <ActivityIndicator size={"large"} color={darkBlue} style={{marginTop:20}} />
+      ) :  (
+   
       <ScrollView horizontal>
         <View>
           <View style={[styles.row, styles.headerRow]}>
-            <Text style={[styles.cell, styles.headerCell]}>Name</Text>
+            <Text style={[styles.cell, styles.headerCell,{paddingLeft:10}]}>Name</Text>
             <Text style={[styles.cell, styles.headerCell]}>License No</Text>
             <Text style={[styles.cell, styles.headerCell]}>Status</Text>
              <Text style={[styles.cell, styles.headerCell]}>Created By</Text>
           </View>
 
           <FlashList
-            data={filteredDrivers}
+            data={driverList}
             keyExtractor={(item, index) => index.toString()}
             estimatedItemSize={50}
             renderItem={({ item, index }) => (
@@ -95,10 +136,10 @@ const [driverList, setDriverList] = useState([]); // Replace with actual data fe
                 <View
                   style={[
                     styles.row,
-                    { backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#fff' },
+                    { backgroundColor: index % 2 === 0 ? '#f9f9f9' : '#fff',height:50  },
                   ]}
                 >
-                  <Text style={styles.cell}>{item.DriverName}</Text>
+                  <Text style={[styles.cell,{paddingLeft:10}]}>{item.DriverName}</Text>
                   <Text style={styles.cell}>{item.DLNumber}</Text>
                   <Text
                     style={[
@@ -115,7 +156,7 @@ const [driverList, setDriverList] = useState([]); // Replace with actual data fe
           />
         </View>
       </ScrollView>
-
+   )}
       {/* Modal */}
       <Modal
         visible={modalVisible}
@@ -130,21 +171,17 @@ const [driverList, setDriverList] = useState([]); // Replace with actual data fe
 
           <View style={styles.modalContent}>
             <ScrollView showsVerticalScrollIndicator={false}>
-              {selectedDriver && (
+              {driverData && (
                 <>
                   {[
-                    ['Id', selectedDriver.Id],
-                    ['Name', selectedDriver.DriverName],
-                    ['License No', selectedDriver.DLNumber],
-                    ['DOB', selectedDriver.Dob],
-                    ['Mobile', selectedDriver.Mobile],
-                    ['Email', selectedDriver.Email],
-                    ['Adhar No',selectedDriver.AdharNo],
-                    ['PAN No', selectedDriver.PanNo],
-
-                    ['Address', selectedDriver.Address],
-                    ['Status', selectedDriver.Status],
-                    ['Created By',selectedDriver.CreatedBy]
+                    ['Id', driverData.Id],
+                    ['Name', driverData.DriverName],
+                    ['License No', driverData.DLNumber],
+                    ['DOB', driverData.Dob],
+                    ['Email', driverData.DriverEmail],
+                    ['Adhar No',driverData.AdharNo],
+                    ['PAN No', driverData.PanNo],
+                    ['Address', driverData.DriverAddress]
                   ].map(([label, value]) => (
                     <View key={label} style={styles.detailRow}>
                       <Text style={styles.detailKey}>{label}</Text>
@@ -155,26 +192,16 @@ const [driverList, setDriverList] = useState([]); // Replace with actual data fe
                    <View style={styles.detailRow}>
                         <Text style={styles.detailKey}>P. Mobile No</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' ,flex:2}}>
-                          <Text style={styles.detailValue}>{selectedDriver.PMobileNo} </Text>
-                          <Icon
-                            name={selectedDriver.isPCVerified ? 'check-circle' : 'times-circle'}
-                            size={18}
-                            color={selectedDriver.isPCVerified ? 'green' : 'red'}
-                          />
+                          <Text style={styles.detailValue}>{driverData.PrimaryContactNo} </Text>
                         </View>
                       </View>
  <View style={styles.detailRow}>
       <Text style={styles.detailKey}>S.Mobile No</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center' ,flex:2}}>
-        <Text style={styles.detailValue}>{selectedDriver.SMobileNo} </Text>
-        <Icon
-          name={selectedDriver.isSCVerified ? 'check-circle' : 'times-circle'}
-          size={18}
-          color={selectedDriver.isSCVerified ? 'green' : 'red'}
-        />
+        <Text style={styles.detailValue}>{driverData.SecondaryContactNo} </Text>
       </View>
     </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
+                  {/* <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
                     {imageList.map((img, idx) => (
                       <TouchableOpacity
                         key={idx}
@@ -190,7 +217,7 @@ const [driverList, setDriverList] = useState([]); // Replace with actual data fe
                         />
                       </TouchableOpacity>
                     ))}
-                  </View>
+                  </View> */}
 
                   <View style={styles.actionContainer}>
                     <TextInput multiline placeholder="Reason / Remark" style={styles.input} />
@@ -242,11 +269,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: darkBlue,
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     marginBottom: 10,
     elevation: 4,
     backgroundColor: '#edf2f4',
+    color:textColor,
+fontSize:18
   },
   row: {
     flexDirection: 'row',
@@ -262,9 +291,9 @@ const styles = StyleSheet.create({
   },
   cell: {
     width: 120,
-    paddingHorizontal: 10,
+    paddingHorizontal:3,
     color: '#023047',
-    fontSize:12 
+    fontSize:13 
   },
   headerCell: {
     fontWeight: 'bold',
@@ -294,11 +323,13 @@ const styles = StyleSheet.create({
   detailKey: {
     fontWeight: 'bold',
     color: '#000',
+    flex:1
   },
   detailValue: {
     color: '#333',
     flex: 1,
-    textAlign: 'right',
+    textAlign: 'left',
+    flex:2
   },
   actionContainer: {
     marginTop: 10,
