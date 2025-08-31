@@ -142,87 +142,6 @@ navigation.navigate('qrcode', {
       handleShowToast();
     }
   };
-  // useEffect(() => {
-  //   if (Object.keys(fetchedData).length === 0) {
-  //     console.log('fetcheddata is empty');
-  //   } else {
-  //     setShowQRCodeFullPage(true);
-  //     handleViewButtonPress();
-  //   }
-  // }, [fetchedData]);
-
-
-  // const handleViewButtonPress = async () => {
-    
-  //   try {
-  //     let htmlToPrint = '';
-  
-  //     // Check the selected print option and assign the appropriate HTML content
-  //     if (selectedPrint === '1') {
-  //       // Print combined HTML (HTMLContent + FreightMemo with page break)
-  //       htmlToPrint = `
-  //         ${HTMLContent(fetchedData,qrData)} 
-  //         <div style="page-break-after: always;"></div>
-  //         ${ConsignorHTML(fetchedData, qrData)} 
-  //          <div style="page-break-after: always;"></div>
-  //          ${ConsigneeHTML(fetchedData,qrData)}
-  //           <div style="page-break-after: always;"></div> 
-  //           ${DriverHTML(fetchedData,qrData)}
-  //           `;
-  //     } else if (selectedPrint === '2') {
-  //       // Print only HTMLContent
-  //       htmlToPrint = `${FreightMemo(fetchData)}`;
-  //     } else if (selectedPrint === '3') {
-  //       // Print only FreightMemo
-  //       htmlToPrint = `${FuelSlip(fetchedData)}`;
-  //     }
-     
-  //     else if (selectedPrint === '4'){
-  //       htmlToPrint =  `${HTMLContent(fetchedData,qrData)}`
-  //     }
-  //     else if (selectedPrint === '5'){
-  //       htmlToPrint =  `${DriverHTML(fetchedData,qrData)}`
-  //     }
-  //     else if (selectedPrint === '6'){
-  //       htmlToPrint =  `${ConsigneeHTML(fetchedData,qrData)}`
-  //     }
-  //     else if (selectedPrint === '7'){
-  //       htmlToPrint =  `${ConsignorHTML(fetchedData,qrData)}`
-  //     }
-  //     else if (selectedPrint === '8'){
-  //       htmlToPrint =  `${FuelSlip(fetchedData)}
-  //       ${FreightMemo(fetchedData)}`
-  //     }
-  //     else {
-  //       seterrorMessage('Invalid selection');
-  //       setShowAlert(true);
-  //       return; // Exit if an invalid option is selected
-  //     } 
-  
-  //     // Convert the selected HTML content to PDF
-  //     const { filePath } = await RNHTMLtoPDF.convert({
-  //       html: htmlToPrint, // Use the selected HTML content
-  //       fileName: `${ChallanNo}challan.pdf`,
-  //       directory: 'Documents',
-  //     });
-  
-  //     // Print the generated PDF
-  //     if (Platform.OS === 'ios') {
-  //       await RNPrint.print({
-  //         filePath: filePath,
-  //       });
-  //     } else {
-  //       await RNPrint.print({
-  //         filePath: filePath,
-  //         jobName: 'Challan',
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log('Error printing PDF: ', error);
-  //     seterrorMessage('Error printing PDF:');
-  //     setShowAlert(true);
-  //   }
-  // };
   
   const handleSubmit = () => {
     if (ChallanNo.length === 0) {
@@ -285,7 +204,6 @@ navigation.navigate('qrcode', {
               placeholderTextColor='black'
               placeholder="Enter Challan Number"
               value={ChallanNo}
-              keyboardType="numeric"
               onChangeText={text => setChallanNo(text)}
             />
           </View>

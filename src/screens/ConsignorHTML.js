@@ -1,6 +1,6 @@
 import {ElBase64} from '../components/Elbase';
 
-export const ConsignorHTML = (data, qrData,type) => {
+export const ConsignorHTML = (data, qrData, type) => {
   console.log('qr data ON consignee html', qrData);
   return `
       <!DOCTYPE html>
@@ -35,11 +35,13 @@ export const ConsignorHTML = (data, qrData,type) => {
     .topsection {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: space-evenly;
       margin-bottom: 0px;
     }
     .qr{
       margin-right: 2px;
+      flex:1;
+      align-item:right;
     }
     h1 {
       text-align: center;
@@ -50,9 +52,9 @@ export const ConsignorHTML = (data, qrData,type) => {
     }
     p {
       text-align: center;
-      margin-top: -6px;
+      margin-top: 0px;
       font-size: 9px;
-      margin-block-end: 0.5em;
+      margin-block-end: 0.1em;
     }
     h6 {
       align-self: center;
@@ -83,6 +85,7 @@ h4  {
       font-weight: lighter;
     }
     .insurancecontainer{
+    flex:1;
       display: grid;
       justify-content: center;
       align-items: center;
@@ -99,14 +102,14 @@ h4  {
     .secondblock {
       display: flex;
       flex-direction: row;
-      gap: 20px;
+      gap: 5px;
       justify-content: space-between;
       border-collapse: collapse;
       border-top: 1px solid #000;
 border-bottom: 1px solid #000;
 
       padding: 10px;
-      padding-top: 20px;
+      padding-top: 0px;
       padding-bottom: 0px;
       margin-bottom: 5px;
     }
@@ -159,7 +162,7 @@ border-bottom: 1px solid #000;
       background-color: #a09e9e;
     }
     .itgbg {
-      height: 50px;
+      height: 20px;
     }
     .title-section {
       text-align: center;
@@ -222,14 +225,14 @@ font-size: 12px;
 font-weight: bold;
     }
 .challan {
- font-size: 10px;
+ font-size: 12px;
   font-weight: bold;
-  margin-top: 10px;
+  margin-top: 0px;
   margin-left: 10px;
   width:150px;
 }
 .exim {
-  margin-right: 20px;
+  flex:4;
 }
 .notediv{
   display: flex;
@@ -259,7 +262,8 @@ padding-left: 10px;
   text-align: left;
 }
 .gsttextcontainer{
-  width: 50%;
+  width: 95%;
+  margin-top:-10px;
 }
 .gsttext{
   font-size: 9px;
@@ -277,11 +281,10 @@ padding-left: 10px;
   width: 20%;
 }
    .challantype {
-  font-size: 16px;
+  font-size: 12px;
   font-weight: bold;
-  margin:auto;
+  margin-left:10px;
   margin-top:2px;
-  width:150px;
 }
 @media print {
             * {
@@ -294,77 +297,115 @@ padding-left: 10px;
       <body></body>
   <div class="block-line">
     <div class="topsection">
-      <div>
-     
-  <img src="${ElBase64}" alt="Flowers in Chania" width="70" height="70" margin-left="20">
-   <p class="challan">Challan No.:${data.ChallanNo}</p>
-   
+
+      <div style="flex:1 margin-left:10px">
+  <img src="${ElBase64}" alt="Flowers in Chania" width="90" height="90" margin-left="20">
+ 
 </div>
+
   <div class="exim">
-  <h1>EXIM LOGISTICS PVT. LTD.</h1>
-  
+  <h1 style="margin-top:-3px;">EXIM LOGISTICS PVT. LTD.</h1>
   <p>A :DCB-928-931. 9TH Floor, DLF Cybercity, Chandaka Industrial Estate, Patia</p>
-  <p>Bhubaneswar-751024, Odisha, India, Phone: (0674) 7107777 to 7887 (110 Lines)</p>
+  <p>Bhubaneswar-751024, Odisha, India, Phone: (0674) 6637777 to 7887 (110 Lines)</p>
   <p>E-mail:info@eximlogistics.in, Website: www.eximlogistics.com</p>
-  <p>CIN NO.: U630120R2006PTC06039</p>
-  
+  <p>CHA Licence No.: 07/2012, Transport Regd. No.: 02/2015</p>
+    <p class="challantype">${type}</p>
 </div>
+
 <div class="qr">
-<img src="data:image/png;base64,${qrData}" alt="QR Code" width="80" height="80" >
- <p class="challantype">${type}</p>
+<img style="margin-left:50px;" src="data:image/png;base64,${qrData}" alt="QR Code" width="80" height="80" >
+ <p class="challan">Challan No.:${data.ChallanNo}</p>
+</div>
 
 </div>
-</div>
+
 <div class="secondblock" >
-<div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px;">
+<div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; border-right: 1px solid black; padding-right:5px;
+padding-top:15px; flex:1;">
   <h4 style="font-weight: bold; margin-block-end: 0.9em;width: 100px;">Cosinor Name & Address:</h4>
-  <h4 style="margin-block-end: 0.9em;">${data.ConsignorName}</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.ConsignorName ? data.ConsignorName : ''
+  }</h4>
 
   <h4 style="font-weight: bold; margin-block-end: 0.9em;">Loading Place:</h4>
-  <h4 style="margin-block-end: 0.9em;">${data.LoadingPoint}</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.LoadingPoint ? data.LoadingPoint : ''
+  }</h4>
 
-  <h4 style="font-weight: bold; margin-block-end: 0.9em;">Vehicle No:</h4>
-  <h4 style="margin-block-end: 0.9em;">${data.VehicleNo}</h4>
-
-  <h4 style="font-weight: bold; margin-block-end: 0.9em;">Engine No:</h4>
-  <h4 style="margin-block-end: 0.9em;"></h4>
-
-  <h4 style="font-weight: bold; margin-block-end: 0.9em;">Chassis No:</h4>
-  <h4 style="margin-block-end: 0.9em;"></h4>
-</div>
-
-<div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px;">
-  <h4 style=" font-weight: bold;margin-block-end: 0.9em; width: 100px;">Consignee Name & Address:</h4>
-  <h4 style="margin-block-end: 0.9em;">${data.ConsigneeName}</h4>
+   <h4 style=" font-weight: bold;margin-block-end: 0.9em; width: 100px; margin-top:10px;">Consignee Name & Address:</h4>
+  <h4 style="margin-block-end: 0.9em;margin-top:10px;">${
+    data?.ConsigneeName ? data.ConsigneeName : ''
+  }</h4>
 
   <h4 style= "font-weight: bold;margin-block-end: 0.9em;">Unloading Place:</h4>
   <h4 style="margin-block-end: 0.9em;">${data.UnloadingPoint}</h4>
 
+</div>
+
+<div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; border-right: 1px solid black; padding-top:15px; flex:1;" >
+ <h4 style="font-weight: bold; margin-block-end: 0.9em;">Vehicle No:</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.VehicleNo ? data.VehicleNo : ''
+  }</h4>
+
+  <h4 style="font-weight: bold; margin-block-end: 0.9em;">Engine No:</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.EngineNo ? data.EngineNo : ''
+  }</h4>
+
+  <h4 style="font-weight: bold; margin-block-end: 0.9em;">Chassis No:</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.ChassisNo ? data.ChassisNo : ''
+  }</h4>
+
+  <h4 style="font-weight: bold; margin-block-end: 0.9em;">Puc Validity:</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.PucValidity ? data.PucValidity : ''
+  }</h4>
+
+  <h4 style="font-weight: bold; margin-block-end: 0.9em;">Insurance V:</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.InsuranceValidity ? data.InsuranceValidity : ''
+  }</h4>
+</div>
+
+<div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; padding-top:15px; flex:1;">
+
   <h4 style=" font-weight: bold;margin-block-end: 0.9em;">STO NO.:</h4>
-  <h4 style="margin-block-end: 0.9em;">123456790</h4>
+  <h4 style="margin-block-end: 0.9em;">${data?.STONo ? data.STONo : ''}</h4>
 
   <h4 style="font-weight: bold;margin-block-end: 0.9em;">Loading Date:</h4>
-  <h4 style="margin-block-end: 0.9em;">${data.LoadDate}</h4>
+  <h4 style="margin-block-end: 0.9em;">${data?.LoadDate? data.LoadDate.split('T')[0] : ''}</h4>
 
   <h4 style="font-weight: bold;margin-block-end: 0.9em;">Invoice No.:</h4>
-  <h4 style="margin-block-end: 0.9em;">${data.ClientInvoiceNo1} ${data.ClientInvoiceNo2} ${data.ClientInvoiceNo3}</h4>
+  <h4 style="margin-block-end: 0.9em;">${data.ClientInvoiceNo1} </h4>
 
   <h4 style="font-weight: bold;margin-block-end: 0.9em;">DEL No:</h4>
   <h4 style="margin-block-end: 0.9em;">${data.DelNo}</h4>
 
-  
+    <h4 style="font-weight: bold; width:70%;">EwayBillNo & Valdity upto:</h4>
+          <h4 style="margin-block-end: 0.9em;">${
+            data?.EwayBillNo1
+          }</h4>
+
 </div>
+
+ 
+        
+  
+
 </div>
 
 
 <h5 class="caution">CAUTION: <span>This consignement will not be detained diverted, re-round or rebooked without Consignee Banks written Permission. 
   It will be delivered at the destination.</span></h5>
+
   <div class="thirdblock">
     <div class="insurancecontainer">
-      <h4 class="marginleft" style="margin-top: 0px;">INSURANCE</h4>
+      <h4 class="marginleft" style="margin-top: 2px;">INSURANCE</h4>
       <h4 style="padding-left: 5px;">The Customer has stated that:
       </h4>
-      <h4 class="marginleft">he has not insured <span class="or">   OR</span></h4>
+      <h4 style="padding-left: 5px;">>he has not insured <span class="or">   OR</span></h4>
       
       <h4 style="padding-left: 5px;">he has insured the Consignment</h4>
       <div class="insuranceblockdiv">
@@ -380,41 +421,54 @@ padding-left: 10px;
                 <h5>Amount...................Date................</h5>
                       </div>
     </div>
-    <div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px;  margin-right:auto;">
-      <h4 style="font-weight: bold; margin-block-end: 0.9em; margin-top: 0px;">Driver Name:</h4>
-      <h4 style="margin-block-end: 0.9em; margin-top: 0px;">${data.DriverName}</h4>
+    <div style="flex:1; display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px;  margin-right:auto;">
+      <h4 style="font-weight: bold; margin-block-end: 0.9em; margin-top: 2px;">Driver Name:</h4>
+      <h4 style="margin-block-end: 0.9em; margin-top: 2px;">${
+        data.DriverName
+      }</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">D.L No.:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.DriverLicenseNo}</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Mobile No.:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
-    
-      <h4 style="font-weight: bold; margin-block-end: 0.9em;">Voter ID No.:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.DriverContact}</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Address:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${
+        data?.DriverAddress +
+        ' ' +
+        data?.DriverStateName +
+        ' ' +
+        data?.DriverPincode
+      }</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Adhar No.:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.DriverAadharNo}</h4>
     </div>
     
-    <div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; border-left: 1px solid black; margin-right:auto; padding-left:10px">
-      <h4 style="font-weight: bold; margin-block-end: 0.9em; margin-top: 0px;">Owner Name:</h4>
-      <h4 style="margin-block-end: 0.9em; margin-top: 0px;">${data.OwnerName}</h4>
+    <div style="flex:1; display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; border-left: 1px solid black; margin-right:auto; padding-left:10px">
+      <h4 style="font-weight: bold; margin-block-end: 0.9em; margin-top: 2px;">Owner Name:</h4>
+      <h4 style="margin-block-end: 0.9em; margin-top: 2px;">${
+        data.OwnerName
+      }</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">PAN No.:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.OwnerPanNo}</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Mobile No.:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.OwnerContactNo}</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Address:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${
+        data?.OnwerAddress +
+        ' ' +
+        data?.OwnerStateName +
+        ' ' +
+        data?.OwnerPincode
+      }</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Adhar No.:</h4>
-      <h4 style="margin-block-end: 0.9em;"></h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.OwnerAadharNo}</h4>
     </div>
     
   </div>
@@ -438,11 +492,11 @@ padding-left: 10px;
         <th>Net Wt</th>
     </tr>
     <tr class="itgbg">
-        <td>${data.LoadType}</td>
-        <td>${data.MaterialName}</td>
-        <td>${data.GrossWt}</td>
-        <td>${data.TareWt}</</td>
-        <td>${data.NetWt}</td>
+        <td>${data?.LoadType}</td>
+        <td>${data?.MaterialName}</td>
+        <td>${data?.GrossWt}</td>
+        <td>${data?.TareWt}</</td>
+        <td>${data?.NetWt}</td>
         <td></td>
         <td></td>
         <td></td>
@@ -451,7 +505,7 @@ padding-left: 10px;
     </tr>
     <tr>
         <!-- Total Materials Value row that spans from Loading to Unloading columns -->
-        <td colspan="8">Total Materials Value:  ${data.MaterialValues}</td>
+        <td colspan="8">Total Materials Value:  ${data?.MaterialValues}</td>
         <td>Advance </td>
         <td></td>
     </tr>
@@ -466,9 +520,9 @@ padding-left: 10px;
 <div class="lastblock" style="display: flex; justify-content: space-between; align-items: flex-start;">
     
   <!-- Left Block -->
-  <div class="lastblockdiv" style="flex: 1; border-right: 1px solid #000;">
+  <div class="lastblockdiv" style="flex: 2; border-right: 1px solid #000;">
       <!-- Centered Heading -->
-      <p class="center" style="text-align: center; font-weight: bold; ">
+      <p class="center" style="text-align: center; font-weight: bold; margin-top:2px;">
           RECEIVER CONFIRMATION
       </p>
 
@@ -508,17 +562,13 @@ padding-left: 10px;
   
   <!-- Right Block -->
   <div class="lastblockdiv" style="flex: 1;">
-      <p class="center" style="text-align: center; font-weight: bold;">
-          SEAL NOS.
-      </p>
     
-      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000; margin-top: -7px;">
-          <h4 style="font-weight: bold; margin: 2px 0; padding-left: 5px;">EwayBillNo:</h4>
-          <h4 style="margin: 5px 0; padding-left: 5px;">${data.EwayBillNo1} ${data.EwayBillNo2} ${data.EwayBillNo3}</h4>
-      </div>
+   
       <div style="display: flex; justify-content: space-between;">
         <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">GPS No.</h4>
-        <h4 style="margin: 1px 0; padding-left: 5px;">${data.GPSNo}</h4>
+        <h4 style="margin: 1px;margin-top:3px; padding-left: 5px;">${
+          data?.GPSNo ? data.GPSNo : ''
+        }</h4>
     </div>
     <div style="display: flex; justify-content: space-between;">
       <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
@@ -528,16 +578,19 @@ padding-left: 10px;
     <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
     <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
 </div>
-
-
-      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000; margin-top: 2px;">
-        <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px ;">Signature & Seal:</h4>
-        <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
-    </div>
-      <div style="display: flex; justify-content: space-between;">
+   <div style="display: flex; justify-content: space-between;">
           <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Remarks:</h4>
-          <h4 style="margin: 1px 0; padding-left: 5px;">${data.Remarks}</</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;">${
+            data?.Remarks ? data.Remarks : ''
+          }</</h4>
       </div>
+      <div style="display: flex; justify-content: space-between;">
+        <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px ;">Seal:</h4>
+        <h4 style="margin: 5px 0; padding-left: 5px;">${
+          data?.SealNo ? data.SealNo : ''
+        }</h4>
+    </div>
+   
   </div>
 </div>
 
@@ -547,13 +600,14 @@ padding-left: 10px;
 </div>
 <div class="notediv2">
   <p class="note">
-    1.Carriers is not responsible for Leakage & Breakage
+    1.Carriers is not responsible for Leakage & Breakage  2.Weight tolerrance is allowed.........% on loaded weight
+      3.We have carefully read the terms and conditions of the back here of & undertake to abide by the terms & condition
   </p>
   <p class="note">
-    2.Weight tolerrance is allowed.........% on loaded weight
+   
   </p>
   <p class="note">
-    3.We have carefully read the terms and conditions of the back here of & undertake to abide by the terms & condition
+  
   </p>
   
 </div>
@@ -573,19 +627,14 @@ padding-left: 10px;
           of the Consignee Bank whose name is mentioned in the Lorry receipt. It will under no of circumstances be delivered to anyone without the written authority from the Consignee Bank 
           or its order enclosed on the Consignee copy or on a separate letter of Authority
         </p>
-      <p class="licence">CHA Licence No.: 07/2012, Transport Regd. No.: 02/2015</p>
+      
       </div>
-     <div class="sign">
-<p class="signtext">Signature of Driver</p>
-     </div>
-     <div class="sign">
-<p class="signtext">For EXIM LOGISTICS PVT. LTD</p>
-     </div>
+ 
     
     </div>
     
-    <div style="display:flex; flex-drirection:row; justify-content:center; gap:10px;padding:5px">
-    <div style="text-align: justify;">
+    <div style="display:flex; flex-drirection:row; justify-content:center; gap:10px;padding:5px; ">
+    <div style="text-align: justify; width:100%"; >
     <p style="font-size:8px;text-align: justify;">TERMS AND CONDITIONS
 
 Goods are accepted and carried under the terms and conditions.</p>
@@ -609,10 +658,11 @@ Goods are accepted and carried under the terms and conditions.</p>
  then the entire loading of the losses including fine, penalty with statutory levy / taxes / GST over the losses as applicable by different central / state govt. agencies / bodies / department and offices from the driver / owner will have to be compensated by the driver / owner from his own account during the period, such losses / damages will be finalized with the appointment of 3rd party surveyor (if satisfied by the owner / driver) and till the period such losses / damages to be paid / compensated by the owner / driver owner's representative(s) in full with the Company's Headquarter (Company) / Branch office (Company) / Sub-Branch office (Company) or 3rd party, the company can take any legal action against the owner / driver (owner's representative) of the vehicle as deemed
   fit in that case to recover the loss. Delay payment of losses includes legal/bank interest.
  </p>
+
     </div>
 
-    <div>
-<p style="font-size:7px;text-align: justify;">
+    <div style="text-align: justify; width:100%";>
+ <p style="font-size:7px;text-align: justify;">
      then the entire loading of the losses including fine, penalty with statutory levy / taxes / GST over the losses as applicable by different central / state govt. agencies / bodies / department and offices from the driver / owner will have to be compensated by the driver / owner from his own account during the period, such losses / damages will be finalized with the appointment of 3rd party surveyor (if satisfied by the owner / driver) and till the period such losses / damages to be paid / compensated by the owner / driver owner's representative(s) in full with the Company's Headquarter (Company) / Branch office (Company) / Sub-Branch office (Company) or 3rd party, the company can take any legal action against the owner / driver (owner's representative) of the vehicle as deemed
   fit in that case to recover the loss. Delay payment of losses includes legal/bank interest.</p>
     <p style="font-size:7px;text-align: justify;">07. During and on timely required E-Way Bill of the loaded materials shall exclusively done by the driver of the vehicle failing which if the vehicle enters into any kind of violations regarding E-Way Bill, the loss caused out of the same reason shall be borne by the driver.
@@ -638,11 +688,20 @@ Goods are accepted and carried under the terms and conditions.</p>
 <p style="font-size:7px;text-align: justify;">
 DECLARATION
 
-I................................................................................................................................................................ driver of the Vehicle No........................................ vide valid DL No..................................................... do here by declare that I have read and understood the above mentioned Terms and Condition properly and again hereby promising to be abided myself with all the terms and condition.
-
-Signature
-
-DRIVER </p>
+I <b>${+' ' + data?.DriverName + ''}</b> driver of the Vehicle No. <b> ${
+    +' ' + data?.VehicleNo + ' '
+  } </b> valid DL No.<b> ${
+    ' ' + data?.DriverLicenseNo + ' '
+  }</b> do here by declare that I have read and understood the above mentioned Terms and Condition properly and again hereby promising to be abided myself with all the terms and condition.
+</p>
+<div style="display: flex; flex-direction:row; width:100%; justify-content:space-evenly; margin-top:50px">
+    <div >
+<p class="signtext">Signature of Driver</p>
+     </div>
+     <div >
+<p class="signtext">For EXIM LOGISTICS PVT. LTD</p>
+     </div>
+</div>
     </div>
     </div>
   </div>

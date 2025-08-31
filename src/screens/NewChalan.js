@@ -152,7 +152,7 @@ const NewChalan = ({navigation, route}) => {
     if (vehicleRes1.ok) {
       const vehicleData1 = await vehicleRes1.json();
       const vehicleList1 = vehicleData1?.apiResult?.Result || [];
-      console.log('vehicle data',vehicleList1) 
+    //  console.log('vehicle data',vehicleList1) 
     setRcValues(vehicleList1?.VehicleRC? vehicleList1.VehicleRC : 'N/A')
      setIsCommercial(vehicleList1.IsCommercial)
       setIsVerified(vehicleList1.IsVerified)
@@ -326,7 +326,8 @@ const NewChalan = ({navigation, route}) => {
   const [brokerData, setBrokerData] = useState([]);
   const [associationData, setAssociationData] = useState([]);
   const [searchPump, setSearchPump] = useState('');
-
+const [STONo,setSTONo]=useState('');
+const [SealNo,setSealNo]=useState('')
   const onSubmitSteps = () => {
     // Perform all validation checks
     if (!jobId) {
@@ -381,6 +382,8 @@ const NewChalan = ({navigation, route}) => {
       TareWt: tierWt ? parseFloat(tierWt) : 0,
       GrossWt: grossWt ? parseFloat(grossWt) : 0,
       NetWt: netWt ? parseFloat(netWt) : 0,
+      STONo : STONo || '',
+      SealNo:SealNo || '',
       TruckSource: truckSource || '',
       OwnerId: ownerId ? parseInt(ownerId, 10) : null,
       LoadingPointId: loadingPointId ? parseInt(loadingPointId, 10) : null,
@@ -726,6 +729,7 @@ const NewChalan = ({navigation, route}) => {
                 margin: 10,
                 fontSize: 14,
                 marginRight: 'auto',
+                fontWeight:'bold'
               }}>
               E-Challan
             </Text>
@@ -755,7 +759,7 @@ const NewChalan = ({navigation, route}) => {
                 <ActivityIndicator size={'large'} color={darkBlue} />
               </>
             ) : (
-              <View style={styles.levelContainer}>
+              <View style={{width:'100%'}}>
                 <View style={{marginTop: 10}}>
                   <CardType2
                     heading="VEHICLE DETAILS"
@@ -764,12 +768,6 @@ const NewChalan = ({navigation, route}) => {
                     borderTopLeftRadius={15}
                     borderTopRightRadius={15}
                   />
-                  {console.log(
-                    'isveryfied',
-                    IsVerified,
-                    'iscommercial',
-                    IsCommercial,
-                  )}
                   <CardType2
                     title="Verification"
                     value={IsVerified ? 'Yes' : 'No'}
@@ -782,7 +780,7 @@ const NewChalan = ({navigation, route}) => {
                     borderBottomRightRadius={16}
                   />
                 
-<TextInput
+{/* <TextInput
   style={{
     borderWidth: 1,
     borderColor: "#ccc",
@@ -800,7 +798,7 @@ const NewChalan = ({navigation, route}) => {
   editable={false}
   multiline={true}
   value={JSON.stringify(rcValues, null, 2)} // pretty printed JSON
-/>
+/> */}
 
 
                 </View>
@@ -1490,6 +1488,38 @@ const NewChalan = ({navigation, route}) => {
                   onChangeText={text => setGuaranteeWt(text)}
                   keyboardType="numeric"
                   value={guaranteewt}
+                />
+              </View>
+<Text style={styles.levelText}>STO No.</Text>
+               <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '80%',
+                    marginRight: 20,
+                  }}
+                  placeholder={'Enter STO No.'}
+                  autoCorrect={false}
+                  onChangeText={text => setSTONo(text)}
+                  value={STONo}
+                />
+              </View>
+<Text style={styles.levelText}>Seal No.</Text>
+               <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '80%',
+                    marginRight: 20,
+                  }}
+                  placeholder={'Enter Seal No.'}
+                  autoCorrect={false}
+                  onChangeText={text => setSealNo(text)}
+                  value={SealNo}
                 />
               </View>
 
