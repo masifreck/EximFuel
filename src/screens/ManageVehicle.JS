@@ -52,7 +52,7 @@ const [singleLoader,setSingleLoader]=useState(false);
             },
           });
     const data =await response.json();
-   // console.log('Single vehicle Data:', data);
+  // console.log('Single vehicle Data:', data);
     if(data?.vehicle){
       setVehicleData(data.vehicle)  
       
@@ -179,22 +179,20 @@ FetchSingleVehicle(item.Id)
   ['ID', vehicleData.Id],
   ['Vehicle No', vehicleData.VehicleNo],
   ['RC No', vehicleData.EngineNo],
-  ['Chassis No.', vehicleData.chasisNo],
+  ['Chassis No.', vehicleData.ChassicNo],
   ['State Permit No', vehicleData.statePermitNo],
-  ['Owner Name', vehicleData.ownerName],
-  ['Owner\'s Father', vehicleData.ownerFatherName],
-  ['Owner\'s Address', vehicleData.ownerAddress],
-  ['Model', vehicleData.model],
-  ['Color', vehicleData.color],
+  ['Owner Name', vehicleData.OwnerName],
+  ['Pollution No', vehicleData.PollutionNo],
+  ['Fitness No', vehicleData.FitnessNo],
+  ['Road Tax No', vehicleData.RoadTaxNo],
+  ['State Permit No', vehicleData.StatePermitNo],
   ['Mfg. Month/Year', vehicleData.manufacturingMonthYear],
-  ['Registration Date', vehicleData.registrationDate],
+  ['Vehicle Tyre', vehicleData.VehicleTyre],
   ['Insurance Validity', vehicleData.insuranceValidTill],
-  ['Status', vehicleData.Status],
-  ['Created By', vehicleData.CreatedBy],
 ].map(([label, value]) => (
   <View key={`${label}-${value}`} style={styles.detailRow}>
     <Text style={styles.detailKey}>{label}</Text>
-    <Text style={styles.detailValue}>{value || 'N/A'}</Text>
+    <Text style={styles.detailValue}>{value || ' '}</Text>
   </View>
 ))}
 

@@ -54,7 +54,7 @@ const [singleLoader,setSingleLoader]=useState(false);
             },
           });
     const data =await response.json();
-   // console.log('Single driver Data:', data);
+    //console.log('Single driver Data:', data);
     if(data?.driver){
       setDriverData(data.driver)  
       
@@ -177,7 +177,7 @@ FetchSingleDriver(item.Id)
                     ['Id', driverData.Id],
                     ['Name', driverData.DriverName],
                     ['License No', driverData.DLNumber],
-                    ['DOB', driverData.Dob],
+                    ['DOB', driverData?.DOBDriver? driverData.DOBDriver.split('T')[0] : ''],
                     ['Email', driverData.DriverEmail],
                     ['Adhar No',driverData.AdharNo],
                     ['PAN No', driverData.PanNo],

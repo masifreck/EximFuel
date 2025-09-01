@@ -26,7 +26,7 @@ const CalendarModal = ({ visible, onClose, onSelect }) => {
       const [day, month, year] = parts;
       const convertedDate = `${year}-${month}-${day}`; // Convert to YYYY-MM-DD
       setConvSelectedStartDate(convertedDate);
-      console.log("Converted date (YYYY-MM-DD):", convertedDate);
+     // console.log("Converted date (YYYY-MM-DD):", convertedDate);
     }
   }, [selectedStartDate]);
 
@@ -55,7 +55,7 @@ const CalendarModal = ({ visible, onClose, onSelect }) => {
                 color: 'white',
                 fontSize: 15,
               }}
-              maxDate={new Date()} // Disable future dates
+             // maxDate={new Date()} // Disable future dates
             />
 
             <View style={styles.buttoncont}>

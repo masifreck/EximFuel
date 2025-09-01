@@ -322,7 +322,7 @@ padding-left: 10px;
 <div class="secondblock" >
 <div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; border-right: 1px solid black; padding-right:5px;
 padding-top:15px; flex:1;">
-  <h4 style="font-weight: bold; margin-block-end: 0.9em;width: 100px;">Cosinor Name & Address:</h4>
+  <h4 style="font-weight: bold; margin-block-end: 0.9em;width: 100px;">Cosinor :</h4>
   <h4 style="margin-block-end: 0.9em;">${
     data?.ConsignorName ? data.ConsignorName : ''
   }</h4>
@@ -332,7 +332,7 @@ padding-top:15px; flex:1;">
     data?.LoadingPoint ? data.LoadingPoint : ''
   }</h4>
 
-   <h4 style=" font-weight: bold;margin-block-end: 0.9em; width: 100px; margin-top:10px;">Consignee Name & Address:</h4>
+   <h4 style=" font-weight: bold;margin-block-end: 0.9em; width: 100px; margin-top:10px;">Consignee :</h4>
   <h4 style="margin-block-end: 0.9em;margin-top:10px;">${
     data?.ConsigneeName ? data.ConsigneeName : ''
   }</h4>
@@ -367,6 +367,10 @@ padding-top:15px; flex:1;">
   <h4 style="margin-block-end: 0.9em;">${
     data?.InsuranceValidity ? data.InsuranceValidity : ''
   }</h4>
+    <h4 style="font-weight: bold; margin-block-end: 0.9em;">Unload Contact:</h4>
+  <h4 style="margin-block-end: 0.9em;">${
+    data?.UnloadingContact
+  }</h4>
 </div>
 
 <div style="display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; padding-top:15px; flex:1;">
@@ -383,10 +387,10 @@ padding-top:15px; flex:1;">
   <h4 style="font-weight: bold;margin-block-end: 0.9em;">DEL No:</h4>
   <h4 style="margin-block-end: 0.9em;">${data.DelNo}</h4>
 
-    <h4 style="font-weight: bold; width:70%;">EwayBillNo & Valdity upto:</h4>
-          <h4 style="margin-block-end: 0.9em;">${
-            data?.EwayBillNo1
-          }</h4>
+    <h4 style="font-weight: bold; width:70%;">EwayBillNo </h4>
+          <h4 style="margin-block-end: 0.9em;">${data?.EwayBillNo1  }</h4>
+            <h4 style="font-weight: bold; width:70%;">E-Valdity Upto :</h4>
+          <h4 style="margin-block-end: 0.9em;">${ data?.EValidity? data.EValidity.split('T')[0] : ''}</h4>
 
 </div>
 
@@ -574,10 +578,7 @@ padding-top:15px; flex:1;">
       <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
       <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
   </div>
-  <div style="display: flex; justify-content: space-between;">
-    <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
-    <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
-</div>
+
    <div style="display: flex; justify-content: space-between;">
           <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Remarks:</h4>
           <h4 style="margin: 1px 0; padding-left: 5px;">${

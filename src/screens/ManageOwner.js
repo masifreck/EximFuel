@@ -14,87 +14,8 @@ import { FlashList } from '@shopify/flash-list';
 import { darkBlue, textColor } from '../components/constant';
 import CustomCheckbox from '../components/CustomeCheckBox';
 import ImageViewing from 'react-native-image-viewing';
-import Icon from 'react-native-vector-icons/FontAwesome'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { is, se } from 'date-fns/locale';
 
-//   {
-//     Id: null,
-//     Name: 'First Owner Name',
-//     PanNo: 'test01pan',
-//     DOB: '1995-06-30',
-//     Tds: 1,
-//     AdharNo: '123569',
-//     PMobileNo: '9648433287',
-//     SMobileNo: 'SecondaryNo',
-//     IFSC: 'IFSC',
-//     AccountNo: 'AccountNo',
-//     BankId: '1',
-//     Account: 3,
-//     Email: 'Email',
-//     Address: 'Address',
-//     Status: 'Pending',
-//     isPCVerified:true,
-//      isSCVerified:false
-//   },
-//     {
-//     Id: null,
-//     Name: 'Second  Owner Name',
-//     PanNo: 'test02pan',
-//     DOB: '1995-06-30',
-//     Tds: 1,
-//     AdharNo: '123569',
-//     PMobileNo: '9648433287',
-//     SMobileNo: 'SecondaryNo',
-//     IFSC: 'IFSC',
-//     AccountNo: 'AccountNo',
-//     BankId: '1',
-//     Account: 3,
-//     Email: 'Email',
-//     Address: 'Address',
-//     Status: 'Pending',
-//      isPCVerified:true,
-//       isSCVerified:false
-//   },
-//     {
-//     Id: null,
-//     Name: 'Update Owner',
-//     PanNo: 'test06pan',
-//     DOB: '1995-06-30',
-//     Tds: 1,
-//     AdharNo: '123569',
-//     PMobileNo: '9648433287',
-//     SMobileNo: 'SecondaryNo',
-//     IFSC: 'IFSC',
-//     AccountNo: 'AccountNo',
-//     BankId: '1',
-//     Account: 3,
-//     Email: 'Email',
-//     Address: 'Address',
-//     Status: 'Pending',
-//      isPCVerified:false,
-//       isSCVerified:true
-//   },
-//   {
-//     Id: null,
-//     Name: 'Another Owner',
-//     PanNo: 'samplePAN2',
-//     DOB: '1993-04-10',
-//     Tds: 1,
-//     AdharNo: '654321',
-//     PMobileNo: '9998887770',
-//     SMobileNo: 'SecondaryNo2',
-//     IFSC: 'IFSC1234',
-//     AccountNo: '123456789',
-//     BankId: '2',
-//     Account: 2,
-//     Email: 'another@email.com',
-//     Address: 'Another Address',
-//     Status: 'Approved',
-//      isPCVerified:true,
-//      isSCVerified:true
-//   },
-// ];
 
 const ManageOwner = () => {
   const [search, setSearch] = useState('');
@@ -303,11 +224,11 @@ const imageList = [
       </View>
      <View style={styles.detailRow}>
         <Text style={styles.detailKey}>Bank </Text>
-        <Text style={styles.detailValue}>{selectedOwner.BankNameName}</Text>
+        <Text style={styles.detailValue}>{selectedOwner.BankName}</Text>
       </View>
         <View style={styles.detailRow}>
         <Text style={styles.detailKey}>Bank Type</Text>
-        <Text style={styles.detailValue}>{selectedOwner.BankTypeName}</Text>
+        <Text style={styles.detailValue}>{selectedOwner.AccountType}</Text>
       </View>
       <View style={styles.detailRow}>
         <Text style={styles.detailKey}>IFSC</Text>
@@ -320,18 +241,14 @@ const imageList = [
       </View>
 
       <View style={styles.detailRow}>
-        <Text style={styles.detailKey}>Account</Text>
-        <Text style={styles.detailValue}>{selectedOwner.Account}</Text>
-      </View>
-
-      <View style={styles.detailRow}>
         <Text style={styles.detailKey}>Email</Text>
-        <Text style={styles.detailValue}>{selectedOwner.Email}</Text>
+        <Text style={styles.detailValue}>{selectedOwner.EmailAddress}</Text>
       </View>
 
       <View style={styles.detailRow}>
         <Text style={styles.detailKey}>Address</Text>
-        <Text style={styles.detailValue}>{selectedOwner.ZipCode}</Text>
+        <Text style={styles.detailValue}>{selectedOwner.Address + " " + selectedOwner.StateName + 
+        " " + selectedOwner.ZipCode}</Text>
       </View>
     </>
   )

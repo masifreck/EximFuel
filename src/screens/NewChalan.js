@@ -58,8 +58,7 @@ const NewChalan = ({navigation, route}) => {
   const [isFirstStep, setFirstSetp] = useState(true);
   const [isStep3, setIsStep3] = useState(false);
   const [GpsNo, setGpsNo] = useState('');
-  const [SlipNo, setSlipNo] = useState('');
-  const [StoNo, setStoNo] = useState('');
+  const [SlipNo, setSlipNo] = useState('')
   const [DelNo, setDelNo] = useState('');
   const [FreightTigerNo, setFreightTigerNo] = useState('');
   const [FreightRate, setFreightRate] = useState(null);
@@ -78,7 +77,8 @@ const NewChalan = ({navigation, route}) => {
   const [clientInvoice2, setClientInvoice2] = useState('');
   const [clientInvoice3, setClientInvoice3] = useState('');
   const [isVisibleEWaybill2, setIsVisibleEWaybill2] = useState(false);
-  const [isVisibleEWaybill3, setIsVisibleEWaybill3] = useState(false);
+const [evalidity,setEvaildity]=useState(null);
+const [openvalidtymodal,setvaliditymodal]=useState(false)
 
   const [otherExpence, setOtherExpence] = useState(0);
   const [detention, setDetention] = useState('');
@@ -113,8 +113,7 @@ const NewChalan = ({navigation, route}) => {
   const [guaranteewt, setGuaranteeWt] = useState('');
 
   const [ewayBillNo1, setEwayBillNo1] = useState('');
-  const [ewayBillNo2, setEwayBillNo2] = useState('');
-  const [ewayBillNo3, setEwayBillNo3] = useState('');
+
   const [ChallanDoc, setChallanDoc] = useState();
   const [InvoiceDoc, setInvoiceDoc] = useState();
 
@@ -129,6 +128,7 @@ const NewChalan = ({navigation, route}) => {
   const [IsCommercial, setIsCommercial] = useState(false);
   const [IsVerified, setIsVerified] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [unloadCont,setUnloadCont]=useState('');
  const [rcValues, setRcValues] = useState([]);
   useEffect(() => {
     const fetchAllDetails = async () => {
@@ -261,6 +261,11 @@ const NewChalan = ({navigation, route}) => {
     return `${year}-${month}-${day}`; // Rearrange to "YYYY-MM-DD"
   };
 
+  const covertDateFormat2=dateString=>{
+    const [month,day,year]=dateString.split('/')
+    return    `${year}-${month}-${day}`
+  }
+
   useEffect(() => {
     if (grossWt && tierWt) {
       let net = parseFloat(grossWt) - parseFloat(tierWt);
@@ -287,7 +292,7 @@ const NewChalan = ({navigation, route}) => {
         }
 
         try {
-          console.log('Decoding JWT:', token);
+        //  console.log('Decoding JWT:', token);
           const clientInvoice1 = jwtDecode(token);
 
           if (!clientInvoice1?.data) {
@@ -303,14 +308,21 @@ const NewChalan = ({navigation, route}) => {
           setMaterialValue(String(lm.TotInvVal));
         } catch (error) {
           Alert.alert('Invalid QR Code', 'Unable to decode JWT.');
-          console.log('Error decoding JWT:', error);
+          //console.log('Error decoding JWT:', error);
         }
       }
 
       if (route.params?.scannedEwayBillNo) {
-        console.log('Scanned Eway Bill No:', route.params.scannedEwayBillNo);
-        const ewayBillNo = route.params.scannedEwayBillNo.split('/')[0]; // Extract value before '/'
+       // console.log('Scanned Eway Bill No:', route.params.scannedEwayBillNo);
+      const scannedData = route.params.scannedEwayBillNo.split('/');
+const ewayBillNo = scannedData[0];
+const evalidRaw = scannedData.slice(2).join('/'); 
+const evalide = evalidRaw?.split(' ')[0];
+console.log('raw e validity',evalide)
+ const formattedDate = covertDateFormat2(evalide);
         setEwayBillNo1(ewayBillNo);
+        setEvaildity(formattedDate);
+
       }
     } catch (error) {
       console.error('Error decoding JWT or processing QR code:', error);
@@ -378,6 +390,8 @@ const [SealNo,setSealNo]=useState('')
       VehicleType: VehicleType || '',
       JobId: jobId ? parseInt(jobId, 10) : null,
       LoadDate: selectedDate || null,
+      EValidity : evalidity || null,
+      UnloadingContact: unloadCont || '',
       MaterialValues: materialValue || '',
       TareWt: tierWt ? parseFloat(tierWt) : 0,
       GrossWt: grossWt ? parseFloat(grossWt) : 0,
@@ -506,11 +520,7 @@ const [SealNo,setSealNo]=useState('')
 
     const postData1 = {
       ewayBillNo1: ewayBillNo1 || '',
-      ewayBillNo2: ewayBillNo2 || '',
-      ewayBillNo3: ewayBillNo3 || '',
       clientInvoiceNo1: clientInvoice1 || '',
-      clientInvoiceNo2: clientInvoice2 || '',
-      clientInvoiceNo3: clientInvoice3 || '',
       gpsNo: GpsNo || '',
       delNo: DelNo || '',
       freightTigerNo: FreightTigerNo ? FreightTigerNo.toString() : '',
@@ -1005,7 +1015,7 @@ const [SealNo,setSealNo]=useState('')
                 Identification Information
               </Text>
 
-              <Text style={styles.levelText}>E-Way Bill No 1</Text>
+              <Text style={styles.levelText}>E-Way Bill No </Text>
               <View
                 style={{
                   flexDirection: 'row',
@@ -1047,8 +1057,51 @@ const [SealNo,setSealNo]=useState('')
                   </TouchableOpacity>
                 </View>
               </View>
+ <Text style={styles.levelText}>
+                E-Validity Date
+              </Text>
+              <View
+                style={[
+                  styles.inputContainer,
+                  {
+                    borderWidth: hasBorder ? 0.9 : 0,
+                    borderColor: hasBorder ? 'red' : 'transparent',
+                  },
+                ]}>
+                {/* Display the selected date in the TextInput */}
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '85%',
+                    marginRight: 20,
+                  }}
+                  value={evalidity} // Bind selected date to TextInput value
+                  placeholder={'YYYY-MM-DD'} // Default placeholder
+                  autoCorrect={false}
+                  editable={false} // Non-editable since date is selected via the calendar
+                />
 
-              <Text style={styles.levelText}>Client Invoice 1</Text>
+                {/* Calendar icon to trigger the modal */}
+                <TouchableOpacity onPress={() => setvaliditymodal(true)}>
+                  <Image
+                    style={styles.rightIcon}
+                    source={require('../assets/calendar.png')}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {/* CalendarModal Component */}
+              <CalendarModal
+                visible={openvalidtymodal}
+                onClose={() => setvaliditymodal(false)}
+                onSelect={(date, convDate) => {
+                  setEvaildity(convDate); // Set the formatted date (YYYY-MM-DD)
+                  setvaliditymodal(false);
+                }}
+              />
+              <Text style={styles.levelText}>Client Invoice </Text>
               <View
                 style={{
                   flexDirection: 'row',
@@ -1103,7 +1156,6 @@ const [SealNo,setSealNo]=useState('')
                     borderColor: hasBorder ? 'red' : 'transparent',
                   },
                 ]}>
-                {/* Display the selected date in the TextInput */}
                 <TextInput
                   placeholderTextColor={'#6c6f73'}
                   style={{
@@ -1113,7 +1165,7 @@ const [SealNo,setSealNo]=useState('')
                     marginRight: 20,
                   }}
                   value={selectedDate} // Bind selected date to TextInput value
-                  placeholder={'DD-MM-YYYY'} // Default placeholder
+                  placeholder={'YYYY-MM-DD'} // Default placeholder
                   autoCorrect={false}
                   editable={false} // Non-editable since date is selected via the calendar
                 />
@@ -1419,6 +1471,23 @@ const [SealNo,setSealNo]=useState('')
                 }}>
                 Other Details
               </Text>
+                 <Text style={styles.levelText}>Unloading Contact</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '80%',
+                    marginRight: 20,
+                  }}
+                  placeholder={'Enter Unloading Contact'}
+                  autoCorrect={false}
+                  onChangeText={text => setUnloadCont(text)}
+                  keyboardType="numeric"
+                  value={unloadCont}
+                />
+              </View>
               <Text style={styles.levelText}>Gross Weight</Text>
               <View style={styles.inputContainer}>
                 <TextInput
@@ -1471,6 +1540,7 @@ const [SealNo,setSealNo]=useState('')
                   onChangeText={text => setNetWt(text)}
                   keyboardType="numeric"
                   value={netWt}
+                  editable={false}
                 />
               </View>
               <Text style={styles.levelText}>Guarantee Weight</Text>
@@ -1640,7 +1710,7 @@ const [SealNo,setSealNo]=useState('')
   showFileDetails={true} 
 /> */}
               <Text style={styles.levelText}>Remarks</Text>
-              <View style={[styles.inputContainer, {height: 100}]}>
+              <View style={[styles.inputContainer, {height: 100, marginBottom: 20}]}>
                 <TextInput
                   placeholderTextColor={'#6c6f73'}
                   style={{
