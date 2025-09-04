@@ -249,6 +249,26 @@ useEffect(() => {
        fetchAndSetCurrentLocation();
       return false;
     }
+    if(!StateId){
+      Alert.alert('Validation Error', 'Please select a state from the dropdown.');
+      return false;
+    }
+    if(!acnumber){
+      Alert.alert('Validation Error', 'Please enter Account Number.');
+      return false;
+    }
+    if(!bankName){
+      Alert.alert('Validation Error', 'Please select Bank Name from the dropdown.');
+      return false;
+    }
+    if(!acType){
+      Alert.alert('Validation Error', 'Please select Account Type from the dropdown.');
+      return false;
+    }
+    if (!IfscCode) {
+      Alert.alert('Validation Error', 'Please enter IFSC Code.');
+      return false;
+    }
 
     return true;
   };

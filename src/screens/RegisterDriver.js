@@ -1041,7 +1041,7 @@ const openDialScreen = async (number) => {
                       flexDirection: 'row',
                       paddingHorizontal: 10,
                       gap: 10,
-                      width: Width * 1,
+
                     }}>
                     {/* <CustomImagePicker
                       width={80}

@@ -1,7 +1,7 @@
 import {ElBase64} from '../components/Elbase';
 
 export const ConsignorHTML = (data, qrData, type) => {
-  console.log('qr data ON consignee html', qrData);
+ // console.log('qr data ON consignee html', qrData);
   return `
       <!DOCTYPE html>
       <html>
@@ -239,7 +239,7 @@ font-weight: bold;
   flex-direction: row;
 justify-content: safe;
 gap: 10px;
-padding-left: 10px;
+padding-left: 5px;
 }
 .remarks{
   margin-top: 30px;
@@ -252,7 +252,7 @@ padding-left: 10px;
 .notediv2{
   width: 100%;
   display: block;
-  margin-top: 10px;
+  margin-top: 3px;
   align-items: flex-start;
 }
 .gstheading{
@@ -409,7 +409,7 @@ padding-top:15px; flex:1;">
       <h4 class="marginleft" style="margin-top: 2px;">INSURANCE</h4>
       <h4 style="padding-left: 5px;">The Customer has stated that:
       </h4>
-      <h4 style="padding-left: 5px;">>he has not insured <span class="or">   OR</span></h4>
+      <h4 style="padding-left: 5px;">he has not insured <span class="or">   OR</span></h4>
       
       <h4 style="padding-left: 5px;">he has insured the Consignment</h4>
       <div class="insuranceblockdiv">
@@ -439,15 +439,15 @@ padding-top:15px; flex:1;">
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Address:</h4>
       <h4 style="margin-block-end: 0.9em;">${
-        data?.DriverAddress +
+        data?.DriverAddress || '' +
         ' ' +
-        data?.DriverStateName +
+        data?.DriverStateName || ''  +
         ' ' +
-        data?.DriverPincode
+        data?.DriverPincode || '' 
       }</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Adhar No.:</h4>
-      <h4 style="margin-block-end: 0.9em;">${data?.DriverAadharNo}</h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.DriverAadharNo || '' }</h4>
     </div>
     
     <div style="flex:1; display: grid; grid-template-columns: auto 1fr; gap: 10px; row-gap: 0px; border-left: 1px solid black; margin-right:auto; padding-left:10px">
@@ -464,15 +464,15 @@ padding-top:15px; flex:1;">
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Address:</h4>
       <h4 style="margin-block-end: 0.9em;">${
-        data?.OnwerAddress +
+        data?.OnwerAddress || ''  +
         ' ' +
-        data?.OwnerStateName +
+        data?.OwnerStateName || ''  +
         ' ' +
-        data?.OwnerPincode
+        data?.OwnerPincode || '' 
       }</h4>
     
       <h4 style="font-weight: bold; margin-block-end: 0.9em;">Adhar No.:</h4>
-      <h4 style="margin-block-end: 0.9em;">${data?.OwnerAadharNo}</h4>
+      <h4 style="margin-block-end: 0.9em;">${data?.OwnerAadharNo || '' }</h4>
     </div>
     
   </div>
@@ -524,7 +524,7 @@ padding-top:15px; flex:1;">
 <div class="lastblock" style="display: flex; justify-content: space-between; align-items: flex-start;">
     
   <!-- Left Block -->
-  <div class="lastblockdiv" style="flex: 2; border-right: 1px solid #000;">
+  <div class="lastblockdiv" style="flex: 3; border-right: 1px solid #000;">
       <!-- Centered Heading -->
       <p class="center" style="text-align: center; font-weight: bold; margin-top:2px;">
           RECEIVER CONFIRMATION
@@ -574,43 +574,33 @@ padding-top:15px; flex:1;">
           data?.GPSNo ? data.GPSNo : ''
         }</h4>
     </div>
-    <div style="display: flex; justify-content: space-between;">
-      <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px;"></h4>
-      <h4 style="margin: 5px 0; padding-left: 5px;"></h4>
-  </div>
+  
 
-   <div style="display: flex; justify-content: space-between;">
-          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Remarks:</h4>
-          <h4 style="margin: 1px 0; padding-left: 5px;">${
-            data?.Remarks ? data.Remarks : ''
-          }</</h4>
-      </div>
+   
       <div style="display: flex; justify-content: space-between;">
         <h4 style="font-weight: bold; margin: 5px 0; padding-left: 5px ;">Seal:</h4>
         <h4 style="margin: 5px 0; padding-left: 5px;">${
           data?.SealNo ? data.SealNo : ''
         }</h4>
     </div>
-   
+   <div style="display: flex; justify-content: space-between;">
+          <h4 style="font-weight: bold; margin: 1px 0; padding-left: 5px;">Remarks:</h4>
+          <h4 style="margin: 1px 0; padding-left: 5px;">${
+            data?.Remarks ? data.Remarks : ''
+          }</</h4>
+      </div>
   </div>
 </div>
 
 <div class="notediv">
 <div>
-<h3>Note:</h3>
+<h3 style='margin-top:0px;'>Note:</h3>
 </div>
 <div class="notediv2">
   <p class="note">
     1.Carriers is not responsible for Leakage & Breakage  2.Weight tolerrance is allowed.........% on loaded weight
       3.We have carefully read the terms and conditions of the back here of & undertake to abide by the terms & condition
   </p>
-  <p class="note">
-   
-  </p>
-  <p class="note">
-  
-  </p>
-  
 </div>
 
 </div>

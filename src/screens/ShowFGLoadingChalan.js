@@ -55,7 +55,7 @@ const ShowFGLoadingChalan = () => {
         <TableRow title="Material Name" value={FetchminesDetails.MaterialName} />
         <TableRow title="Job No" value={FetchminesDetails.JobNo} />
         <TableRow title="Freight Rate" value={FetchminesDetails.FreightRate} />
-        <TableRow title="Eway Bill 1" value={FetchminesDetails.EwayBillNo1} />
+        <TableRow title="Eway Bill " value={FetchminesDetails.EwayBillNo1} />
         <TableRow title="Validty UpTo" value={FetchminesDetails?.EValidity? FetchminesDetails.EValidity.split('T')[0] : ''} />
         {/* <TableRow title="Eway Bill 3" value={FetchminesDetails.EwayBillNo3} /> */}
         <TableRow title="Client Invoice " value={FetchminesDetails.ClientInvoiceNo1} />

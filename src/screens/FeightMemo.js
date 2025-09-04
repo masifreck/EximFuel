@@ -1,6 +1,10 @@
 
 import { ElBase64 } from "../components/Elbase";
-export const FreightMemo = (data)=>{
+export const FreightMemo = (data,qrData)=>{
+    const frieght = (data?.NetWt * data?.FreightRate)?.toFixed(3)
+    const advance = data?.Cash + data?.BankAmount + data?.HSD
+    const balance = frieght - advance
+
     return`
       <!DOCTYPE html>
       <html>
@@ -26,17 +30,16 @@ export const FreightMemo = (data)=>{
     border-color: #000;
     padding: 20px 0; 
     border: 1px solid #000;
-    padding-top: 5px;
+    padding: 5px;
     width: 100%;
     
     }
     .topcontainer{
         display: flex;
         flex-direction: row;
-        gap: 10px;
-        align-items: center;
-        padding-left: 5px;
-        padding-right: 20px;
+    justify-content: space-between;
+    margin-horizontal: 10px;
+    
     }
     .logo{
         width: 100px;
@@ -114,52 +117,65 @@ export const FreightMemo = (data)=>{
     <div class="logo">
     <img src="${ElBase64}" alt="Flowers in Chania" width="70" height="70">
 </div>
+
     <div class="exim">
     <h1>EXIM LOGISTICS PVT. LTD.</h1>
     <p class="justify">A :DCB-928-931. 9TH Floor, DLF Cybercity, Chandaka </p>
     <p class="justify">Industrial Estate, Patia Bhubaneswar-751024, Odisha, India</p>
-   <p class="justify">Phone: (0674)7107777 to 7887 (110 Lines)</p>
+   <p class="justify">Phone: (0674) 6637777 to 7887 (110 Lines)</p>
     <p class="eximtext">E-mail:info@eximlogistics.in, Website: www.eximlogistics.com</p>
     <p style="font-weight: bold;" class="eximtext">CIN NO.: U630120R2006PTC06039</p>
     <p class="freightmemo">FREIGHT MEMO</p>
   </div>
+
+  <div >
+<img style="margin-left:50px;" src="data:image/png;base64,${qrData}" alt="QR Code" width="80" height="80" >
+  </div>
 </div>
+
 <div class="secondcontainer">
     <div>
-<p class="text" style="margin-block-end: 0em; margin-top: -10px;">Ref./Challan No:${data.ChallanNo}</p>
+<p class="text" style="margin-block-end: 0em; margin-top: -10px;">Ref./Challan No:${data?.ChallanNo}</p>
     </div>
     <div>
 <p class="text" style="margin-block-end: 0em;margin-top: -10px;">No.:</p>
-<p class="text" style="margin-block-end: 0em; margin-top: 0px;">Date.:${data.LoadDate}</p>
+<p class="text" style="margin-block-end: 0em; margin-top: 0px;">Date.:${data?.LoadDate? data.LoadDate.split('T')[0]:''}</p>
     </div>
 </div>
 <div class="mainbody" style="display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 10px; row-gap: 0px;">
     <p  class="text" style="font-weight: bold; margin-block-end: 0em;">1. Vehicle No.:</p>
-    <p  class="text" style="margin-block-end: 0em;">${data.VehicleNo}</p>
+    <p  class="text" style="margin-block-end: 0em;">${data?.VehicleNo}</p>
   
     <p  class="text" style="font-weight: bold; margin-block-end: 0em;">2. Association/Broker:</p>
-    <p  class="text" style="margin-block-end: 0em;">${data.AssociationName}</p>
+   <p className="text" style={{ marginBlockEnd: "0em" }}>
+  ${data?.AssociationName || ''} / ${data?.BrokerName || ''}
+</p>
+
   
-    <p  class="text"  class="eximtext" style="font-weight: bold; margin-block-end: 0em;">3. Despatch:</p>
-    <p  class="text" style="margin-block-end: 0em;">From 05/10/2024 To 05/10/2024 </p>
+    <p  class="text"  class="eximtext" style="font-weight: bold; margin-block-end: 0em;">3.Dispatch:</p>
+    <p  class="text" style="margin-block-end: 0em;">${data?.ConsignorName || '' + ' ' + data?.ConsigneeName || ''}</p>
   
     <p class="text" style="font-weight: bold; margin-block-end: 0em;">4. Material:</p>
-    <p class="text" style="margin-block-end: 0em;">${data.MaterialName}</p>
+    <p class="text" style="margin-block-end: 0em;">${data?.MaterialName}</p>
   
     <p class="text" style="font-weight: bold; margin-block-end: 0em;">5. Loading Qty:</p>
-    <p class="text" style="margin-block-end: 0em;"></p>
+    <p class="text" style="margin-block-end: 0em;">${data?.NetWt}</p>
   
     <p class="text" style="font-weight: bold; margin-block-end: 0em;">6. Transportation Rate:</p>
-    <p class="text" style="margin-block-end: 0em;">₹ ${data.FreightRate} </p>
+    <p class="text" style="margin-block-end: 0em;">₹ ${data?.FreightRate} </p>
   
     <p class="text" style="font-weight: bold; margin-block-end: 0em;">7. Freight:</p>
-    <p class="text" style="margin-block-end: 0em;">₹ </p>
+    <p class="text" style="margin-block-end: 0em;">₹ ${frieght}
+ </p>
   
     <p class="text" style="font-weight: bold; margin-block-end: 0em;">8. Advance:</p>
-    <p class="text" style="margin-block-end: 0em;">Cash ₹  Fuel in Ltr</p>
+    <p class="text" style="margin-block-end: 0em;">${advance}</p>
   
     <p class="text" style="font-weight: bold; margin-block-end: 0em;">9. Balance:</p>
-    <p class="text" style="margin-block-end: 0em;">₹ </p>
+    <p class="text" style="margin-block-end: 0em;">₹
+    ${balance}
+
+    </p>
   </div>
   <div class="lastcontainer">
 <div>

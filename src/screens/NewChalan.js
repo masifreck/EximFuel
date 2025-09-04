@@ -45,15 +45,15 @@ const NewChalan = ({navigation, route}) => {
     global.btoa = btoa;
   }
 
-  const {params: {JobDetails, VEHICLENO, VEHICLEID, DLNo} = {}} = useRoute();
+  const {params: {JobDetails, VEHICLENO, VEHICLEID, DLNo ,Id} = {}} = useRoute();
 
   //console.log("Job Details from route:", JobDetails);
   // console.log("Vehicle No:", VEHICLENO);
   // console.log("Vehicle ID:", VEHICLEID);
-  // console.log("DL No:", DLNo);
+  // console.log("id:", Id);
 
   const [data1, setData1] = useState({});
-
+const [AId,setAId]=useState(null);
   const [isStep1Visible, setIsStep1Visible] = useState(false);
   const [isFirstStep, setFirstSetp] = useState(true);
   const [isStep3, setIsStep3] = useState(false);
@@ -254,7 +254,7 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
     };
 
     fetchAllDetails();
-  }, [VEHICLENO, JobDetails, DLNo, apiTokenReceived]);
+  }, [VEHICLENO, JobDetails, DLNo, apiTokenReceived, Id]);
 
   const convertDateFormat = dateString => {
     const [day, month, year] = dateString.split('/'); // Split by "/"
@@ -342,25 +342,45 @@ const [STONo,setSTONo]=useState('');
 const [SealNo,setSealNo]=useState('')
   const onSubmitSteps = () => {
     // Perform all validation checks
-    if (!jobId) {
-      Alert.alert('Validation Error', 'Please Select Job No');
-      return false;
-    }
-    if (!netWt) {
-      Alert.alert('Validation Error', 'Please Enter Net Weight');
-      return false;
-    }
-    if (!driverId) {
-      Alert.alert('Validation Error', 'Please Select Driver');
-      return false;
-    }
-    if (!truckSource) {
-      Alert.alert('Validation Error', 'Please Truck Source');
-      return false;
+  if (!FreightRate) {
+      Alert.alert('Validation Error', 'Freight Rate is Mandatory');
+      return;
     }
 
     return true; // Return true if all validations pass
   };
+const deleteAlloments = async(Id)=>{
+  if(!Id) {
+    Alert.alert("Error","No Allotment ID found for deletion.")
+    return;
+  }
+     try {
+              const response = await fetch(
+                `https://Exim.Tranzol.com/api/LoadingChallan/DeletePreLoading?id=${Id}`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                      Authorization: `Basic ${apiTokenReceived}`,
+                  },
+                }
+              );
+  
+              const result = await response.text(); // API returns plain text
+  
+              // if (result.includes("Delete successfully")) {
+              //   //Alert.alert("✅ Success", "Allotment deleted successfully.");
+              //   console.log("Delete successful:", result);
+              // } else {
+              //   Alert.alert("⚠️ Failed", "Deletion was not successful.");
+              //   console.warn("Unexpected response:", result);
+              // }
+            } catch (error) {
+              Alert.alert("❌ Error", "Failed to delete allotment.");
+              console.error("Error deleting PreLoading:", error);
+            }
+}
+
   const HandleSubmit = async () => {
     const isValid = onSubmitSteps();
     if (!isValid) return; // Stop if validation fails
@@ -436,7 +456,7 @@ const [SealNo,setSealNo]=useState('')
     // }
 
     // Now you can send formData in your API request
-    console.log('sending Data', formData);
+   // console.log('sending Data', formData);
 
     // Submit the FormData to the provided URL
     try {
@@ -454,11 +474,12 @@ const [SealNo,setSealNo]=useState('')
 
       if (response.ok) {
         const responseText = await response.text();
-        console.log('Server Response:', responseText);
+       // console.log('Server Response:', responseText);
 
         if (responseText.includes('E-')) {
+          deleteAlloments(Id)
           const code = responseText.replace(/"/g, '').trim();
-
+deleteAlloments(Id)
           Alert.alert(
             'Success',
             `Your Code: ${code}`,
@@ -486,7 +507,7 @@ const [SealNo,setSealNo]=useState('')
       }
     } catch (error) {
       console.error('Error submitting data:', error);
-      Alert.alert('Error', 'Failed to submit data');
+      Alert.alert('Error', 'Failed to submit data'); 
     } finally {
       setIsLoading(false);
     }
@@ -513,36 +534,25 @@ const [SealNo,setSealNo]=useState('')
       return;
     }
 
-    if (!FreightRate) {
-      Alert.alert('Validation Error', 'Freight Rate is Mandatory');
-      return;
+    
+  if (!jobId) {
+      Alert.alert('Validation Error', 'Please Select Job No');
+      return false;
     }
-
-    const postData1 = {
-      ewayBillNo1: ewayBillNo1 || '',
-      clientInvoiceNo1: clientInvoice1 || '',
-      gpsNo: GpsNo || '',
-      delNo: DelNo || '',
-      freightTigerNo: FreightTigerNo ? FreightTigerNo.toString() : '',
-      freightRate: FreightRate ? parseFloat(FreightRate) : null,
-      cash: Cash ? parseInt(Cash) : null,
-      bankAmount: BankAmount ? parseInt(BankAmount) : null,
-      hsd: HSD ? parseFloat(HSD) : null,
-      detention: detention ? parseInt(detention) : null,
-      pumpId: PumpId ? PumpId : null,
-      accountholderName: acName || '',
-      ifscCode: Ifsc || '',
-      otherExpense: otherExpence ? parseFloat(otherExpence) : 0,
-    };
-
-    setData1(postData1);
-
-    // Delay navigation to ensure state is updated before moving to the next step
-    setTimeout(() => {
-      setIsStep1Visible(false);
+    if (!netWt) {
+      Alert.alert('Validation Error', 'Please Enter Net Weight');
+      return false;
+    }
+    if (!driverId) {
+      Alert.alert('Validation Error', 'Please Select Driver');
+      return false;
+    }
+    if (!truckSource) {
+      Alert.alert('Validation Error', 'Please Truck Source');
+      return false;
+    }
+  setIsStep1Visible(false);
       setIsStep3(true);
-    }, 100);
-    console.log('data1', data1);
   };
 
   //////////////Next page Method /////////////////////////////////////////////////////////////////////
@@ -563,14 +573,13 @@ const [SealNo,setSealNo]=useState('')
 
       // Reset all state values to empty or default values
       setEwayBillNo1('');
-      setEwayBillNo2('');
-      setEwayBillNo3('');
+     
       setClientInvoice1('');
       setClientInvoice2('');
       setClientInvoice3('');
       setGpsNo('');
       setSlipNo('');
-      setStoNo('');
+      setSTONo('');
       setDelNo('');
       setFreightTigerNo('');
       setFreightRate(null); // assuming this is a number
@@ -1263,212 +1272,6 @@ const [SealNo,setSealNo]=useState('')
                   textAlign: 'center',
                   fontFamily: 'PoppinsBold',
                 }}>
-                Financial Information
-              </Text>
-              <Text style={styles.levelText}>
-                Freight Rate<Text style={{color: 'red'}}>*</Text>
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholderTextColor={'#6c6f73'}
-                  style={{
-                    color: 'black',
-                    fontSize: 15,
-                    width: '100%',
-                  }}
-                  placeholder={'0.00'}
-                  autoCorrect={false}
-                  onChangeText={text => setFreightRate(text)}
-                  value={FreightRate}
-                  keyboardType="numeric"
-                />
-              </View>
-              <Text style={styles.levelText}>Cash</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholderTextColor={'#6c6f73'}
-                  style={{
-                    color: 'black',
-                    fontSize: 15,
-                    width: '100%',
-                  }}
-                  placeholder={'0.00'}
-                  autoCorrect={false}
-                  onChangeText={text => setCash(text)}
-                  value={Cash}
-                  keyboardType="numeric"
-                />
-              </View>
-              <Text style={styles.levelText}>Petrol pump</Text>
-              <Dropdown
-                style={styles.dropdown}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                itemTextStyle={{color: 'black'}}
-                data={pumpData} // Updated job data from API
-                search
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder={'Select Petrol Pump'}
-                value={PumpName}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={item => {
-                  setPumpName(item.value);
-                  setPumpId(item.value); // Set selected job number
-                  // setSelectedVehicleNo(item.label)
-                  //console.log('Selected Driver ID:', item.value,selectedVehicleNo,);  // Log the selected job ID
-                  setIsFocus(false);
-                }}
-                onChangeText={text => {
-                  setSearchPump(text);
-                  console.log('pump search', searchPump);
-                }}
-              />
-              <Text style={styles.levelText}>HSD</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholderTextColor={'#6c6f73'}
-                  style={{
-                    color: 'black',
-                    fontSize: 15,
-                    width: '100%',
-                  }}
-                  placeholder={'0.00'}
-                  autoCorrect={false}
-                  onChangeText={text => setHSD(text)}
-                  value={HSD}
-                  keyboardType="numeric"
-                />
-              </View>
-              <Text style={styles.levelText}>Other Expense</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholderTextColor={'#6c6f73'}
-                  style={{
-                    color: 'black',
-                    fontSize: 15,
-                    width: '100%',
-                  }}
-                  placeholder={'Other Expense'}
-                  autoCorrect={false}
-                  onChangeText={text => setOtherExpence(text)}
-                  value={otherExpence}
-                  keyboardType="numeric"
-                />
-              </View>
-              <Text style={styles.levelText}>Detention</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholderTextColor={'#6c6f73'}
-                  style={{
-                    color: 'black',
-                    fontSize: 15,
-                    width: '100%',
-                  }}
-                  placeholder={'Enter Detention'}
-                  autoCorrect={false}
-                  onChangeText={text => setDetention(text)}
-                  value={detention}
-                  keyboardType="numeric"
-                />
-              </View>
-
-              <Text style={styles.levelText}>Bank Amount</Text>
-              <View style={styles.inputContainerend}>
-                <TextInput
-                  placeholderTextColor={'#6c6f73'}
-                  style={{
-                    color: 'black',
-                    fontSize: 15,
-                    width: '100%',
-                  }}
-                  placeholder={'0.00'}
-                  autoCorrect={false}
-                  onChangeText={text => setBankAmount(text)}
-                  value={BankAmount}
-                  keyboardType="numeric"
-                />
-              </View>
-              <View style={styles.togglecontainer}>
-                <Text style={styles.togglelabel}>Other Account</Text>
-                <Switch
-                  value={isOtherAccount}
-                  onValueChange={toggleSwitch}
-                  thumbColor={isOtherAccount ? 'white' : '#f4f3f4'}
-                  trackColor={{false: '#ccc', true: darkBlue || '#4682B4'}}
-                  ios_backgroundColor="#ccc"
-                />
-              </View>
-              {isOtherAccount && (
-                <>
-                  <Text style={styles.levelText}>Account Holder Name</Text>
-                  <View style={styles.inputContainerend}>
-                    <TextInput
-                      placeholderTextColor={'#6c6f73'}
-                      style={{
-                        color: 'black',
-                        fontSize: 15,
-                        width: '100%',
-                      }}
-                      placeholder={'Enter A/C Holder Name'}
-                      autoCorrect={false}
-                      onChangeText={text => setAcName(text)}
-                      value={acName}
-                    />
-                  </View>
-                  <Text style={styles.levelText}>Account No</Text>
-                  <View style={styles.inputContainerend}>
-                    <TextInput
-                      placeholderTextColor={'#6c6f73'}
-                      style={{
-                        color: 'black',
-                        fontSize: 15,
-                        width: '100%',
-                      }}
-                      placeholder={'Enter Account No'}
-                      autoCorrect={false}
-                      onChangeText={text => setAccountNo(text)}
-                      value={AccountNo}
-                      keyboardType="numeric"
-                    />
-                  </View>
-                  <Text style={styles.levelText}>IFSC Code</Text>
-                  <View style={styles.inputContainerend}>
-                    <TextInput
-                      placeholderTextColor={'#6c6f73'}
-                      style={{
-                        color: 'black',
-                        fontSize: 15,
-                        width: '100%',
-                      }}
-                      placeholder={'Enter IFSC Code'}
-                      autoCorrect={false}
-                      onChangeText={text => setIfsc(text)}
-                      value={Ifsc}
-                    />
-                  </View>
-                </>
-              )}
-            </View>
-          </View>
-        ) : isStep3 ? (
-          <View style={styles.container}>
-            <View style={styles.levelContainer}>
-              <Text style={styles.MandatoryText}>
-                Mandatory Fields<Text style={{color: 'red'}}>*</Text>
-              </Text>
-              <Text
-                style={{
-                  fontSize: 18,
-                  marginBottom: 8,
-                  marginTop: 8,
-                  color: darkBlue,
-                  textAlign: 'center',
-                  fontFamily: 'PoppinsBold',
-                }}>
                 Other Details
               </Text>
                  <Text style={styles.levelText}>Unloading Contact</Text>
@@ -1676,7 +1479,7 @@ const [SealNo,setSealNo]=useState('')
                 Load Type<Text style={{color: 'red'}}>*</Text>
               </Text>
               <Dropdown
-                style={styles.dropdown}
+                style={[styles.dropdown,{marginBottom:10}]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 inputSearchStyle={styles.inputSearchStyle}
@@ -1693,6 +1496,214 @@ const [SealNo,setSealNo]=useState('')
                 }}
               />
 
+            </View>
+            
+          </View>
+        ) : isStep3 ? (
+          <View style={styles.container}>
+            <View style={styles.levelContainer}>
+              <Text style={styles.MandatoryText}>
+                Mandatory Fields<Text style={{color: 'red'}}>*</Text>
+              </Text>
+                <Text
+                style={{
+                  fontSize: 18,
+                  marginBottom: 8,
+                  marginTop: 8,
+                  color: darkBlue,
+                  textAlign: 'center',
+                  fontFamily: 'PoppinsBold',
+                }}>
+                Financial Information
+              </Text>
+              <Text style={styles.levelText}>
+                Freight Rate<Text style={{color: 'red'}}>*</Text>
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '100%',
+                  }}
+                  placeholder={'0.00'}
+                  autoCorrect={false}
+                  onChangeText={text => setFreightRate(text)}
+                  value={FreightRate}
+                  keyboardType="numeric"
+                />
+              </View>
+              <Text style={styles.levelText}>Cash</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '100%',
+                  }}
+                  placeholder={'0.00'}
+                  autoCorrect={false}
+                  onChangeText={text => setCash(text)}
+                  value={Cash}
+                  keyboardType="numeric"
+                />
+              </View>
+              <Text style={styles.levelText}>Petrol pump</Text>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={pumpData} // Updated job data from API
+                search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Petrol Pump'}
+                value={PumpName}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={item => {
+                  setPumpName(item.value);
+                  setPumpId(item.value); // Set selected job number
+                  // setSelectedVehicleNo(item.label)
+                  //console.log('Selected Driver ID:', item.value,selectedVehicleNo,);  // Log the selected job ID
+                  setIsFocus(false);
+                }}
+                onChangeText={text => {
+                  setSearchPump(text);
+                  console.log('pump search', searchPump);
+                }}
+              />
+              <Text style={styles.levelText}>HSD</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '100%',
+                  }}
+                  placeholder={'0.00'}
+                  autoCorrect={false}
+                  onChangeText={text => setHSD(text)}
+                  value={HSD}
+                  keyboardType="numeric"
+                />
+              </View>
+              <Text style={styles.levelText}>Other Expense</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '100%',
+                  }}
+                  placeholder={'Other Expense'}
+                  autoCorrect={false}
+                  onChangeText={text => setOtherExpence(text)}
+                  value={otherExpence}
+                  keyboardType="numeric"
+                />
+              </View>
+              <Text style={styles.levelText}>Detention</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '100%',
+                  }}
+                  placeholder={'Enter Detention'}
+                  autoCorrect={false}
+                  onChangeText={text => setDetention(text)}
+                  value={detention}
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <Text style={styles.levelText}>Bank Amount</Text>
+              <View style={styles.inputContainerend}>
+                <TextInput
+                  placeholderTextColor={'#6c6f73'}
+                  style={{
+                    color: 'black',
+                    fontSize: 15,
+                    width: '100%',
+                  }}
+                  placeholder={'0.00'}
+                  autoCorrect={false}
+                  onChangeText={text => setBankAmount(text)}
+                  value={BankAmount}
+                  keyboardType="numeric"
+                />
+              </View>
+              <View style={styles.togglecontainer}>
+                <Text style={styles.togglelabel}>Other Account</Text>
+                <Switch
+                  value={isOtherAccount}
+                  onValueChange={toggleSwitch}
+                  thumbColor={isOtherAccount ? 'white' : '#f4f3f4'}
+                  trackColor={{false: '#ccc', true: darkBlue || '#4682B4'}}
+                  ios_backgroundColor="#ccc"
+                />
+              </View>
+              {isOtherAccount && (
+                <>
+                  <Text style={styles.levelText}>Account Holder Name</Text>
+                  <View style={styles.inputContainerend}>
+                    <TextInput
+                      placeholderTextColor={'#6c6f73'}
+                      style={{
+                        color: 'black',
+                        fontSize: 15,
+                        width: '100%',
+                      }}
+                      placeholder={'Enter A/C Holder Name'}
+                      autoCorrect={false}
+                      onChangeText={text => setAcName(text)}
+                      value={acName}
+                    />
+                  </View>
+                  <Text style={styles.levelText}>Account No</Text>
+                  <View style={styles.inputContainerend}>
+                    <TextInput
+                      placeholderTextColor={'#6c6f73'}
+                      style={{
+                        color: 'black',
+                        fontSize: 15,
+                        width: '100%',
+                      }}
+                      placeholder={'Enter Account No'}
+                      autoCorrect={false}
+                      onChangeText={text => setAccountNo(text)}
+                      value={AccountNo}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <Text style={styles.levelText}>IFSC Code</Text>
+                  <View style={styles.inputContainerend}>
+                    <TextInput
+                      placeholderTextColor={'#6c6f73'}
+                      style={{
+                        color: 'black',
+                        fontSize: 15,
+                        width: '100%',
+                      }}
+                      placeholder={'Enter IFSC Code'}
+                      autoCorrect={false}
+                      onChangeText={text => setIfsc(text)}
+                      value={Ifsc}
+                    />
+                  </View>
+                </>
+              )}
+            
               {/* <Text style={styles.levelText}>Attachments</Text> */}
 
               {/* Custom file picker for InvoiceDoc */}

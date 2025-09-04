@@ -9,7 +9,6 @@ import Driver from './screens/Driver';
 import Vehicle from './screens/Vehicle';
 import MinesLoading from './screens/MinesLoading';
 import Unloading from './screens/Unloading';
-import FGLoading from './screens/FGLoading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Drawer = createDrawerNavigator();
 
@@ -44,7 +43,7 @@ const CustomDrawerContent = (props) => {
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity> */}
         <Text style={styles.footerText}>Powered by Tranzol</Text>
-        <Text style={styles.versionText}>Version 0.0.2</Text>
+        <Text style={styles.versionText}>Version 0.0.3</Text>
       </View>
     </DrawerContentScrollView>
   );

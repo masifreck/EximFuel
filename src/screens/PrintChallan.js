@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, act} from 'react';
 import ImageData from '../components/ImageData';
 import {
   View,
@@ -16,6 +16,7 @@ import CustomAlert from '../components/CustomAlert';
 import { styles } from './PrintChallanStyle';
 import { Dropdown } from 'react-native-element-dropdown';
 import { dropdownData } from '../components/DropDownData';
+import { darkBlue } from '../components/constant';
 
 
 const PrintChallan = ({navigation}) => {
@@ -30,39 +31,7 @@ const [selectedPrint,setSelectedPrint]=useState("1")
   const [hasBorder, setHasBorder] = useState(false); // State for border
   const [errorMessage, seterrorMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
-  const [showQRCodeFullPage, setShowQRCodeFullPage] = useState(false);
 
-
-  const svgRef = useRef(null); // Ref for QR code
-  const [qrData, setQrData] = useState('');
- const [qrValue,setQRValue]=useState('')
- 
-  const getDataURL = () => {
-    if (svgRef.current) {
-      svgRef.current.toDataURL((dataURL) => {
-        
-        setQrData(dataURL)// Log the dataURL when successful
-        console.log('QR Code Data URL:', qrData);
-      });
-    } else {
-      console.log('QR Code reference is not set yet'); // Log if svgRef.current is not available
-    }
-  };
-  
-
-  const callback = (dataURL) => {
-    console.log('q s',dataURL);
-  };
- 
- 
-
-  useEffect(() => {
-    if (svgRef.current) {
-      getDataURL();
-    } else {
-      console.log('Waiting for QRCode reference...');
-    }
-  }, [svgRef.current]); 
   const handleShowToast = () => {
     setShowToast(true);
 
@@ -89,7 +58,7 @@ const [selectedPrint,setSelectedPrint]=useState("1")
     setShowToast(false);
   };
   const 
-  fetchData = async () => {
+  fetchData = async (action) => {
     setIsLoading(true);
     if (ChallanNo.length !== 0) {
       try {
@@ -111,19 +80,13 @@ const [selectedPrint,setSelectedPrint]=useState("1")
             handleShowToast();
             console.log('error');
           } else {
-            // console.log(data);
-console.log('data',data.apiResult.Result)
-            setFetchedData(data.apiResult.Result);
-setQRValue(`${data.apiResult.Result.ChallanNo}|${data.apiResult.Result.LoadDate}|${data.apiResult.Result.VehicleNo}`);
 navigation.navigate('qrcode', { 
   qrValue: `${data.apiResult.Result.ChallanNo}`, 
   // |${data.apiResult.Result.LoadDate}|${data.apiResult.Result.VehicleNo}
   fetchedData: data.apiResult.Result, 
-  selectedPrint 
+  selectedPrint ,
+  action
 });
-
-
-            console.log('qr value',qrValue)
           }
         } else {
           setIsLoading(false);
@@ -143,12 +106,12 @@ navigation.navigate('qrcode', {
     }
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = (action) => {
     if (ChallanNo.length === 0) {
       seterrorMessage('Enter Challan Number');
       handleShowToast();
     } else {
-      fetchData();
+      fetchData(action);
     }
   };
   const resetInputs = () => {
@@ -219,13 +182,24 @@ navigation.navigate('qrcode', {
         style={styles.dropdown}
         onChange={handleSelect} // Method to handle selected value
       />
-<TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          {IsLoading ? (<ActivityIndicator size='small'color='white'/>):(
-            <>
-            
-            <Text style={styles.buttonText}>Submit</Text>
-            </>)} 
+       {IsLoading ? (
+        <View  style={{marginTop:20}}>
+        <ActivityIndicator size='medium'color={darkBlue}/>
+        </View>
+        ):(
+      <View style={{flexDirection:'row',justifyContent:'space-between',width:'80%'}}>
+        
+          <>
+<TouchableOpacity style={styles.submitButton} onPress={()=>handleSubmit('print')}>
+            <Text style={styles.buttonText}> 🖨️ Print</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.submitButton} onPress={()=>handleSubmit('share')}>
+            <Text style={styles.buttonText}> 📤 Share</Text>
+          </TouchableOpacity>
+          </>
+          </View>
+       )}
         </View>
     <CustomAlert
         visible={showAlert}

@@ -16,7 +16,16 @@ import { useFocusEffect } from "@react-navigation/native";
 const COL_WIDTH = 120; // 🔒 Fixed width for ALL columns
 
 const AllotmentList = ({ navigation }) => {
-  const [apiTokenReceived, setApiTokenReceived] = useState(null);
+
+    const [apiTokenReceived, setapiTokenReceived] = useState(null);
+    AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+    });
   const [searchText, setSearchText] = useState("");
   const [allotments, setAllotments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -74,6 +83,49 @@ useFocusEffect(
     );
   });
 
+const deletePreLoading = async (id) => {
+  console.log("Attempting to delete PreLoading with ID:", id);
+  Alert.alert(
+    "Confirm Deletion 🗑️",
+    `Are you sure you want to delete Allotment ID ${id}?`,
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const response = await fetch(
+              `https://Exim.Tranzol.com/api/LoadingChallan/DeletePreLoading?id=${id}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                    Authorization: `Basic ${apiTokenReceived}`,
+                },
+              }
+            );
+
+            const result = await response.text(); // API returns plain text
+
+            if (result.includes("Delete successfully")) {
+              Alert.alert("✅ Success", "Allotment deleted successfully.");
+              console.log("Delete successful:", result);
+              fetchAllotments(apiTokenReceived); // Refresh list
+            } else {
+              Alert.alert("⚠️ Failed", "Deletion was not successful.");
+              console.warn("Unexpected response:", result);
+            }
+          } catch (error) {
+            Alert.alert("❌ Error", "Failed to delete allotment.");
+            console.error("Error deleting PreLoading:", error);
+          }
+        },
+      },
+    ]
+  );
+};
+  
   const handleRowClick = (item) => {
     Alert.alert(
       "Confirm",
@@ -89,6 +141,7 @@ useFocusEffect(
               VEHICLEID: item.VehicleId, // may be undefined
               DLNo: item.DriverDlNo, // may be undefined
               PANNo: item.PANNo, // may be undefined
+              Id: item.Id, 
             });
           },
         },
@@ -113,6 +166,11 @@ useFocusEffect(
         <Text style={[styles.cell, { width: COL_WIDTH }]}>{normalized(item.DriverName)}</Text>
         <Text style={[styles.cell, { width: COL_WIDTH }]}>{normalized(item.OwnerName)}</Text>
         <Text style={[styles.cell, { width: COL_WIDTH }]}>{normalized(item.CreatedBy) || "-"}</Text>
+        <TouchableOpacity
+        style={[styles.cell, { width: 70, alignItems: "center" }]}
+        onPress={()=> deletePreLoading(item.Id)}>
+          <Text style={{ color: 'red', fontWeight: "bold" ,fontSize:18}}>❌</Text>
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
@@ -160,6 +218,9 @@ useFocusEffect(
 
   <View style={styles.headerCellWrapper}>
     <Text style={[styles.headerCell, { width: COL_WIDTH }]}> ✍️ Created By</Text>
+  </View>
+    <View style={styles.headerCellWrapper}>
+    <Text style={[styles.headerCell, { width: 100 }]}>🗑️ Delete</Text>
   </View>
 </View>
 

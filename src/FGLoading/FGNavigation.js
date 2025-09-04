@@ -6,6 +6,7 @@ import { darkBlue } from "../components/constant";
 import PreChallan from "./PreChallan";
 import AllotmentList from "./GenerateChallan";
 import CheckDetails from "./CheckDetails";
+import PrintChallan from "../screens/PrintChallan";
 
 const Tab = createBottomTabNavigator();
 
@@ -62,6 +63,8 @@ const FGNavigation = () => {
             iconName = "file-plus-outline";
           } else if (route.name === "Details") {
             iconName = "file-search-outline";
+          } else if(route.name==='print'){
+            iconName='printer-outline'
           }
 
           return (
@@ -85,6 +88,7 @@ const FGNavigation = () => {
       <Tab.Screen name="Allotment" component={PreChallan} />
       <Tab.Screen name="Generate" component={AllotmentList} />
       <Tab.Screen name="Details" component={CheckDetails} />
+      <Tab.Screen name='print' component={PrintChallan} />
     </Tab.Navigator>
   );
 };

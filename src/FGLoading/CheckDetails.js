@@ -10,18 +10,16 @@ import {
   TextInput,KeyboardAvoidingView,      
   Alert
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 // import {TextInput} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import CustomAlert from '../components/CustomAlert';
 import useApiToken from '../components/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../components/Loading';
-import { Dropdown } from 'react-native-element-dropdown';
 import {  Dimensions } from "react-native";
 import { textColor } from '../components/constant';
 import { darkBlue } from '../components/constant';
-import SelectButton from '../components/SelectButton';
 const ScreenWidth = Dimensions.get('window').width;
 const CheckDetails = () => {
   const navigation = useNavigation();
@@ -45,25 +43,7 @@ const CheckDetails = () => {
   const [showToast, setShowToast] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [hasBorder, setHasBorder] = useState(false); // State for border
- const [isFocus, setIsFocus] = useState(false);
-   const [jobId,setJobId]=useState('')
 
-    const [jobData,setJobData]=useState([])
-    const [vehicleData,setVehicleData]=useState([])
-    const [PANNo,setPANNo]=useState('');
-    const [driverData,setDriverData]=useState([])  
-const [DLNo,setDLNo]=useState('');
-      const [searchTerm, setSearchTerm] = useState('');
-      const [searchVehicle,setSearchVehicle]=useState('')
-      const [searchDriver,setSearchDriver]=useState('')
-  const [selectedJobNo,setSelectedJobNo]=useState('')
-  const [selectedVehicleNo,setSelectedVehicleNo]=useState('');
-   const [vehicleId, setVehicleId] = useState('');
-    const [driverId, setDriverId] = useState('');
-    const [jobNo,setJobNo]=useState('');
-      const [vehicleNo,setVehicleNo]=useState('');
-      const [driverName,setDriverName]=useState('')
-      const [JobDetails,setJobDetails]=useState({});
   const handleShowToast = () => {
     setShowToast(true);
 

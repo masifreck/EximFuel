@@ -213,13 +213,13 @@ const OwnerDetails = () => {
           <Text style={styles.buttonText}>Manage Driver</Text>
         </TouchableOpacity>
         <View style={styles.registerTextContainer}>
-          <Text style={styles.blackText}>If Not Registered! </Text>
-          <TouchableOpacity
+     
+          {/* <TouchableOpacity
             onPress={() => {
               navigation.navigate('RegisterDriver');
             }}>
             <Text style={styles.blueText}>Click Here to Register.</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
 

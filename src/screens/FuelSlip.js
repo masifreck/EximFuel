@@ -1,6 +1,6 @@
 
 import { ElBase64 } from "../components/Elbase";
-export const FuelSlip =(data)=>{ 
+export const FuelSlip =(data,qrData)=>{ 
     return`
       <!DOCTYPE html>
       <html>
@@ -19,24 +19,21 @@ export const FuelSlip =(data)=>{
         margin-left: auto;
         margin-right: auto;
     }
-    .maincontainer {
+    .maincontainer {s
       width: 100%;
     height: 100%; /* Thickness of the line */
     border-width: 1px;/* Color of the line */
     border-color: #000;
     padding: 20px 0; 
     border: 1px solid #000;
-    padding-top: 5px;
+    padding: 5px;
     width: 100%;
     
     }
     .topcontainer{
         display: flex;
         flex-direction: row;
-        gap: 10px;
-        align-items: center;
-        padding-left: 5px;
-        padding-right: 20px;
+       justify-content: space-between;
     }
     .logo{
         width: 100px;
@@ -115,11 +112,16 @@ export const FuelSlip =(data)=>{
         <h1>EXIM LOGISTICS PVT. LTD.</h1>
         <p class="justify">A :DCB-928-931. 9TH Floor, DLF Cybercity, Chandaka </p>
         <p class="justify">Industrial Estate, Patia Bhubaneswar-751024, Odisha, India</p>
-       <p class="justify">Phone: (0674)7107777 to 7887 (110 Lines)</p>
+       <p class="justify">Phone: (0674) 6637777 to 7887 (110 Lines)</p>
         <p class="eximtext">E-mail:info@eximlogistics.in, Website: www.eximlogistics.com</p>
         <p style="font-weight: bold;" class="eximtext">CIN NO.: U630120R2006PTC06039</p>
         <p class="freightmemo">Fuel Slip</p>
       </div>
+
+        <div >
+<img style="margin-left:50px;" src="data:image/png;base64,${qrData}" alt="QR Code" width="80" height="80" >
+  </div>
+
     </div>
 <div class="secondcontainer">
     <div>
@@ -128,7 +130,7 @@ export const FuelSlip =(data)=>{
     <div>
 
 <p class="text" style="margin-block-end: 0em; margin-top: 0px; font-weight: bold;">Slip No.</p>
-<p class="text" style="margin-block-end: 0em; margin-top: 0px; font-weight: bold;">Load Date.: ${data.LoadDate}</p>
+<p class="text" style="margin-block-end: 0em; margin-top: 0px; font-weight: bold;">Load Date.: ${data?.LoadDate? data.LoadDate.split('T')[0]:''}</p>
     </div>
 </div>
 <div class="mainbody" style="display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 10px; row-gap: 0px;">
@@ -136,10 +138,12 @@ export const FuelSlip =(data)=>{
     <p  class="text" style="margin-block-end: 0em;">${data.VehicleNo}</p>
   
     <p  class="text" style="font-weight: bold; margin-block-end: 0em;">2. Sector:</p>
-    <p  class="text" style="margin-block-end: 0em;"></p>
+    <p  class="text" style="margin-block-end: 0em;">${data?.LoadingPoint + ' '
+        + ' to ' + ' ' + data?.UnloadingPoint
+    }</p>
   
     <p  class="text"  class="eximtext" style="font-weight: bold; margin-block-end: 0em;">3. Amount:</p>
-    <p  class="text" style="margin-block-end: 0em;"></p>
+    <p  class="text" style="margin-block-end: 0em;">${data?.HSD}</p>
     <p  class="text"  class="eximtext" style="font-weight: bold; margin-block-end: 0em;">4. Pump:</p>
     <p  class="text" style="margin-block-end: 0em;">${data.PumpName}</p>
   </div>
