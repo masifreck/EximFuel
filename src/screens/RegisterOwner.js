@@ -269,7 +269,26 @@ useEffect(() => {
       Alert.alert('Validation Error', 'Please enter IFSC Code.');
       return false;
     }
-
+if (!adharFront) {
+      setErrorMessage('Please upload Aadhar Front Photo');
+      setShowAlert(true);
+      return false;
+    }
+    if (!adharBack) {
+      setErrorMessage('Please upload Aadhar Back Photo');
+      setShowAlert(true);
+      return false;
+    }
+    if (!PanPhotot) {
+      setErrorMessage('Please upload Pan Card Photo');
+      setShowAlert(true);
+      return false;
+    }
+    if (!passPhoto) {
+      setErrorMessage('Please upload Passbook Photo');
+      setShowAlert(true);
+      return false;
+    }
     return true;
   };
 
@@ -1066,12 +1085,14 @@ const HadleSendOTP2 = async () => {
               title=" Adhar Front"
               onImagePicked={handleAdharFront}
               imageData={adharFront}
+              isMandatory={true}
             />
             <CustomImagePicker
               bgImage={require('../assets/adhar_BACK.png')}
               title=" Adhar Back"
               onImagePicked={handleAdharBack}
               imageData={adharBack}
+              isMandatory={true}
             />
           </View>
 
@@ -1081,12 +1102,14 @@ const HadleSendOTP2 = async () => {
               title="Passbook Front"
               onImagePicked={handlePassbook}
               imageData={passPhoto}
+              isMandatory={true}
             />
             <CustomImagePicker
               bgImage={require('../assets/pan-card.png')}
               title=" PAN Card Front"
               onImagePicked={handlePanCard}
               imageData={PanPhotot}
+              isMandatory={true}
             />
           </View>
         </View>

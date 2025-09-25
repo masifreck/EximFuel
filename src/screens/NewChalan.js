@@ -45,13 +45,13 @@ const NewChalan = ({navigation, route}) => {
     global.btoa = btoa;
   }
 
-  const {params: {JobDetails, VEHICLENO, VEHICLEID, DLNo ,Id} = {}} = useRoute();
+  const {params: {JobDetails, VEHICLENO, VEHICLEID, DLNo ,Id, challan} = {}} = useRoute();
 
   //console.log("Job Details from route:", JobDetails);
   // console.log("Vehicle No:", VEHICLENO);
   // console.log("Vehicle ID:", VEHICLEID);
   // console.log("id:", Id);
-
+const [ChallanNo,setChallanNo] = useState('');
   const [data1, setData1] = useState({});
 const [AId,setAId]=useState(null);
   const [isStep1Visible, setIsStep1Visible] = useState(false);
@@ -87,7 +87,12 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
 
   const [brokerName, setBrokerName] = useState('');
   const [associationName, setAssociationName] = useState('');
+
   const [jobId, setJobId] = useState('');
+  const [jobNo,setJobNo]=useState('');
+  const [searchJob,setSearchJob]=useState('');
+  const [JobData, setJobData] = useState([]);
+
   const [ownerId, setOwnerId] = useState('');
   const [truckSource, setTruckSource] = useState('');
   const [loadingPointId, setLoadingPointId] = useState('');
@@ -118,7 +123,46 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
   const [InvoiceDoc, setInvoiceDoc] = useState();
 
   const [isOtherAccount, setIsOtherAccount] = useState(false);
-
+ const fetchJob = async (search) => {
+    try {
+      console.log('Fetching jobs with search:', search);
+      const encodedSearch = encodeURIComponent(search);
+      const url = `https://exim.tranzol.com/api/DropDown/Jobno?search=${encodedSearch}`;
+      console.log('Request URL:', url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+        Authorization: `Basic ${apiTokenReceived}`,
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+     //   console.log('API Response:', data);
+        
+        if (data.JobList) {
+          const jobData = data.JobList.map((job) => ({
+            label: job.JobNo,
+            value: job.JobId,            
+          }));
+          setJobData(jobData);
+           console.log('Job data set:', jobData);
+        } else {
+          console.log('JobList is missing in the response');
+        }
+      } else {
+        console.log('Error in fetching Job no:', response.status);
+      }
+    } catch (error) {
+      console.log('Error in fetching job no:', error);
+    }
+  };
+  useEffect(() => {
+    if (searchJob) {
+      fetchJob(searchJob);
+    }
+  }, [searchJob]);
   useEffect(() => {}, [isVisibleEWaybill2]);
 
   const [ownerData, setOwnerData] = useState(null);
@@ -201,31 +245,7 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
         }
 
         // ================= JOB DETAILS =================
-        if (JobDetails) {
-          const jobUrl = `https://exim.tranzol.com/api/DropDown/Jobno?search=${JobDetails.label}`;
-          const jobRes = await fetch(jobUrl, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Basic ${apiTokenReceived}`,
-            },
-          });
-
-          if (jobRes.ok) {
-            const jobData = await jobRes.json();
-            //console.log("Job Data:", jobData);
-            if (jobData?.JobList?.length > 0) {
-              const job = jobData.JobList[0];
-              setJobId(job.JobId);
-              setJobDetails2(job);
-              setLoadingPointId(job.LoadingPointId);
-              setUnLoadingPointId(job.UnloadingPointId);
-              setConsignorId(job.ConsignorId);
-              setConsigneeId(job.ConsigneeId);
-              setMaterialId(job.MaterialId);
-            }
-          }
-        }
+       
 
         // ================= DRIVER DETAILS =================
         if (DLNo) {
@@ -256,6 +276,46 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
     fetchAllDetails();
   }, [VEHICLENO, JobDetails, DLNo, apiTokenReceived, Id]);
 
+  useEffect(()=>{
+    if(JobDetails){
+      setJobNo(JobDetails.label)
+      fetchJobNo(JobDetails.label)
+    }
+  },[JobDetails])
+const fetchJobNo = async ( jobNo)=> {
+          const jobUrl = `https://exim.tranzol.com/api/DropDown/Jobno?search=${jobNo}`;
+          const jobRes = await fetch(jobUrl, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Basic ${apiTokenReceived}`,
+            },
+          });
+
+          if (jobRes.ok) {
+            const jobData = await jobRes.json();
+          //  console.log("Job with job no  Data:", jobData);
+            if (jobData?.JobList?.length > 0) {
+              const job = jobData.JobList[0];
+              setJobId(job.JobId);
+              setJobDetails2(job);
+              setLoadingPointId(job.LoadingPointId);
+              setUnLoadingPointId(job.UnloadingPointId);
+              setConsignorId(job.ConsignorId);
+              setConsigneeId(job.ConsigneeId);
+              setMaterialId(job.MaterialId);
+            }
+          }
+        }
+  useEffect(()=>{
+    if(jobNo){
+      try{
+          fetchJobNo(jobNo)
+      }catch(error){
+        Alert.alert('Error In Job Fetch',error)
+      }
+    }
+  },[jobNo])
   const convertDateFormat = dateString => {
     const [day, month, year] = dateString.split('/'); // Split by "/"
     return `${year}-${month}-${day}`; // Rearrange to "YYYY-MM-DD"
@@ -386,6 +446,7 @@ const deleteAlloments = async(Id)=>{
     if (!isValid) return; // Stop if validation fails
     setIsLoading(true);
     const postData = {
+      ChallanNo :challan || '',
       EwayBillNo1: ewayBillNo1 || '',
       ClientInvoiceNo1: clientInvoice1 || '',
       GPSNo: GpsNo || '',
@@ -476,27 +537,30 @@ const deleteAlloments = async(Id)=>{
         const responseText = await response.text();
        // console.log('Server Response:', responseText);
 
-        if (responseText.includes('E-')) {
-          deleteAlloments(Id)
-          const code = responseText.replace(/"/g, '').trim();
-deleteAlloments(Id)
-          Alert.alert(
-            'Success',
-            `Your Code: ${code}`,
-            [
-              {
-                text: 'Copy & OK',
-                onPress: () => {
-                  Clipboard.setString(code); // ✅ Copy to clipboard
-                  navigation.goBack();
-                },
-              },
-            ],
-            {cancelable: false},
-          );
-        } else {
-          Alert.alert('Error', responseText.replace(/"/g, ''));
-        }
+//         if (responseText.includes('E-')) {
+//           deleteAlloments(Id)
+//           const code = responseText.replace(/"/g, '').trim();
+// deleteAlloments(Id)
+//           Alert.alert(
+//             'Success',
+//             `Your Code: ${code}`,
+//             [
+//               {
+//                 text: 'Copy & OK',
+//                 onPress: () => {
+//                   Clipboard.setString(code); // ✅ Copy to clipboard
+//                   navigation.goBack();
+//                 },
+//               },
+//             ],
+//             {cancelable: false},
+//           );
+        // } else {
+        //   Alert.alert('Error', responseText.replace(/"/g, ''));
+        // }
+        deleteAlloments(Id)
+        Alert.alert('Sucess','Challan saved !')
+           navigation.goBack();
       } else {
         console.error(
           'Server returned an error:',
@@ -723,6 +787,11 @@ deleteAlloments(Id)
       console.log('Error in fetching broker no:', error);
     }
   };
+
+  const [isJobEdit,setJobEdit]=useState(false);
+  const JobEditToggle =()=>{
+    setJobEdit(prev=>!prev)
+  }
   const toggleSwitch = () => setIsOtherAccount(prev => !prev);
   return (
     <ScrollView
@@ -756,7 +825,8 @@ deleteAlloments(Id)
               placeholderTextColor={'#6c6f73'}
               style={{
                 color: 'black',
-                fontSize: 15,
+                fontSize: 16,
+                fontWeight:'bold',
                 width: '100%',
                 height: 50,
                 backgroundColor: inputbgColor,
@@ -768,8 +838,9 @@ deleteAlloments(Id)
               }}
               numberOfLines={2}
               placeholder={
-                'Challan No will automatically generate after submssion !!'
+                ''
               }
+              value={challan}
               editable={false}
             />
 
@@ -914,11 +985,51 @@ deleteAlloments(Id)
                     />
                   </>
                 </View>
+              {isJobEdit && (
+                <>
+                <View style={{zIndex:10}}>
+                   <Text style={styles.levelText}>
+                Select Job No
+              </Text>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={JobData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Load Type'}
+                value={jobId}
+                onChange={item => {
+                  setJobId(item.value);
+                  setJobNo(item.label)
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchJob(text);  // Update searchTerm as user types
+  }}
+              />
+              </View>
+                </>
+              )}
                 <View style={{marginTop: 10, marginBottom: 20}}>
+                      <TouchableOpacity 
+                      onPress={JobEditToggle}
+                      style={{position:'absolute',top:10,right:10,width:50,height:25,zIndex:10}} >
+                    <Image
+                    source={require('../assets/pencil.png')}
+                    style={{width: '100%', height: 25, resizeMode: 'contain'}}
+                  />
+                  </TouchableOpacity>  
                   <CardType2
                     heading="JOB DETAILS"
                     title="Job No"
-                    value={JobDetails?.label ? JobDetails.label : ' '}
+                    value={jobNo ? jobNo : ' '}
                     borderTopLeftRadius={15}
                     borderTopRightRadius={15}
                   />
@@ -979,21 +1090,31 @@ deleteAlloments(Id)
                     <Text style={styles.btntext}>Reset</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => {
-                      if (!IsVerified) {
-                        Alert.alert(
-                          'Error',
-                          'Vehicle Verification is required before proceeding!',
-                        );
-                      } else if (!IsCommercial) {
-                        Alert.alert(
-                          'Error',
-                          'This action is only allowed for Commercial entries!',
-                        );
-                      } else {
-                        HandleNext1();
-                      }
-                    }}
+            onPress={() => {
+  if (!challan) {
+    Alert.alert('Validation Error', 'Challan No is mandatory');
+    return;
+  }
+
+  if (!IsVerified) {
+    Alert.alert(
+      'Error',
+      'Vehicle Verification is required before proceeding!'
+    );
+    return;
+  }
+
+  if (!IsCommercial) {
+    Alert.alert(
+      'Error',
+      'This action is only allowed for Commercial entries!'
+    );
+    return;
+  }
+
+  HandleNext1();
+}}
+
                     style={[styles.btn, {marginBottom: 50}]}>
                     <Text style={styles.btntext}>Next</Text>
                   </TouchableOpacity>

@@ -269,12 +269,12 @@ useEffect(() => {
   fetchAndSetCurrentLocation();
 }, []);
   const validation = () => {
-     if(!MapUrl){
-      setErrorMessage('Please enalbe your location');
-      setShowAlert(true);
-       fetchAndSetCurrentLocation();
-      return false;
-    }
+    //  if(!MapUrl){
+    //   setErrorMessage('Please enalbe your location');
+    //   setShowAlert(true);
+    //    fetchAndSetCurrentLocation();
+    //   return false;
+    // }
     if(!ownerNameSelected){
       setErrorMessage('Please select Owner Name');
       setShowAlert(true);
@@ -285,7 +285,16 @@ useEffect(() => {
       setShowAlert(true);
       return false;
     }
-
+if (!RCFrontPhoto) {
+  setErrorMessage('Please upload RC Front Photo');
+  setShowAlert(true);
+  return false;
+}
+  if (!RCBackPhotot) {
+  setErrorMessage('Please upload RC Back Photo');
+  setShowAlert(true);
+  return false;
+}
     return true;
   };
   const registertheVehicle =async () => {
@@ -650,12 +659,14 @@ style={styles.dlCard}>
               title=" RC Front"
               onImagePicked={handleRCFront}
               imageData={RCFrontPhoto}
+              isMandatory={true}
             />
             <CustomImagePicker
               bgImage={require('../assets/rcnewback.png')}
               title=" RC Back"
               onImagePicked={handleRCBack}
               imageData={RCBackPhotot}
+              isMandatory={true}
             />
           </View>
 

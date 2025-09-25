@@ -4,7 +4,6 @@ export const FreightMemo = (data,qrData)=>{
     const frieght = (data?.NetWt * data?.FreightRate)?.toFixed(3)
     const advance = data?.Cash + data?.BankAmount + data?.HSD
     const balance = frieght - advance
-
     return`
       <!DOCTYPE html>
       <html>
@@ -83,7 +82,7 @@ export const FreightMemo = (data,qrData)=>{
         padding-left: 10px;
     }
     mainbody{
-        padding: 10px;
+        padding: 5px;
     }
     .lastcontainer{
         display: flex;
@@ -100,9 +99,45 @@ export const FreightMemo = (data,qrData)=>{
         border-top: 1px solid #000;
         padding-left: 10px;
     }
+        .text{
+        font-size: 12px;
+        }
     .notetext{
         font-size: 11px;
     }
+        .row-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns:  auto 1fr;
+    gap: 10px;
+    row-gap: 0px;
+    width:70%;
+  }
+      .pair2 {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+    row-gap: 0px;
+    padding-horizontal: 10px;
+    width:30%;
+  }
+
+  .label {
+    font-weight: bold;
+    margin-block-end: 0em;
+     font-size: 12px;
+  }
+
+  .value {
+    margin-block-end: 0em;
+     font-size: 12px;
+  }
     @media print {
             * {
                 -webkit-print-color-adjust: exact; /* For Safari */
@@ -140,9 +175,12 @@ export const FreightMemo = (data,qrData)=>{
     <div>
 <p class="text" style="margin-block-end: 0em;margin-top: -10px;">No.:</p>
 <p class="text" style="margin-block-end: 0em; margin-top: 0px;">Date.:${data?.LoadDate? data.LoadDate.split('T')[0]:''}</p>
+
+
+
     </div>
 </div>
-<div class="mainbody" style="display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 10px; row-gap: 0px;">
+<div class="mainbody" style="display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 5px; row-gap: 0px;">
     <p  class="text" style="font-weight: bold; margin-block-end: 0em;">1. Vehicle No.:</p>
     <p  class="text" style="margin-block-end: 0em;">${data?.VehicleNo}</p>
   
@@ -150,7 +188,6 @@ export const FreightMemo = (data,qrData)=>{
    <p className="text" style={{ marginBlockEnd: "0em" }}>
   ${data?.AssociationName || ''} / ${data?.BrokerName || ''}
 </p>
-
   
     <p  class="text"  class="eximtext" style="font-weight: bold; margin-block-end: 0em;">3.Dispatch:</p>
     <p  class="text" style="margin-block-end: 0em;">${data?.ConsignorName || '' + ' ' + data?.ConsigneeName || ''}</p>
@@ -164,19 +201,66 @@ export const FreightMemo = (data,qrData)=>{
     <p class="text" style="font-weight: bold; margin-block-end: 0em;">6. Transportation Rate:</p>
     <p class="text" style="margin-block-end: 0em;">₹ ${data?.FreightRate} </p>
   
-    <p class="text" style="font-weight: bold; margin-block-end: 0em;">7. Freight:</p>
-    <p class="text" style="margin-block-end: 0em;">₹ ${frieght}
- </p>
+    
   
-    <p class="text" style="font-weight: bold; margin-block-end: 0em;">8. Advance:</p>
-    <p class="text" style="margin-block-end: 0em;">${advance}</p>
-  
-    <p class="text" style="font-weight: bold; margin-block-end: 0em;">9. Balance:</p>
-    <p class="text" style="margin-block-end: 0em;">₹
-    ${balance}
+ 
 
-    </p>
   </div>
+  <div style="padding:5px">
+
+  <div class="row-container">
+  <div class="pair">
+    <p class="label">7. Freight:</p>
+    <p class="value">₹ ${frieght}</p>
+  </div>
+  <div class="pair2">
+    <p class="label">8. Cash:</p>
+    <p class="value">${data?.Cash}</p>
+  </div>
+</div>
+
+<div class="row-container">
+  <div class="pair">
+    <p class="label">9. Bank Amt:</p>
+    <p class="value">${data?.BankAmount}</p>
+  </div>
+  <div class="pair2">
+    <p class="label">10. HSD:</p>
+    <p class="value">${data?.HSD}</p>
+  </div>
+</div>
+
+<div class="row-container">
+  <div class="pair">
+    <p class="label">11. Advance:</p>
+    <p class="value">${advance}</p>
+  </div>
+  <div class="pair2">
+    <p class="label">12. Balance:</p>
+    <p class="value">₹${balance}</p>
+  </div>
+</div>
+
+<div class="row-container">
+  <div class="pair">
+    <p class="label">13. A/C Name:</p>
+    <p class="value">${data?.AccountholderName}</p>
+  </div>
+  <div class="pair2">
+ <p class="label">15. IFSC:</p>
+    <p class="value">${data?.IfscCode}</p>
+  </div>
+</div>
+
+<div class="row-container">
+  <div class="pair">
+        <p class="label">14. A/C No.:</p>
+    <p class="value">${data?.AccountNo}</p>
+  </div>
+  <div class="pair"></div>
+</div>
+</div>
+  
   <div class="lastcontainer">
 <div>
     <p class="sign">Signature of Representative</p>

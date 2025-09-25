@@ -48,7 +48,7 @@ const AllotmentList = ({ navigation }) => {
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       const result = await response.json();
-     // console.log("PreLoading API Response:", result);
+    // console.log("PreLoading API Response:", result);
       setAllotments(Array.isArray(result?.data) ? result.data : []);
     } catch (error) {
       console.error("Error fetching PreLoading data:", error);
@@ -142,6 +142,7 @@ const deletePreLoading = async (id) => {
               DLNo: item.DriverDlNo, // may be undefined
               PANNo: item.PANNo, // may be undefined
               Id: item.Id, 
+              challan :item.ChallanNo
             });
           },
         },
@@ -160,7 +161,7 @@ const deletePreLoading = async (id) => {
         onPress={() => handleRowClick(item)}
       >
         <Text style={[styles.cell, { width: 100 }]}>{dateOnly}</Text>
-        <Text style={[styles.cell, { width: 90 }]}>{normalized(item.Id)}</Text>
+        <Text style={[styles.cell, { width: 90 }]}>{normalized(item.ChallanNo)}</Text>
         <Text style={[styles.cell, { width: 150 }]}>{normalized(item.JobNo)}</Text>
         <Text style={[styles.cell, { width: COL_WIDTH }]}>{normalized(item.VehicleNo)}</Text>
         <Text style={[styles.cell, { width: COL_WIDTH }]}>{normalized(item.DriverName)}</Text>
@@ -197,7 +198,7 @@ const deletePreLoading = async (id) => {
   </View>
 
   <View style={styles.headerCellWrapper}>
-    <Text style={[styles.headerCell, { width: 90 }]}>🆔 Alltmnt Id</Text>
+    <Text style={[styles.headerCell, { width: 90 }]}>📑Challan No</Text>
   </View>
 
   <View style={styles.headerCellWrapper}>

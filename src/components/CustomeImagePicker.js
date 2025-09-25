@@ -5,7 +5,7 @@ import { darkBlue, inputbgColor, textColor } from './constant';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const ScreenWidth=Dimensions.get('window').width
-const   CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width,imageData}) => {
+const   CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width,imageData,isMandatory}) => {
 
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -101,9 +101,11 @@ const   CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,
     return (
         <>
         <View style={{flexDirection:'column'}}>
-          <Text style={styles.pickbtntext}>
-                        {title}
-                    </Text>
+        <Text style={styles.pickbtntext}>
+  {title}
+  {isMandatory && <Text style={{ color: 'red' }}> *</Text>}
+</Text>
+
         <ImageBackground source={imageData ? { uri: imageData.uri } : bgImage } style={{width:width?width:120,height:80,margin:10,
         }}  imageStyle={{ borderRadius: 10, }}>
             

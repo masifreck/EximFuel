@@ -142,10 +142,28 @@ console.log('pre loading payload',payload)
       <Text style={styles.detailKey}>Mobile</Text>
       <Text style={styles.detailValue}>{ownerData?.PrimaryMobileNo ?? "N/A"}</Text>
     </View>
-    <View style={styles.detailRow}>
-      <Text style={styles.detailKey}>Account No</Text>
-      <Text style={styles.detailValue}>{ownerData?.AccountNo ?? "N/A"}</Text>
+      <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Bank Name</Text>
+      <Text style={styles.detailValue}>{ownerData?.BankNameName ?? " "}</Text>
     </View>
+    <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Account Type </Text>
+      <Text style={styles.detailValue}>{ownerData?.BankTypeName ?? "N/A"}</Text>
+    </View>
+
+     <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Account No</Text>
+      <Text style={styles.detailValue}>{ownerData?.AccountNo ?? " "}</Text>
+    </View>
+     <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>Account No</Text>
+      <Text style={styles.detailValue}>{ownerData?.AccountNo ?? " "}</Text>
+    </View>
+     <View style={styles.detailRow}>
+      <Text style={styles.detailKey}>IFSC Code</Text>
+      <Text style={styles.detailValue}>{ownerData?.IFSCCode ?? " "}</Text>
+    </View>
+   
   </View>
 
   {/* Driver Details */}

@@ -220,9 +220,9 @@ const RegisterDriver = ({route}) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const adharRegex = /^\d{12}$/;
     if (
-      !(cleanDL.length === 15 || cleanDL.length === 16) ||
-      !regex.test(cleanDL)
+      !(dlNumber.length === 15 || dlNumber.length === 16) 
     ) {
+      console.log('dl no',cleanDL)
       setErrorMessage('Please enter a valid DL No.');
       setShowAlert(true);
       return false;
@@ -265,17 +265,36 @@ const RegisterDriver = ({route}) => {
       setShowAlert(true);
       return false;
     }
-    if (email && !emailRegex.test(email)) {
-      setErrorMessage('Please enter a valid email address');
+    // if (email && !emailRegex.test(email)) {
+    //   setErrorMessage('Please enter a valid email address');
+    //   setShowAlert(true);
+    //   return false;
+    // }
+
+     if (!DriverFrontImage) {
+ setErrorMessage('Please add Driver Photo');
       setShowAlert(true);
       return false;
-    }
-    if (!MapUrl) {
-      setErrorMessage('Please enalbe your location');
+     }
+     if (!driverAddress || driverAddress.length < 12) {
+  setErrorMessage('Driver Address must be at least 12 characters long');
+  setShowAlert(true);
+  return false;
+}
+
+
+      if (DLPhoto) {
+ setErrorMessage('Please add Driver DL.');
       setShowAlert(true);
-      fetchAndSetCurrentLocation();
       return false;
-    }
+
+      }
+    // if (!MapUrl) {
+    //   setErrorMessage('Please enalbe your location');
+    //   setShowAlert(true);
+    //   fetchAndSetCurrentLocation();
+    //   return false;
+    // }
     // If valid
     return true;
   };
@@ -322,20 +341,20 @@ const RegisterDriver = ({route}) => {
         name: DriverFrontImage.fileName || 'driver.jpg',
       });
     }
-    if (DriverLeftImage) {
-      formData.append('DriverLeftImage', {
-        uri: DriverLeftImage.uri,
-        type: DriverLeftImage.type,
-        name: DriverLeftImage.fileName || 'driver.jpg',
-      });
-    }
-    if (DriverRightImage) {
-      formData.append('DriverRightImage', {
-        uri: DriverRightImage.uri,
-        type: DriverRightImage.type,
-        name: DriverRightImage.fileName || 'driver.jpg',
-      });
-    }
+    // if (DriverLeftImage) {
+    //   formData.append('DriverLeftImage', {
+    //     uri: DriverLeftImage.uri,
+    //     type: DriverLeftImage.type,
+    //     name: DriverLeftImage.fileName || 'driver.jpg',
+    //   });
+    // }
+    // if (DriverRightImage) {
+    //   formData.append('DriverRightImage', {
+    //     uri: DriverRightImage.uri,
+    //     type: DriverRightImage.type,
+    //     name: DriverRightImage.fileName || 'driver.jpg',
+    //   });
+    // }
     if (DLPhoto) {
       formData.append('DrivingLicence', {
         uri: DLPhoto.uri,
@@ -651,7 +670,7 @@ const openDialScreen = async (number) => {
         });
 
         const data = await response.json();
-        //  console.log(data);
+         console.log(data);
         setCalendarVisible(false);
         if (data?.apiResult?.Result) {
           const Details = data.apiResult.Result;
@@ -687,7 +706,7 @@ const openDialScreen = async (number) => {
       ) : (
         <ScrollView style={{backgroundColor: '#edeef2'}}>
           {IsLoading ? (
-            <Loading />
+            <LoadingIndicator/>
           ) : (
             <View style={styles.container}>
               <View style={styles.imgContainer}>
@@ -751,8 +770,7 @@ const openDialScreen = async (number) => {
               {currentPage === 1 && (
                 <>
                   <DLCard
-                    dlno={dlNumber}
-                    DOB={selectedStartDate}
+                    dlno={dlNumber}                    DOB={selectedStartDate}
                     name={name}
                     ValidTill={ValidTill}
                     Commercial={Commercial}
@@ -1054,6 +1072,7 @@ const openDialScreen = async (number) => {
                     /> */}
                     <CustomImagePicker
                       width={80}
+                      isMandatory={true}
                       bgImage={require('../assets/frontphoto.png')}
                       onlyCamera={true}
                       title="Driver Photo Front"
@@ -1104,6 +1123,7 @@ const openDialScreen = async (number) => {
                       iconName="camera-enhance"
                       onImagePicked={handleDL}
                       imageData={DLPhoto}
+                      isMandatory={true}
                     />
 
                     <CustomImagePicker
