@@ -1,6 +1,6 @@
 import {ElBase64} from '../components/Elbase';
 
-export const ConsignorHTML = (data, qrData, type) => {
+export const ConsignorHTML = (data, qrData, type,signatureUrl) => {
  // console.log('qr data ON consignee html', qrData);
   return `
       <!DOCTYPE html>
@@ -180,14 +180,14 @@ border-bottom: 1px solid #000;
     }
     .sign{
       width: 20%;
-      margin-top: 20px;
+      margin-top: 0px;
     }
     .signtext{
       font-weight: bold;
       width: 80%;
     }
     .signature-section {
-      margin-top: 20px;
+      margin-top: 0px;
     }
     .systemgen{
       font-size: 10px;
@@ -685,11 +685,12 @@ I <b>${+' ' + data?.DriverName + ''}</b> driver of the Vehicle No. <b> ${
     ' ' + data?.DriverLicenseNo + ' '
   }</b> do here by declare that I have read and understood the above mentioned Terms and Condition properly and again hereby promising to be abided myself with all the terms and condition.
 </p>
-<div style="display: flex; flex-direction:row; width:100%; justify-content:space-evenly; margin-top:50px">
+<div style="display: flex; flex-direction:row; width:100%; justify-content:space-evenly; margin-top:5px">
     <div >
-<p class="signtext">Signature of Driver</p>
+<p style="margin-top:60px;" class="signtext">Signature of Driver</p>
      </div>
      <div >
+       <img src="${signatureUrl}" style="width:110px;height:60px;" />
 <p class="signtext">For EXIM LOGISTICS PVT. LTD</p>
      </div>
 </div>

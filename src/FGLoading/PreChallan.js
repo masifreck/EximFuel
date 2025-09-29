@@ -335,6 +335,25 @@ const fetchDriver = async (search) => {
   const handleSelection = (value) => {
     setSelected(value);
   };
+  const resetInputs1 = () => {
+  setchallanNumber('');
+  setPANNo('');
+  setDLNo('');
+  setSearchTerm('');
+  setSearchVehicle('');
+  setSearchDriver('');
+  setSelectedJobNo('');
+  setSelectedVehicleNo('');
+  setOwnerName('');
+  setOwnerId('');
+  setVehicleId('');
+  setDriverId('');
+  setJobNo('');
+  setVehicleNo('');
+  setDriverName('');
+  setSelectedDate(null);
+  setJobDetails({});
+};
 const handleGenerateChallan = () => {
   if (
     (!jobNo || jobNo.length === 0) ||
@@ -359,6 +378,7 @@ const handleGenerateChallan = () => {
       ownerId:ownerId,
       selectedDate:selectedDate,
     });
+    resetInputs1();
   }
 };
 

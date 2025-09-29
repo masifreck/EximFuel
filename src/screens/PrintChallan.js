@@ -25,7 +25,7 @@ const PrintChallan = ({navigation}) => {
 const [selectedPrint,setSelectedPrint]=useState("1")
   const [IsLoading, setIsLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [ChallanNo, setChallanNo] = useState('');
+  const [ChallanNo, setChallanNo] = useState('E-2526-');
   const [fetchedData, setFetchedData] = useState({});
   const [fadeAnim] = useState(new Animated.Value(0));
   const [hasBorder, setHasBorder] = useState(false); // State for border

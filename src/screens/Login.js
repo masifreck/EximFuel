@@ -77,7 +77,8 @@ const Login = ({navigation}) => {
             console.log(result);
             AsyncStorage.setItem('username', userId);
             AsyncStorage.setItem('password', password);
-            AsyncStorage.setItem('Token', result);
+            AsyncStorage.setItem('Token', result.token);
+                AsyncStorage.setItem('Sign', result.signature);
             navigation.replace('DrawerNavigation');
           }
         })

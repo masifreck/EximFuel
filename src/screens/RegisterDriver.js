@@ -276,7 +276,7 @@ const RegisterDriver = ({route}) => {
       setShowAlert(true);
       return false;
      }
-     if (!driverAddress || driverAddress.length < 12) {
+     if (!currentAdd || currentAdd.length < 12) {
   setErrorMessage('Driver Address must be at least 12 characters long');
   setShowAlert(true);
   return false;
@@ -318,7 +318,7 @@ const RegisterDriver = ({route}) => {
       SCVerification: isSCVerified,
       SecondaryContactNo: secondaryContact,
       DriverEmail: email,
-      DriverAddress: driverAddress,
+      DriverAddress: currentAdd,
       PanNo: PanNo,
     };
     const formData = new FormData();
@@ -852,6 +852,7 @@ const openDialScreen = async (number) => {
                       stringlength={12}
                       keyboardTypename="numeric"
                       isMandatory={true}
+                      value={adharNumber}
                     />
 
                     <View
@@ -870,6 +871,7 @@ const openDialScreen = async (number) => {
                         keyboardTypename="numeric"
                         isMandatory={true}
                         isIcon={true}
+                        value={primaryContact}
                       />
                       <TouchableOpacity
                         style={{position: 'absolute', right: 95, top: 20}}
@@ -939,6 +941,7 @@ const openDialScreen = async (number) => {
                         stringlength={10}
                         keyboardTypename="numeric"
                         isIcon={true}
+                        value={secondaryContact}
                       />
 
                       <TouchableOpacity
@@ -1000,12 +1003,15 @@ const openDialScreen = async (number) => {
                       placeholdername="Enter Pan Number"
                       onChangeText={text => setPanNo(text)}
                       autoCapitalize={'charters'}
+                      stringlength={10}
+                      value={PanNo}
                     />
 
                     <CustomInput
                       labelText="Email Address"
                       placeholdername="Enter Email Id"
                       onChangeText={text => setEmail(text)}
+                      value={email}
                     />
                     {/* <CustomInput
               labelText="Driver Address"

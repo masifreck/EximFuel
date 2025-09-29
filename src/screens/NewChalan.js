@@ -11,7 +11,7 @@ import {
   Dimensions,
   Switch,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect,useCallback} from 'react';
 import {data, LoadtypeData} from '../components/DropDownData';
 import {useRoute} from '@react-navigation/native';
 
@@ -28,22 +28,32 @@ import CardType2 from '../FGLoading/CardType2';
 import Searching from '../components/Searching';
 import {decode as atob, encode as btoa} from 'base-64';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { useFocusEffect } from "@react-navigation/native";
 const NewChalan = ({navigation, route}) => {
-  const [apiTokenReceived, setapiTokenReceived] = useState(null);
-  AsyncStorage.getItem('Token')
-    .then(token => {
+const [apiTokenReceived, setapiTokenReceived] = useState(null);
+
+useEffect(() => {
+  const getToken = async () => {
+    try {
+      let token = await AsyncStorage.getItem('Token');
+      if (!token) {
+        token = useApiToken(); // fallback if not in AsyncStorage
+      }
       setapiTokenReceived(token);
-    })
-    .catch(error => {
-      const TokenReceived = useApiToken();
-      setapiTokenReceived(TokenReceived);
-    });
+    } catch (err) {
+      console.log('Error getting token:', err);
+    }
+  };
+  getToken();
+}, []);
+
   if (!global.atob) {
     global.atob = atob;
   }
   if (!global.btoa) {
     global.btoa = btoa;
   }
+  const { params } = useRoute();
 
   const {params: {JobDetails, VEHICLENO, VEHICLEID, DLNo ,Id, challan} = {}} = useRoute();
 
@@ -125,10 +135,10 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
   const [isOtherAccount, setIsOtherAccount] = useState(false);
  const fetchJob = async (search) => {
     try {
-      console.log('Fetching jobs with search:', search);
+    //  console.log('Fetching jobs with search:', search);
       const encodedSearch = encodeURIComponent(search);
       const url = `https://exim.tranzol.com/api/DropDown/Jobno?search=${encodedSearch}`;
-      console.log('Request URL:', url);
+      //console.log('Request URL:', url);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -147,9 +157,9 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
             value: job.JobId,            
           }));
           setJobData(jobData);
-           console.log('Job data set:', jobData);
+         //  console.log('Job data set:', jobData);
         } else {
-          console.log('JobList is missing in the response');
+         // console.log('JobList is missing in the response');
         }
       } else {
         console.log('Error in fetching Job no:', response.status);
@@ -266,7 +276,7 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
           }
         }
       } catch (error) {
-        console.error('Error fetching details:', error);
+      //  console.error('Error fetching details:', error);
         Alert.alert('Error', 'Failed to fetch details. Please try again.');
       } finally {
         setLoadingDetails(false);
@@ -275,38 +285,61 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
 
     fetchAllDetails();
   }, [VEHICLENO, JobDetails, DLNo, apiTokenReceived, Id]);
-
-  useEffect(()=>{
-    if(JobDetails){
-      setJobNo(JobDetails.label)
-      fetchJobNo(JobDetails.label)
+const fetchJobNo = useCallback(
+  async (jobNo) => {
+    if (!apiTokenReceived) {
+   //   console.log('Token not ready yet!');
+      return;
     }
-  },[JobDetails])
-const fetchJobNo = async ( jobNo)=> {
-          const jobUrl = `https://exim.tranzol.com/api/DropDown/Jobno?search=${jobNo}`;
-          const jobRes = await fetch(jobUrl, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Basic ${apiTokenReceived}`,
-            },
-          });
 
-          if (jobRes.ok) {
-            const jobData = await jobRes.json();
-          //  console.log("Job with job no  Data:", jobData);
-            if (jobData?.JobList?.length > 0) {
-              const job = jobData.JobList[0];
-              setJobId(job.JobId);
-              setJobDetails2(job);
-              setLoadingPointId(job.LoadingPointId);
-              setUnLoadingPointId(job.UnloadingPointId);
-              setConsignorId(job.ConsignorId);
-              setConsigneeId(job.ConsigneeId);
-              setMaterialId(job.MaterialId);
-            }
-          }
+//    console.log('Inside fetchJobNo with jobNo:', jobNo);
+
+    try {
+      const jobUrl = `https://exim.tranzol.com/api/DropDown/Jobno?search=${jobNo}`;
+      const jobRes = await fetch(jobUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${apiTokenReceived}`,
+        },
+      });
+
+      if (jobRes.ok) {
+        const jobData = await jobRes.json();
+       // console.log('Job with job no Data:', jobData);
+
+        if (jobData?.JobList?.length > 0) {
+          const job = jobData.JobList[0];
+          setJobId(job.JobId);
+          setJobDetails2(job);
+          setLoadingPointId(job.LoadingPointId);
+          setUnLoadingPointId(job.UnloadingPointId);
+          setConsignorId(job.ConsignorId);
+          setConsigneeId(job.ConsigneeId);
+          setMaterialId(job.MaterialId);
+         // console.log('Job set successfully ✅');
         }
+      } else {
+        console.log('Error fetching job, status:', jobRes.status);
+      }
+    } catch (err) {
+      console.error('Error fetching job:', err);
+    }
+  },
+  [apiTokenReceived] // Depend on token so function always sees latest
+);
+
+useEffect(() => {
+  if (params?.JobDetails?.label && apiTokenReceived) {
+    console.log('Calling fetchJobNo from route:', params.JobDetails.label);
+    fetchJobNo(params.JobDetails.label);
+    setJobNo(params.JobDetails.label);
+  }
+}, [params?.JobDetails?.label, apiTokenReceived, fetchJobNo]);
+
+
+
+//
   useEffect(()=>{
     if(jobNo){
       try{
@@ -316,6 +349,7 @@ const fetchJobNo = async ( jobNo)=> {
       }
     }
   },[jobNo])
+
   const convertDateFormat = dateString => {
     const [day, month, year] = dateString.split('/'); // Split by "/"
     return `${year}-${month}-${day}`; // Rearrange to "YYYY-MM-DD"
@@ -347,7 +381,7 @@ const fetchJobNo = async ( jobNo)=> {
         // ✅ Check format before decoding
         if (token.split('.').length !== 3) {
           Alert.alert('Invalid QR Code', 'Scanned QR code is incomplete.');
-          console.log('⚠️ Invalid JWT format:', token);
+         // console.log('⚠️ Invalid JWT format:', token);
           return;
         }
 
@@ -672,7 +706,6 @@ const deleteAlloments = async(Id)=>{
   }, [searchPump]);
   const fetchPump = async search => {
     try {
-      console.log('Fetching Association with search:', search);
       const encodedSearch = encodeURIComponent(search);
       const url = `https://exim.tranzol.com/api/DropDown/Pumpname?search=${encodedSearch}`;
       console.log('Request URL:', url);
@@ -714,7 +747,7 @@ const deleteAlloments = async(Id)=>{
   }, [searchAssociation]);
   const fetchAssociation = async search => {
     try {
-      console.log('Fetching Association with search:', search);
+     // console.log('Fetching Association with search:', search);
       const encodedSearch = encodeURIComponent(search);
       const url = `https://exim.tranzol.com/api/DropDown/association?search=${encodedSearch}`;
       console.log('Request URL:', url);
@@ -728,7 +761,7 @@ const deleteAlloments = async(Id)=>{
 
       if (response.ok) {
         const data = await response.json();
-        console.log('API Response:', data);
+      //  console.log('API Response:', data);
 
         if (data.Association) {
           // Corrected to use VehicleNoList
@@ -754,7 +787,7 @@ const deleteAlloments = async(Id)=>{
   }, [searchBroker]);
   const fetchBroker = async search => {
     try {
-      console.log('Fetching broker with search:', search);
+     // console.log('Fetching broker with search:', search);
       const encodedSearch = encodeURIComponent(search);
       const url = `https://exim.tranzol.com/api/DropDown/Broker?search=${encodedSearch}`;
       console.log('Request URL:', url);
@@ -768,7 +801,7 @@ const deleteAlloments = async(Id)=>{
 
       if (response.ok) {
         const data = await response.json();
-        console.log('API Response:', data);
+      //  console.log('API Response:', data);
 
         if (data.BrokerList) {
           // Corrected to use VehicleNoList
@@ -832,9 +865,10 @@ const deleteAlloments = async(Id)=>{
                 backgroundColor: inputbgColor,
                 borderRadius: 12,
                 elevation: 4,
-                fontSize: 12,
+                fontSize: 16,
                 marginBottom: 10,
                 padding: 10,
+                paddingLeft:20
               }}
               numberOfLines={2}
               placeholder={
@@ -842,6 +876,7 @@ const deleteAlloments = async(Id)=>{
               }
               value={challan}
               editable={false}
+              
             />
 
             {loadingDetails ? (
@@ -1009,6 +1044,7 @@ const deleteAlloments = async(Id)=>{
                   setJobId(item.value);
                   setJobNo(item.label)
                   setIsFocus(false);
+                  setJobEdit(false);
                 }}
                   onChangeText={text => {
     setSearchJob(text);  // Update searchTerm as user types
@@ -1096,21 +1132,21 @@ const deleteAlloments = async(Id)=>{
     return;
   }
 
-  if (!IsVerified) {
-    Alert.alert(
-      'Error',
-      'Vehicle Verification is required before proceeding!'
-    );
-    return;
-  }
+  // if (!IsVerified) {
+  //   Alert.alert(
+  //     'Error',
+  //     'Vehicle Verification is required before proceeding!'
+  //   );
+  //   return;
+  // }
 
-  if (!IsCommercial) {
-    Alert.alert(
-      'Error',
-      'This action is only allowed for Commercial entries!'
-    );
-    return;
-  }
+  // if (!IsCommercial) {
+  //   Alert.alert(
+  //     'Error',
+  //     'This action is only allowed for Commercial entries!'
+  //   );
+  //   return;
+  // }
 
   HandleNext1();
 }}
