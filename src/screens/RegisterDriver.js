@@ -283,7 +283,7 @@ const RegisterDriver = ({route}) => {
 }
 
 
-      if (DLPhoto) {
+      if (!DLPhoto) {
  setErrorMessage('Please add Driver DL.');
       setShowAlert(true);
       return false;

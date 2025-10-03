@@ -238,11 +238,7 @@ useEffect(() => {
       return false;
     }
 
-    if (!emailRegex.test(email)) {
-      setErrorMessage('Please enter a valid email address');
-      setShowAlert(true);
-      return false;
-    }
+   
     if(!MapUrl){
       setErrorMessage('Please enalbe your location');
       setShowAlert(true);
@@ -284,11 +280,7 @@ if (!adharFront) {
       setShowAlert(true);
       return false;
     }
-    if (!passPhoto) {
-      setErrorMessage('Please upload Passbook Photo');
-      setShowAlert(true);
-      return false;
-    }
+
     return true;
   };
 
@@ -1102,7 +1094,7 @@ const HadleSendOTP2 = async () => {
               title="Passbook Front"
               onImagePicked={handlePassbook}
               imageData={passPhoto}
-              isMandatory={true}
+            
             />
             <CustomImagePicker
               bgImage={require('../assets/pan-card.png')}
