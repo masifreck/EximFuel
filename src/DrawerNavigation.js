@@ -43,7 +43,7 @@ const CustomDrawerContent = (props) => {
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity> */}
         <Text style={styles.footerText}>Powered by Tranzol</Text>
-        <Text style={styles.versionText}>Version 0.0.9</Text>
+        <Text style={styles.versionText}>Version 0.1.0</Text>
       </View>
     </DrawerContentScrollView>
   );

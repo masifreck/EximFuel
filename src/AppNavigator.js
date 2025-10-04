@@ -51,6 +51,7 @@ import PrintMines from './screens/PrintMines';
 import { MinesQRCode } from './components/MinesQRCode';
 import FGNavigation from './FGLoading/FGNavigation';
 import SubmitPreChallan from './FGLoading/SubmitPreChallan';
+import SuccessUI from './components/SuccessUI';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -328,6 +329,11 @@ options={getScreenOptions('Submit Pre Challan')}
   name='minesQRCode'
   component={MinesQRCode}
   options={getScreenOptions('QR Code')}
+  />
+  <Stack.Screen 
+  name='success'
+  component={SuccessUI}
+  options={{headerShown: false}}
   />
       </Stack.Navigator>
     </NavigationContainer>

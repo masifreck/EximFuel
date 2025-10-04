@@ -1,7 +1,7 @@
 
 import { ElBase64 } from "../components/Elbase";
 export const FreightMemo = (data,qrData)=>{
-    const frieght = (data?.NetWt * data?.FreightRate)?.toFixed(3)
+    const frieght = (data?.NetWt * data?.FreightRate)?.toFixed(2)
     const advance = data?.Cash + data?.BankAmount + data?.HSD
     const balance = frieght - advance
     return`

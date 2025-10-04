@@ -331,7 +331,7 @@ const RegisterDriver = ({route}) => {
           value = String(value);
         }
         formData.append(key, value);
-        console.log(`${key}: ${value}`); // Hermes-safe logging
+       // console.log(`${key}: ${value}`); // Hermes-safe logging
       }
     });
     if (DriverFrontImage) {
@@ -385,7 +385,7 @@ const RegisterDriver = ({route}) => {
       });
     }
 
-    console.log('data', postData);
+   // console.log('data', postData);
 
     fetch('https://Exim.Tranzol.com/api/OwnerApi/CreateDriver',{
       method:'POST',
@@ -406,8 +406,9 @@ const RegisterDriver = ({route}) => {
       .then(data => {
         setIsLoading(false);
         if (data.apiResult.Result !== null) {
-           Alert.alert('Registration Successful', 'Driver registered successfully!', )
-          navigation.goBack();
+            const successMessage = `✅ Driver Registration Successful! 🎉\n\n👨‍✈️ Name: ${name}\n🪪 DL No: ${dlNumber}\n📞 Contact: ${primaryContact}`;
+
+    navigation.navigate('success', { message: successMessage });
         } else if (data.apiResult.Result === null) {
           if (
             data.apiResult.Error.includes(

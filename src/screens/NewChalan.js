@@ -1,4 +1,4 @@
-import {
+              import {
   ScrollView,
   ActivityIndicator,
   Alert,
@@ -29,6 +29,7 @@ import Searching from '../components/Searching';
 import {decode as atob, encode as btoa} from 'base-64';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useFocusEffect } from "@react-navigation/native";
+import SuccessUI from '../components/SuccessUI';
 const NewChalan = ({navigation, route}) => {
 const [apiTokenReceived, setapiTokenReceived] = useState(null);
 
@@ -569,32 +570,14 @@ const deleteAlloments = async(Id)=>{
 
       if (response.ok) {
         const responseText = await response.text();
-       // console.log('Server Response:', responseText);
 
-//         if (responseText.includes('E-')) {
-//           deleteAlloments(Id)
-//           const code = responseText.replace(/"/g, '').trim();
-// deleteAlloments(Id)
-//           Alert.alert(
-//             'Success',
-//             `Your Code: ${code}`,
-//             [
-//               {
-//                 text: 'Copy & OK',
-//                 onPress: () => {
-//                   Clipboard.setString(code); // ✅ Copy to clipboard
-//                   navigation.goBack();
-//                 },
-//               },
-//             ],
-//             {cancelable: false},
-//           );
-        // } else {
-        //   Alert.alert('Error', responseText.replace(/"/g, ''));
-        // }
         deleteAlloments(Id)
-        Alert.alert('Sucess','Challan saved !')
-           navigation.goBack();
+         navigation.navigate('success', {
+      message: `✅ Operation completed successfully! 🎉
+
+📦 Challan No: ${challan} | 🧾 Job No: ${jobNo} | 🚛 Vehicle No: ${VEHICLENO}`,
+    });
+
       } else {
         console.error(
           'Server returned an error:',
@@ -1132,21 +1115,21 @@ const deleteAlloments = async(Id)=>{
     return;
   }
 
-  // if (!IsVerified) {
-  //   Alert.alert(
-  //     'Error',
-  //     'Vehicle Verification is required before proceeding!'
-  //   );
-  //   return;
-  // }
+  if (!IsVerified) {
+    Alert.alert(
+      'Error',
+      'Vehicle Verification is required before proceeding!'
+    );
+    return;
+  }
 
-  // if (!IsCommercial) {
-  //   Alert.alert(
-  //     'Error',
-  //     'This action is only allowed for Commercial entries!'
-  //   );
-  //   return;
-  // }
+  if (!IsCommercial) {
+    Alert.alert(
+      'Error',
+      'This action is only allowed for Commercial entries!'
+    );
+    return;
+  }
 
   HandleNext1();
 }}

@@ -239,12 +239,12 @@ useEffect(() => {
     }
 
    
-    if(!MapUrl){
-      setErrorMessage('Please enalbe your location');
-      setShowAlert(true);
-       fetchAndSetCurrentLocation();
-      return false;
-    }
+    // if(!MapUrl){
+    //   setErrorMessage('Please enalbe your location');
+    //   setShowAlert(true);
+    //    fetchAndSetCurrentLocation();
+    //   return false;
+    // }
     if(!StateId){
       Alert.alert('Validation Error', 'Please select a state from the dropdown.');
       return false;
@@ -386,8 +386,9 @@ const registertheOwner = () => {
   })
   .then(data => {
     if (data.apiResult.Result !== null) {
-      Alert.alert('Registration Successful', 'Owner registered successfully!', )
-      navigation.goBack();
+       const successMessage = `✅ Owner Registration Successful! 🎉\n\n👤 Owner Name: ${name}\n🪪 PAN No: ${panno}\n\nWelcome aboard! 🚀`;
+
+    navigation.navigate('success', { message: successMessage });
     } else {
       if (data.apiResult.Error.includes("owner_panNo")) {
         setErrorMessage('Panno already exists.');

@@ -407,8 +407,9 @@ MapUrl: MapUrl,
       .then(data => {
         setIsLoading(false);
         if (data.apiResult.Result !== null) {
-        Alert.alert('Registration Successful', 'Owner registered successfully!', )
-           navigation.goBack();
+                     const successMessage = `✅ Vehicle Registration Successful! 🎉\n\n🚛 Vehicle No: ${vehicleRegistrationNo} \n\n with Owner ${ownerNameSelected}✨`;
+
+    navigation.navigate('success', { message: successMessage });
         } else {
           if (
             data.apiResult.Error.includes(
