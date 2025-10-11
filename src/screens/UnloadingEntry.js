@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Animated,
-  Modal,ScrollView
+  Modal,ScrollView,ActivityIndicator
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 // import {ScrollView} from 'react-native-gesture-handler';
@@ -18,6 +18,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import useApiToken from '../components/Token';
 import LoadingIndicator from '../components/LoadingIndicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomImagePicker from '../components/CustomeImagePicker';
 import Unloading from './Unloading';
 import { darkBlue } from '../components/constant';
 const RegisterOwner = () => {
@@ -59,8 +60,9 @@ const RegisterOwner = () => {
       console.log('Error retrieving token:', error);
     });
   const route = useRoute();
- // const {Unloading} = route.params;
-  const FetchminesDetails = Unloading?.apiResult?.Result? Unloading : {};
+ const {Unloading} = route.params;
+ console.log('Unloading data received:', Unloading);
+  const FetchminesDetails = Unloading?.apiResult?.Result || {};
 
 // States with safe default values
 const [isFocus, setIsFocus] = useState(false);
@@ -69,13 +71,21 @@ const [showAlert, setShowAlert] = useState(false);
 
 const [ChallanNo, setChallanNo] = useState(FetchminesDetails.ChallanNo || '');
 const [VehicleNo, setVehicleNo] = useState(FetchminesDetails.VehicleNo || '');
-const [WayBillNo, setWayBillNo] = useState(FetchminesDetails.WayBillNo || '');
-const [GSPNo, setGSPNo] = useState(FetchminesDetails.GSPNo || '');
-const [GrossWt, setGrossWt] = useState(FetchminesDetails.GrossWt || '');
-const [TareWt, setTareWt] = useState(FetchminesDetails.TareWt || '');
-const [NetWt, setNetWt] = useState(FetchminesDetails.NetWt || '');
-const [Moisture, setMoisture] = useState(FetchminesDetails.Moisture || '');
-const [LoadDate, setLoadDate] = useState(FetchminesDetails.LoadDate || '');
+const [WayBillNo, setWayBillNo] = useState(FetchminesDetails.EwayBillNo1 || '');
+const [GSPNo, setGSPNo] = useState(FetchminesDetails.GPSNo || '');
+const [GrossWt, setGrossWt] = useState(
+  parseFloat(FetchminesDetails?.GrossWt)?.toFixed(3) || ''
+);
+
+const [TareWt, setTareWt] = useState(
+  parseFloat(FetchminesDetails?.TareWt)?.toFixed(3) || ''
+);
+
+const [NetWt, setNetWt] = useState(
+  parseFloat(FetchminesDetails?.NetWt)?.toFixed(3) || ''
+);
+
+const [LoadDate, setLoadDate] = useState(FetchminesDetails?.LoadDate? FetchminesDetails.LoadDate.split('T')[0] : '');
 const [LoadType, setLoadType] = useState(FetchminesDetails.LoadType || '');
 const [Id, setId] = useState(FetchminesDetails.Id || '');
 
@@ -89,58 +99,103 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
     {label: 'Yes', value: '1'},
     {label: 'No', value: '0'},
   ];
+const [PrintUnloadImage,setPrintUnloadImage]=useState(null)
+const [UnloadImage, setUnloadImage] = useState(null);
 
-  const registertheVehicle = () => {
-    const postData = {
-      Id: Id,
-      GPSReceived: GPSReceived,
-      UnloadDate: convselectedStartDate,
-      UnloadGrossWt: UnloadGrossWt,
-      UnloadTareWt: UnloadTareWt,
-      UnloadWt: UnloadWt,
-      GRNNumber: GRNNumber,
-    };
-    const url =
-      'https://Exim.Tranzol.com/api/LoadingChallan/CreateUnloadingChallan';
+const [Loading, setLoading] = useState(false); // Loading state
+const resetUnloadingStates = () => {
+  setChallanNo(FetchminesDetails.ChallanNo || '');
+  setVehicleNo(FetchminesDetails.VehicleNo || '');
+  setWayBillNo(FetchminesDetails.EwayBillNo1 || '');
+  setGSPNo(FetchminesDetails.GPSNo || '');
+  setGrossWt(parseFloat(FetchminesDetails?.GrossWt)?.toFixed(3) || '');
+  setTareWt(parseFloat(FetchminesDetails?.TareWt)?.toFixed(3) || '');
+  setNetWt(parseFloat(FetchminesDetails?.NetWt)?.toFixed(3) || '');
+  setLoadDate(FetchminesDetails?.LoadDate ? FetchminesDetails.LoadDate.split('T')[0] : '');
+  setLoadType(FetchminesDetails.LoadType || '');
+  setId(FetchminesDetails.Id || '');
 
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${apiTokenReceived}`,
-        clientId: 'TRANZOLBOSS',
-        clientSecret: 'TRANZOLBOSSPAN',
-      },
-      redirect: 'follow',
-      body: JSON.stringify(postData),
-    };
-    fetch(url, requestOptions)
-      .then(response => {
-        console.log(response);
-        if (!response.ok) {
-          const error = 'Network response was not ok';
-          setErrorMessage(error);
-          setShowAlert(true);
-          throw new Error('Network response was not ok');
+  setUnloadDate('');
+  setUnloadGrossWt('0.00');
+  setUnloadTareWt('0.00');
+  setUnloadWt('0.00');
+  setGRNNumber('');
+  setGPSReceived('');
+  setPrintUnloadImage(null);
+  setUnloadImage(null);
+};
+
+const registertheVehicle = () => {
+ 
+
+const postData = { LoadingId: Id, GPSReceived: GPSReceived, UnloadDate: convselectedStartDate, UnloadGrossWt: UnloadGrossWt, UnloadTareWt: UnloadTareWt, UnloadWt: UnloadWt, GRNNumber: GRNNumber, };
+ const formData = new FormData();   
+Object.keys(postData).forEach(key => {
+      if (postData[key] !== null) {
+        let value = postData[key];
+        if (typeof value === 'boolean' || typeof value === 'number') {
+          value = String(value);
         }
-        return response.json();
-      })
-      .then(data => {
-        if (data.apiResult.Result !== null) {
-          console.log('gone into postman', data);
-          const errorMessage = 'Registration Successfull';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
-        } else {
-          handleShowToast();
-        }
-      })
-      .catch(error => {
-        console.log('Fetch Error:', error);
-        setErrorMessage('An error occurred during the request');
-        setShowAlert(true);
+        formData.append(key, value);
+       // console.log(`${key}: ${value}`); // Hermes-safe logging
+      }
+    });
+      if (PrintUnloadImage) {
+      formData.append('PrintUnloadImage', {
+        uri: PrintUnloadImage.uri,
+        type: PrintUnloadImage.type,
+        name: PrintUnloadImage.fileName || 'unlodingdoc1.jpg',
       });
+    }
+      if (UnloadImage) {
+      formData.append('UnloadImage', {
+        uri: UnloadImage.uri,
+        type: UnloadImage.type,
+        name: UnloadImage.fileName || 'unloadingdoc2.jpg',
+      });
+    }
+  const url = 'https://Exim.Tranzol.com/api/LoadingChallan/CreateUnloadingChallan';
+
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${apiTokenReceived}`,
+      clientId: 'TRANZOLBOSS',
+      clientSecret: 'TRANZOLBOSSPAN',
+    },
+    body: formData,
+    redirect: 'follow',
   };
+
+  setLoading(true); // Start loading
+
+  fetch(url, requestOptions)
+    .then(response => {
+      setLoading(false); // Stop loading
+      if (!response.ok) {
+        setErrorMessage('Network response was not ok');
+        setShowAlert(true);
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data?.apiResult?.Result !== null) {
+        setErrorMessage('Registration Successful');
+        resetUnloadingStates();
+        setShowAlert(true);
+      } else {
+        handleShowToast();
+      }
+    })
+    .catch(error => {
+      setLoading(false); // Stop loading on error
+      console.log('Fetch Error:', error);
+      setErrorMessage('An error occurred during the request');
+      setShowAlert(true);
+    });
+};
+
   const closeAlert = () => {
     // Function to close the alert
     setShowAlert(false);
@@ -333,21 +388,7 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
               />
             </View>
 
-            <Text style={styles.levelText}>Moisture</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholderTextColor={'#6c6f73'}
-                style={{
-                  color: 'black',
-                  fontSize: 15,
-                  width: '100%',
-                }}
-                value={Moisture.toString()}
-                editable={false}
-                autoCorrect={false}
-                onChangeText={text => setMoisture(text)}
-              />
-            </View>
+         
             <Text style={styles.levelText}>Load Date</Text>
             <View style={styles.inputContainer}>
               <TextInput
@@ -377,6 +418,7 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
                 onChangeText={text => setLoadType(text)}
               />
             </View>
+          {/* {unload part starts from here } */}
             <Text
               style={{
                 fontSize: 18,
@@ -430,6 +472,7 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
                 placeholder={'0.00'}
                 autoCorrect={false}
                 onChangeText={text => setUnloadGrossWt(text)}
+                keyboardType='numeric'
               />
             </View>
 
@@ -447,6 +490,7 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
                 placeholder={'0.00'}
                 autoCorrect={false}
                 onChangeText={text => setUnloadTareWt(text)}
+                keyboardType='numeric'
               />
             </View>
 
@@ -464,6 +508,7 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
                 placeholder={'0.00'}
                 autoCorrect={false}
                 onChangeText={text => setUnloadWt(text)}
+                keyboardType='numeric'
               />
             </View>
 
@@ -507,9 +552,37 @@ const [Id, setId] = useState(FetchminesDetails.Id || '');
                 setIsFocus(false);
               }}
             />
+               <View style={{flexDirection:'row',justifyContent:'space-evenly',width:'90%',marginTop:10}}>
+             <CustomImagePicker
+                      
+                   
+                      bgImage={require('../assets/invoice.png')}
+                      
+                      title="Unloading Doc 1"
+                      iconName="camera-enhance"
+                      onImagePicked={(imageData) => setPrintUnloadImage(imageData)}
+                      imageData={PrintUnloadImage}
+                    />
+                     <CustomImagePicker
+                      width={80}
+                    
+                      bgImage={require('../assets/lr.png')}
+                    
+                      title="Unloading Doc 2"
+                      iconName="camera-enhance"
+                      onImagePicked={(imageData) => setUnloadImage(imageData)}
+                      imageData={UnloadImage}
+                    />
           </View>
+          </View>
+       
           <TouchableOpacity style={styles.button} onPress={registertheVehicle}>
+            {Loading ? (
+              <ActivityIndicator color="#fff"  size='small'/>
+            ):(
+          
             <Text style={styles.text}>Register</Text>
+              )}
           </TouchableOpacity>
         </View>
       )}

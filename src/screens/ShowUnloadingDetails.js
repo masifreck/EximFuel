@@ -34,26 +34,28 @@ const TableRow = ({title, value, color}) => (
 
 const ShowUnloadingDetails = () => {
   const route = useRoute();
-  const {Unloading} = route.params;
+  const {Unloading,finishGoodsData} = route.params;
 
-  const FetchminesDetails = Unloading.apiResult.Result;
-  console.log(FetchminesDetails);
+  const FetchminesDetails = Unloading?.date;
+  const LoadingDetails = finishGoodsData?.apiResult?.Result || '';
+  console.log('Loading Details', finishGoodsData);
+ 
   return (
     <ScrollView>
       <Text style={styles.levelText}>Challan Details</Text>
       <View style={styles.inputContainer}>
-        <TableRow title="ChallanNo" value={FetchminesDetails.ChallanNo} />
+        <TableRow title="ChallanNo" value={LoadingDetails.ChallanNo} />
         <TableRow title="UnloadDate" value={FetchminesDetails.UnloadDate} />
-        <TableRow title="WayBillNo" value={FetchminesDetails.WayBillNo} />
-        <TableRow title="GrossWt" value={FetchminesDetails.GrossWt} />
-        <TableRow title="TareWt" value={FetchminesDetails.TareWt} />
-        <TableRow title="NetWt" value={FetchminesDetails.NetWt} />
-        <TableRow title="Moisture" value={FetchminesDetails.Moisture} />
-        <TableRow title="LoadDate" value={FetchminesDetails.LoadDate} />
-        <TableRow title="LoadType" value={FetchminesDetails.LoadType} />
-        <TableRow title="GSPNo" value={FetchminesDetails.GSPNo} />
-        <TableRow title="GPSReceived" value={FetchminesDetails.GPSReceived} />
-        <TableRow title="VehicleNo" value={FetchminesDetails.VehicleNo} />
+        <TableRow title="WayBillNo" value={LoadingDetails.EwayBillNo1} />
+        <TableRow title="GrossWt" value={LoadingDetails.GrossWt} />
+        <TableRow title="TareWt" value={LoadingDetails.TareWt} />
+        <TableRow title="NetWt" value={LoadingDetails.NetWt} />
+      
+        <TableRow title="LoadDate" value={LoadingDetails.LoadDate} />
+        <TableRow title="LoadType" value={LoadingDetails.LoadType} />
+        <TableRow title="GSPNo" value={LoadingDetails.GPSNo} />
+        <TableRow title="GPSReceived" value={LoadingDetails.GPSReceived} />
+        <TableRow title="VehicleNo" value={LoadingDetails.VehicleNo} />
         <TableRow
           title="UnloadGrossWt"
           value={FetchminesDetails.UnloadGrossWt}

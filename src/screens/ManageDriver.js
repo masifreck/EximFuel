@@ -8,7 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  StyleSheet,ActivityIndicator
+  StyleSheet,ActivityIndicator,Alert
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -37,6 +37,8 @@ const [isLoading,setIsLoading]=useState(false);
 const [driverList, setDriverList] = useState([]); 
 const [driverData,setDriverData]=useState([]);
 const [singleLoader,setSingleLoader]=useState(false);
+const [statusRemarks,setstatusRemarks]=useState('')
+  const [loading, setLoading] = useState(false);
   const imageList = [
     require('../assets/dlpng.webp'),
     require('../assets/aadhaar.png'),
@@ -102,7 +104,50 @@ return()=>clearTimeout(handler)
 FetchSingleDriver(item.Id)
     setModalVisible(true);
   };
+ const approveDriver = async (approveStatus,id, statusRemarks) => {
+    if( !approveStatus || !statusRemarks){
+      Alert.alert( 'Error',"Please fill all the fields")
+      return;
 
+    }
+    if(!declare){
+      Alert.alert("Please confirm the declaration")
+      return;
+    }
+   console.log('Approving owner with ID:', id, 'Status:', approveStatus, 'Remarks:', statusRemarks);
+    setLoading(true);
+    try {
+      const response = await fetch('https://Exim.Tranzol.com/api/OwnerApi/ApproveDriver', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          Id: id,
+          ApproveStatus: approveStatus,
+          StatusRemarks: statusRemarks,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data?.apiResult?.StatusCode === 0) {
+        Alert.alert('Success',`${data.apiResult?.Result || 'Owner approved successfully.'}`);
+        setDriverData([]);
+        setModalVisible(false);
+        setstatusRemarks('')
+        setSearch('')
+      } else {
+       Alert.alert('Error', data?.apiResult?.Result || 'Failed to approve owner.');
+       console.error('API Error:', data);
+      }
+    } catch (error) {
+      console.error('Error approving owner:', error);
+      Alert.alert('Error', 'An error occurred while approving the owner.');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Search Bar */}
@@ -220,7 +265,10 @@ FetchSingleDriver(item.Id)
                   </View> */}
 
                   <View style={styles.actionContainer}>
-                    <TextInput multiline placeholder="Reason / Remark" style={styles.input} />
+                    <TextInput multiline placeholder="Reason / Remark" style={styles.input} 
+                    value={statusRemarks}
+                    onChangeText={(text)=>setstatusRemarks(text)}
+                    />
 
                     <View style={{ marginBottom: 10 }}>
                       <CustomCheckbox
@@ -229,20 +277,34 @@ FetchSingleDriver(item.Id)
                         onChange={(val) => setDeclare(val)}
                       />
                     </View>
-
+   {loading? (
+                <ActivityIndicator size="large" color={darkBlue} style={{ marginVertical: 10 }} />
+              ) : (
+             <>
                     <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'space-between' }}>
-                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#dc3545' }]}>
+                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#dc3545' }]}
+                            disabled={loading}
+          onPress={() => approveDriver(5,driverData.Id, statusRemarks)}
+                      >
                         <Text style={styles.btnText}>Reject</Text>
                       </TouchableOpacity>
 
-                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#28a745' }]}>
+                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#28a745' }]}
+                            disabled={loading}
+          onPress={() => approveDriver(4,driverData.Id, statusRemarks)}
+                      >
                         <Text style={styles.btnText}>Approve</Text>
                       </TouchableOpacity>
 
-                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#ffc107' }]}>
+                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#ffc107' }]}
+                            disabled={loading}
+          onPress={() => approveDriver(0,driverData.Id, statusRemarks)}
+                      >
                         <Text style={styles.btnText}>Return</Text>
                       </TouchableOpacity>
                     </View>
+                     </>
+               )}
                   </View>
                 </>
               )}

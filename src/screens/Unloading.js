@@ -17,10 +17,22 @@ import LottieView from 'lottie-react-native';
 import Loading from '../components/Loading';
 import { inputbgColor } from '../components/constant';
 import { darkBlue } from '../components/constant';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Unloading = () => {
   const navigation = useNavigation();
-  const apiTokenReceived = useApiToken();
-  console.log('Received token', apiTokenReceived);
+  const [apiTokenReceived, setapiTokenReceived] = useState(null);
+ AsyncStorage.getItem('Token')
+    .then(token => {
+      setapiTokenReceived(token);
+     
+      console.log('Retrieved token:', token);
+    })
+    .catch(error => {
+      const TokenReceived = useApiToken();
+      setapiTokenReceived(TokenReceived);
+      console.log('Received token', apiTokenReceived);
+      console.log('Error retrieving token:', error);
+    });
 
   const [challanNumber, setchallanNumber] = useState('');
   const [Unloading, setUnloading] = useState(null);
@@ -30,6 +42,7 @@ const Unloading = () => {
   const [showToast, setShowToast] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [hasBorder, setHasBorder] = useState(false); // State for border
+  const [loadingDetails,setLoadingDetails]=useState(null)
   const handleShowToast = () => {
     setShowToast(true);
 
@@ -63,61 +76,99 @@ const Unloading = () => {
     // Function to close the alert
     setShowAlert(false);
   };
-  const handleShowDetails = async () => {
-    if (challanNumber.length === 0) {
-      setErrorMessage('Enter Challan Number');
+ const handleShowDetails = async () => {
+  if (challanNumber.length === 0) {
+    setErrorMessage('Enter Challan Number');
+    handleShowToast();
+    resetInputs();
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    // 1️⃣ First API: Get Unloading Challan
+    const unloadingUrl = `https://Exim.Tranzol.com/api/LoadingChallan/GetUnloadingChallan?challanNo=${challanNumber}`;
+    const unloadingResponse = await fetch(unloadingUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Basic ${apiTokenReceived}`,
+        clientId: 'TRANZOLBOSS',
+        clientSecret: 'TRANZOLBOSSPAN',
+      },
+      redirect: 'follow',
+    });
+
+    if (!unloadingResponse.ok) {
+      setIsLoading(false);
+      setErrorMessage('Error fetching Unloading Challan details');
+      setShowAlert(true);
+      resetInputs();
+      return;
+    }
+    const finishGoodsUrl = `https://exim.tranzol.com/api/LoadingChallan/GetFinishGoods?challanNo=${challanNumber}`;
+    const finishGoodsResponse = await fetch(finishGoodsUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Basic ${apiTokenReceived}`,
+      },
+      redirect: 'follow',
+    });
+
+    setIsLoading(false);
+
+    if (!finishGoodsResponse.ok) {
+      setErrorMessage('Error fetching Finish Goods details');
+      setShowAlert(true);
+      resetInputs();
+      return;
+    }
+
+    const finishGoodsData = await finishGoodsResponse.json();
+    //console.log('Finish Goods API Response:', finishGoodsData);
+setLoadingDetails(finishGoodsData)
+    if (finishGoodsData.apiResult?.Result === null) {
+      const errorMessage = 'Invalid Challan Number (Finish Goods not found)';
+      setErrorMessage(errorMessage);
+      setShowAlert(true);
+      resetInputs();
+      return;
+    }
+
+    // 3️⃣ Success: Navigate with both data
+    navigation.navigate('UnloadingEntry', {
+      Unloading: finishGoodsData,
+    
+    });
+    const unloadingData = await unloadingResponse.json();
+    console.log('Unloading API Response:', unloadingData);
+
+    if (unloadingData.error || unloadingData.date === null) {
+      setIsLoading(false);
+      setErrorMessage(unloadingData.error || 'Challan Number Not Found');
       handleShowToast();
       resetInputs();
-    } else {
-      setIsLoading(true); // Set loading state to true
-      try {
-        const url = `https://Exim.Tranzol.com/api/LoadingChallan/GetUnloadingChallan?challanNo=${challanNumber}`;
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            Authorization: `Basic ${apiTokenReceived}`,
-            clientId: 'TRANZOLBOSS',
-            clientSecret: 'TRANZOLBOSSPAN',
-          },
-          redirect: 'follow',
-        });
-        setIsLoading(false);
-        if (response.ok) {
-          const data = await response.json();
-          console.log('API Response:', data);
-          if (data.error) {
-            console.log('API Response Error:', errorMessage);
-            setErrorMessage(data.error);
-            setShowAlert(true);
-          } else {
-            setUnloading(data);
-            if (data.apiResult.Result === null) {
-              const errorMessage = 'Challan Number Not Found';
-              setErrorMessage(errorMessage);
-              handleShowToast();
-              resetInputs();
-            } else {
-              navigation.navigate('UnloadingEntry', {
-                Unloading: data,
-              });
-              resetInputs();
-            }
-          }
-        } else {
-          console.log('Error fetching Challan details');
-          const errorMessage = 'Error fetching Challan details';
-          setErrorMessage(errorMessage);
-          setShowAlert(true);
-          resetInputs();
-        }
-      } catch (error) {
-        console.log('An error occurred:', error);
-        setErrorMessage('An error occurred:');
-        setShowAlert(true);
-        resetInputs();
-      }
+
     }
-  };
+
+   //create method to navigate to show the unloading details
+    else {
+      navigation.navigate('ShowUnloadingDetails', {
+        Unloading: unloadingData,
+        finishGoodsData:finishGoodsData
+      });
+    }
+    setIsLoading(false);
+
+  } catch (error) {
+    console.log('An error occurred:', error);
+    setIsLoading(false);
+    setErrorMessage('An error occurred while fetching data.');
+    setShowAlert(true);
+    resetInputs();
+  }
+};
+
   return (
     <ScrollView>
       {isLoading ? (
@@ -196,9 +247,7 @@ const Unloading = () => {
             />
             </TouchableOpacity>
             </View>
-          <TouchableOpacity style={styles.button}  onPress={()=>  navigation.navigate('UnloadingEntry', {
-                Unloading: '',
-              })}>
+          <TouchableOpacity style={styles.button}  onPress={()=>  handleShowDetails()}>
             <Text style={styles.text}>View Details</Text>
           </TouchableOpacity>
          

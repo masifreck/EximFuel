@@ -15,6 +15,7 @@ import { darkBlue, textColor } from '../components/constant';
 import CustomCheckbox from '../components/CustomeCheckBox';
 import ImageViewing from 'react-native-image-viewing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { te } from 'date-fns/locale';
 
 
 const ManageOwner = () => {
@@ -27,6 +28,7 @@ const [currentImageIndex, setCurrentImageIndex] = useState(0);
 const [ownerList, setOwnerList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 const [singleLoader,setSingleLoader]=useState(false)
+const [statusRemarks,setstatusRemarks]=useState('')
   const [apiTokenReceived, setapiTokenReceived] = useState();
   AsyncStorage.getItem('Token')
     .then(token => {
@@ -105,6 +107,54 @@ const imageList = [
     // setSelectedOwner(item);
     setModalVisible(true);
   };
+  const [loading, setLoading] = useState(false);
+
+  const approveOwner = async (id, approveStatus, statusRemarks) => {
+    if( !approveStatus || !statusRemarks){
+      Alert.alert( 'Error',"Please fill all the fields")
+      return;
+
+    }
+    if(!declare){
+      Alert.alert("Please confirm the declaration")
+      return;
+    }
+   // console.log('Approving owner with ID:', id, 'Status:', approveStatus, 'Remarks:', statusRemarks);
+    setLoading(true);
+    try {
+      const response = await fetch('https://Exim.Tranzol.com/api/OwnerApi/ApproveOwner', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          Id: id,
+          ApproveStatus: approveStatus,
+          StatusRemarks: statusRemarks,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data?.apiResult?.StatusCode === 0) {
+        Alert.alert('Success',`${data.apiResult?.Message || 'Owner approved successfully.'}`);
+        setSelectedOwner(null);
+        setModalVisible(false);
+        setstatusRemarks('')
+        setDeclayer(false)
+        setSearch('')
+        FetchOwnerData(search || ''); // Refresh the list after approval
+      } else {
+       Alert.alert('Error', data?.apiResult?.Message || 'Failed to approve owner.');
+       console.error('API Error:', data);
+      }
+    } catch (error) {
+      console.error('Error approving owner:', error);
+      Alert.alert('Error', 'An error occurred while approving the owner.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
   <View style={styles.container}>
@@ -178,7 +228,7 @@ const imageList = [
     <ActivityIndicator size="large" color={darkBlue} />
   ) : (
     <>
-    {  console.log('Selected Owner in ui:', selectedOwner)}
+ 
       <View style={styles.detailRow}>
         <Text style={styles.detailKey}>Id</Text>
         <Text style={styles.detailValue}>{selectedOwner.Id}</Text>
@@ -296,23 +346,41 @@ const imageList = [
                 multiline
                 placeholder="Reason / Remark"
                 style={styles.input}
+                value={statusRemarks}
+                  onChangeText={(text) => setstatusRemarks(text)}
+                
               />
+              {loading? (
+                <ActivityIndicator size="large" color={darkBlue} style={{ marginVertical: 10 }} />
+              ) : (
+             <>
             <View style={{marginBottom:10}}>
                <CustomCheckbox label="I hereby confirm that all required documents have been properly verified and the appropriate options have been duly selected." value={declare} onChange={(value) => setDeclayer(value ? true : false)} />
                 </View>
               <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'space-between' }}>
-                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#dc3545' }]}>
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#dc3545' }]}
+                    disabled={loading}
+          onPress={() => approveOwner(5,selectedOwner.Id, statusRemarks)}
+                >
                   <Text style={styles.btnText}>Reject</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#28a745' }]}>
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#28a745' }]}
+                    disabled={loading}
+          onPress={() => approveOwner(4,selectedOwner.Id, statusRemarks)}
+                >
                   <Text style={styles.btnText}>Approve</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#ffc107' }]}>
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#ffc107' }]}
+                 disabled={loading}
+          onPress={() => approveOwner(0,selectedOwner.Id, statusRemarks)}
+                >
                   <Text style={styles.btnText}>Return</Text>
                 </TouchableOpacity>
               </View>
+              </>
+               )}
             </View>
       
           </ScrollView>

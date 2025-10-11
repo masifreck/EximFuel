@@ -381,7 +381,7 @@ const registertheOwner = () => {
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
-    console.log('Response:', data);
+    //console.log('Response:', data);
     return data;
   })
   .then(data => {

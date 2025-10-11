@@ -8,7 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  StyleSheet,ActivityIndicator
+  StyleSheet,ActivityIndicator,Alert
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -16,6 +16,7 @@ import ImageViewing from 'react-native-image-viewing';
 import CustomCheckbox from '../components/CustomeCheckBox'; // Ensure this exists or adjust
 import { darkBlue } from '../components/constant'; // Update according to your theme/colors
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { te } from 'date-fns/locale';
 
 
 
@@ -29,8 +30,7 @@ const ManageVehicle = () => {
       const TokenReceived = useApiToken();
       setapiTokenReceived(TokenReceived);
     });
-  const [search, setSearch] = useState('');
-  const [selectedVehicle, setSelectedDriver] = useState(null);  
+  const [search, setSearch] = useState(''); 
   const [modalVisible, setModalVisible] = useState(false);
   const [declare, setDeclare] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
@@ -39,7 +39,8 @@ const ManageVehicle = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [vehicleData,setVehicleData]=useState([]);
 const [singleLoader,setSingleLoader]=useState(false);
-
+const [statusRemarks,setstatusRemarks]=useState('')
+const [loading, setLoading] = useState(false);
    const FetchSingleVehicle = async(id)=>{
   setSingleLoader(true)
   try {
@@ -52,7 +53,7 @@ const [singleLoader,setSingleLoader]=useState(false);
             },
           });
     const data =await response.json();
-  // console.log('Single vehicle Data:', data);
+   console.log('Single vehicle Data:', data);
     if(data?.vehicle){
       setVehicleData(data.vehicle)  
       
@@ -75,7 +76,7 @@ const [singleLoader,setSingleLoader]=useState(false);
       const data = await response.json();
       if (data?.Entities) {
         setVehicleList(data.Entities);
-        console.log('Vehicle data fetched successfully:', data.Entities);
+      //  console.log('Vehicle data fetched successfully:', data.Entities);
       } else {
         console.warn('Unexpected response format', data);
         setVehicleList([]);
@@ -104,7 +105,52 @@ const [singleLoader,setSingleLoader]=useState(false);
 FetchSingleVehicle(item.Id)
     setModalVisible(true);
   };
+    const approveVehicle = async (approveStatus,id, statusRemarks) => {
+      if( !approveStatus || !statusRemarks){
+        Alert.alert( 'Error',"Please fill all the fields")
+        return;
   
+      }
+      if(!declare){
+        Alert.alert("Please confirm the declaration")
+        return;
+      }
+     console.log('Approving owner with ID:', id, 'Status:', approveStatus, 'Remarks:', statusRemarks);
+      setLoading(true);
+      try {
+        const response = await fetch('https://Exim.Tranzol.com/api/VehicleApi/ApprovalVehicle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            Id: id,
+            ApproveStatus: approveStatus,
+            StatusRemarks: statusRemarks,
+          }),
+        });
+
+        const data = await response.json();
+  
+        if (response.ok && data?.apiResult?.StatusCode === 0) {
+          Alert.alert('Success',`${data.apiResult?.Result || 'Vehicle approved successfully.'}`);
+         setVehicleData([]);
+          setModalVisible(false);
+          setstatusRemarks('')
+        
+          setSearch('')
+          
+        } else {
+         Alert.alert('Error', data?.apiResult?.Result || 'Failed to approve Vehicle.');
+         console.error('API Error:', data);
+        }
+      } catch (error) {
+        console.error('Error approving Vehicle:', error);
+        Alert.alert('Error', 'An error occurred while approving the Vehicle.');
+      } finally {
+        setLoading(false);
+      }
+    };
   return (
     <View style={styles.container}>
       {/* Search Bar */}
@@ -215,7 +261,10 @@ FetchSingleVehicle(item.Id)
                   </View> */}
 
                   <View style={styles.actionContainer}>
-                    <TextInput multiline placeholder="Reason / Remark" style={styles.input} />
+                    <TextInput multiline placeholder="Reason / Remark" style={styles.input}
+                    value={statusRemarks}
+                    onChangeText={(text)=>setstatusRemarks(text)}
+                    />
 
                     <View style={{ marginBottom: 10 }}>
                       <CustomCheckbox
@@ -224,20 +273,34 @@ FetchSingleVehicle(item.Id)
                         onChange={(val) => setDeclare(val)}
                       />
                     </View>
-
+    {loading? (
+                <ActivityIndicator size="large" color={darkBlue} style={{ marginVertical: 10 }} />
+              ) : (
+             <>
                     <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'space-between' }}>
-                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#dc3545' }]}>
+                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#dc3545' }]}
+                         disabled={loading}
+          onPress={() => approveVehicle(2,vehicleData.Id, statusRemarks)}
+                      >
                         <Text style={styles.btnText}>Reject</Text>
                       </TouchableOpacity>
 
-                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#28a745' }]}>
+                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#28a745' }]}
+                         disabled={loading}
+          onPress={() => approveVehicle(4,vehicleData.Id, statusRemarks)}
+                      >
                         <Text style={styles.btnText}>Approve</Text>
                       </TouchableOpacity>
 
-                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#ffc107' }]}>
+                      <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#ffc107' }]}
+                         disabled={loading}
+          onPress={() => approveVehicle(0,vehicleData.Id, statusRemarks)}
+                      >
                         <Text style={styles.btnText}>Return</Text>
                       </TouchableOpacity>
                     </View>
+                    </>
+              )}
                   </View>
                 </>
               )}

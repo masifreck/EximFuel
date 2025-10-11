@@ -659,7 +659,7 @@ const openDialScreen = async (number) => {
     const fetchDLDetails = async () => {
       setIsDLSearching(true);
       const url = `https://Exim.Tranzol.com/api/OwnerApi/GetVerifyDriver?licenseNo=${dlNumber}
-    &dob=${selectedStartDate}`;
+  22${selectedStartDate}`;
       console.log(url);
       try {
         const response = await fetch(url, {

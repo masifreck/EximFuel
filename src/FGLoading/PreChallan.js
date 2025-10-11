@@ -356,7 +356,7 @@ const fetchDriver = async (search) => {
 };
 const handleGenerateChallan = () => {
   if (
-    (!jobNo || jobNo.length === 0) ||
+    // (!jobNo || jobNo.length === 0) ||
     (!vehicleNo || vehicleNo.length === 0) ||
     (!driverName || driverName.length === 0) ||
     (!selectedDate || selectedDate.length === 0)
@@ -425,7 +425,7 @@ const handleGenerateChallan = () => {
             <>
            <View>
    <Text style={styles.levelText}>
-          Job No <Text style={{color: 'red'}}>*</Text>
+          Job No 
         </Text>
         <Dropdown
   style={styles.dropdown}

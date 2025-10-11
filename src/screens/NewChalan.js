@@ -22,7 +22,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {styles} from './NewChallanStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {jwtDecode} from 'jwt-decode';
-import CustomImagePicker from '../components/CustomFilePicker';
+import CustomImagePicker from '../components/CustomeImagePicker';
 import StepIndicator from '../FGLoading/StepIndicator';
 import CardType2 from '../FGLoading/CardType2';
 import Searching from '../components/Searching';
@@ -122,7 +122,6 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
   const [loadType, setLoadType] = useState('');
   const [materialValue, setMaterialValue] = useState('');
   const [remarks, setRemarks] = useState('');
-  const [attachment, setAttachment] = useState('');
   const [materialId, setMaterialId] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null); //27/02/2024
@@ -132,6 +131,9 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
 
   const [ChallanDoc, setChallanDoc] = useState();
   const [InvoiceDoc, setInvoiceDoc] = useState();
+   const [VehicleWithDriverImage,setVehicleWithDriverImage]=useState();
+   const [ChassisImage,setChassisImage]=useState();
+   const [EWayBillPhoto,setEWayBillPhoto]=useState();
 
   const [isOtherAccount, setIsOtherAccount] = useState(false);
  const fetchJob = async (search) => {
@@ -535,22 +537,42 @@ const deleteAlloments = async(Id)=>{
     });
 
     //Append documents if they exist
-    // if (ChallanDoc) {
-    //   formData.append('ChallanDoc', {
-    //     uri: ChallanDoc.uri,
-    //     type: ChallanDoc.type, // Ensure correct MIME type is set
-    //     name: ChallanDoc.name,
-    //   });
-    // }
+    if (ChallanDoc) {
+      formData.append('ChallanDoc', {
+        uri: ChallanDoc.uri,
+        type: ChallanDoc.type, // Ensure correct MIME type is set
+        name: ChallanDoc.name || 'challan.jpg', // Provide a default name if none
+      });
+    }
 
-    // if (InvoiceDoc) {
-    //   formData.append('InvoiceDoc', {
-    //     uri: InvoiceDoc.uri,
-    //     type: InvoiceDoc.type, // Ensure correct MIME type is set
-    //     name: InvoiceDoc.name,
-    //   });
-    // }
-
+    if (InvoiceDoc) {
+      formData.append('InvoiceDoc', {
+        uri: InvoiceDoc.uri,
+        type: InvoiceDoc.type, // Ensure correct MIME type is set
+        name: InvoiceDoc.name || 'invoice.jpg', // Provide a default name if none
+      });
+    }
+    if (EWayBillPhoto) {
+      formData.append('EWayBillPhoto', {
+        uri: EWayBillPhoto.uri,
+        type: EWayBillPhoto.type, // Ensure correct MIME type is set
+        name: EWayBillPhoto.name || 'ewaybill.jpg', // Provide a default name if none
+      });
+    }
+        if (ChassisImage) {
+      formData.append('ChassisImage', {
+        uri: ChassisImage.uri,
+        type: ChassisImage.type, // Ensure correct MIME type is set
+        name: ChassisImage.name || 'chassis.jpg', // Provide a default name if none
+      });
+    }
+        if (VehicleWithDriverImage) {
+      formData.append('VehicleWithDriverImage', {
+        uri: VehicleWithDriverImage.uri,
+        type: VehicleWithDriverImage.type, // Ensure correct MIME type is set
+        name: VehicleWithDriverImage.name || 'vehicle.jpg', // Provide a default name if none
+      });
+    }
     // Now you can send formData in your API request
    // console.log('sending Data', formData);
 
@@ -585,6 +607,7 @@ const deleteAlloments = async(Id)=>{
           response.statusText,
         );
         Alert.alert('Error', `Server error: ${response.statusText}`);
+        console.log('Response details:', await response.text());
       }
     } catch (error) {
       console.error('Error submitting data:', error);
@@ -1847,19 +1870,47 @@ const deleteAlloments = async(Id)=>{
               {/* <Text style={styles.levelText}>Attachments</Text> */}
 
               {/* Custom file picker for InvoiceDoc */}
-
-              {/* <CustomImagePicker 
+<View style={{flexDirection:'row',justifyContent:'space-evenly',gap:10}}>
+              <CustomImagePicker 
   title='Choose Client Invoice'
-  onFileSelected={(file) => setInvoiceDoc(file)} // Set the file in state
-  showFileDetails={true} // Show file details
+  onImagePicked={(file) => setInvoiceDoc(file)} // Set the file in state
+  showFileDetails={true} 
+  imageData={InvoiceDoc}
+  bgImage={require('../assets/invoice.png')}
 />
 
 
 <CustomImagePicker
+width={80}
   title='Choose Challan'
-  onFileSelected={(file) => setChallanDoc(file)} // Set the file in state
+  onImagePicked={(file) => setChallanDoc(file)} // Set the file in state
+  imageData={ChallanDoc}
+  bgImage={require('../assets/lr.png')}
+/>
+</View>
+<View style={{flexDirection:'row',justifyContent:'space-evenly',gap:10}}>
+           <CustomImagePicker 
+  title='E-Way Bill Photo'
+  onImagePicked={(file) => setEWayBillPhoto(file)} // Set the file in state
   showFileDetails={true} 
-/> */}
+  imageData={EWayBillPhoto}
+  bgImage={require('../assets/eway-bill-img.png')}
+/>
+           <CustomImagePicker 
+  title='Chassis Photo'
+  onImagePicked={(file) => setChassisImage(file)} // Set the file in state
+  showFileDetails={true} 
+  imageData={ChassisImage}
+  bgImage={require('../assets/chasis.png')}
+/>
+</View>
+           <CustomImagePicker 
+  title='Driver with Vehicle Photo'
+  onImagePicked={(file) => setVehicleWithDriverImage(file)} // Set the file in state
+  showFileDetails={true} 
+  imageData={VehicleWithDriverImage}
+  bgImage={require('../assets/driverwithvehicle.png')}
+/>
               <Text style={styles.levelText}>Remarks</Text>
               <View style={[styles.inputContainer, {height: 100, marginBottom: 20}]}>
                 <TextInput
