@@ -10,6 +10,7 @@ import Vehicle from './screens/Vehicle';
 import MinesLoading from './screens/MinesLoading';
 import Unloading from './screens/Unloading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FGNavigation from './FGLoading/FGNavigation';
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
@@ -106,7 +107,7 @@ const DrawerNavigation = () => {
           )
         }}
       />
-      {/* <Drawer.Screen name="FGLoading" component={FGLoading}
+      <Drawer.Screen name="FGLoading" component={FGNavigation}
         options={{
           title: 'FG Loading',
           headerShown: false,
@@ -114,7 +115,7 @@ const DrawerNavigation = () => {
             <Icon name="package-variant-closed" color={color} size={size} />
           )
         }}
-      /> */}
+      />
       <Drawer.Screen name="Unloading" component={Unloading}
         options={{
           title: 'Unloading',

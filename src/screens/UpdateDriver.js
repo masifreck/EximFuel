@@ -213,11 +213,11 @@ if (email && !emailRegex.test(email)) {
         setIsLoading(false);
         if (data.apiResult.Result !== null) {
           const errorMessage = 'Update Successfull!';
-          setErrorMessage(errorMessage);
+          setErrorMessage(data?.apiResult?.Result);
           setShowAlert(true);
         } else if (data.apiResult.Result === null) {
           const errorMessage = 'Something Went Wrong!';
-          setErrorMessage(errorMessage);
+          setErrorMessage(data?.apiResult?.Error);
           setShowAlert(true);
         } else {
           const errorMessage = 'Fill Mandatory Fields';

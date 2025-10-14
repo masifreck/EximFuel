@@ -115,7 +115,7 @@ const resetUnloadingStates = () => {
   setLoadType(FetchminesDetails.LoadType || '');
   setId(FetchminesDetails.Id || '');
 
-  setUnloadDate('');
+  setUnloadDate(''); 
   setUnloadGrossWt('0.00');
   setUnloadTareWt('0.00');
   setUnloadWt('0.00');

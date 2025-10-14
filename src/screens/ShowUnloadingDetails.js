@@ -32,17 +32,24 @@ const TableRow = ({title, value, color}) => (
   </View>
 );
 
-const ShowUnloadingDetails = () => {
+const ShowUnloadingDetails = ({navigation}) => {
   const route = useRoute();
   const {Unloading,finishGoodsData} = route.params;
 
   const FetchminesDetails = Unloading?.date;
   const LoadingDetails = finishGoodsData?.apiResult?.Result || '';
   console.log('Loading Details', finishGoodsData);
- 
+ const HandleNavigation=()=>{
+  navigation.navigate('updateUnloadingChalan',{Unloading:Unloading, finishGoodsData:LoadingDetails} )
+ }
   return (
     <ScrollView>
+      <View style={{flexDirection:'row',justifyContent:'space-evenly'}}>
       <Text style={styles.levelText}>Challan Details</Text>
+      <TouchableOpacity onPress={HandleNavigation}>
+        <Image style={{width:50,height:50}} source={require('../assets/edit.png')}/>
+      </TouchableOpacity>
+      </View>
       <View style={styles.inputContainer}>
         <TableRow title="ChallanNo" value={LoadingDetails.ChallanNo} />
         <TableRow title="UnloadDate" value={FetchminesDetails.UnloadDate} />
@@ -54,7 +61,12 @@ const ShowUnloadingDetails = () => {
         <TableRow title="LoadDate" value={LoadingDetails.LoadDate} />
         <TableRow title="LoadType" value={LoadingDetails.LoadType} />
         <TableRow title="GSPNo" value={LoadingDetails.GPSNo} />
-        <TableRow title="GPSReceived" value={LoadingDetails.GPSReceived} />
+       <TableRow
+  title="GPSReceived"
+  value={LoadingDetails.IsGpsReceived === 'True' ? 'yes' : 'no'}
+/>
+
+
         <TableRow title="VehicleNo" value={LoadingDetails.VehicleNo} />
         <TableRow
           title="UnloadGrossWt"

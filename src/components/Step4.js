@@ -48,8 +48,13 @@ const [truckSource,setTruckSource]=useState('')
   const [driverId, setDriverId] = useState('');
   const [brokerId, setBrokerId] = useState('');
   const [associationId, setAssociationId] = useState('');
+
   const [consigneeId, setConsigneeId] = useState(null);
   const [consignorId, setConsignorId] = useState(null);
+const [loadingPoint,setLoadingPoint]=useState('');
+  const [unLoadingPoint,setUnLoadingPoint]=useState('');
+const [materialId,setMaterialId]=useState('')
+
   const [IsGps, setIsGps] = useState('');
   const [VehicleType, setVehicleType] = useState('');
   const [driverType,setDriverType]=useState('');
@@ -58,8 +63,7 @@ const [truckSource,setTruckSource]=useState('')
   const [consignorType,setConsignorType]=useState('');
   const [consigneeType,setConsigneeType]=useState('');
   const [hasBorder, setHasBorder] = useState(false);
- const [loadingPoint,setLoadingPoint]=useState('');
-  const [unLoadingPoint,setUnLoadingPoint]=useState('');
+ 
   const [grossWt,setGrossWt]=useState('');
   const [tierWt,setTierWt]=useState('');
   const [netWt,setNetWt]=useState('');
@@ -68,7 +72,7 @@ const [truckSource,setTruckSource]=useState('')
   const [remarks,setRemarks]=useState('');
   const [attachment,setAttachment]=useState('');
   const [materialType,setMaterialType]=useState('')
-  const [materialId,setMaterialId]=useState('')
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null); //27/02/2024
   const [ConvSelectedStartDate, setConvSelectedStartDate] = useState(null); //2024-02-29

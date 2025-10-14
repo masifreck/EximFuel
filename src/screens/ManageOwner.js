@@ -109,7 +109,7 @@ const imageList = [
   };
   const [loading, setLoading] = useState(false);
 
-  const approveOwner = async (id, approveStatus, statusRemarks) => {
+  const approveOwner = async (approveStatus,id, statusRemarks) => {
     if( !approveStatus || !statusRemarks){
       Alert.alert( 'Error',"Please fill all the fields")
       return;
@@ -137,7 +137,7 @@ const imageList = [
       const data = await response.json();
 
       if (response.ok && data?.apiResult?.StatusCode === 0) {
-        Alert.alert('Success',`${data.apiResult?.Message || 'Owner approved successfully.'}`);
+        Alert.alert('Success',`${data.apiResult?.Result || 'Owner approved successfully.'}`);
         setSelectedOwner(null);
         setModalVisible(false);
         setstatusRemarks('')
@@ -145,7 +145,7 @@ const imageList = [
         setSearch('')
         FetchOwnerData(search || ''); // Refresh the list after approval
       } else {
-       Alert.alert('Error', data?.apiResult?.Message || 'Failed to approve owner.');
+       Alert.alert('Error', data?.apiResult?.Result || 'Failed to approve owner.');
        console.error('API Error:', data);
       }
     } catch (error) {
@@ -360,7 +360,7 @@ const imageList = [
               <View style={{ flexDirection: 'row', gap: 10, justifyContent: 'space-between' }}>
                 <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#dc3545' }]}
                     disabled={loading}
-          onPress={() => approveOwner(5,selectedOwner.Id, statusRemarks)}
+          onPress={() => approveOwner(2,selectedOwner.Id, statusRemarks)}
                 >
                   <Text style={styles.btnText}>Reject</Text>
                 </TouchableOpacity>

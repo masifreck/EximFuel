@@ -249,22 +249,22 @@ useEffect(() => {
       Alert.alert('Validation Error', 'Please select a state from the dropdown.');
       return false;
     }
-    if(!acnumber){
-      Alert.alert('Validation Error', 'Please enter Account Number.');
-      return false;
-    }
-    if(!bankName){
-      Alert.alert('Validation Error', 'Please select Bank Name from the dropdown.');
-      return false;
-    }
-    if(!acType){
-      Alert.alert('Validation Error', 'Please select Account Type from the dropdown.');
-      return false;
-    }
-    if (!IfscCode) {
-      Alert.alert('Validation Error', 'Please enter IFSC Code.');
-      return false;
-    }
+    // if(!acnumber){
+    //   Alert.alert('Validation Error', 'Please enter Account Number.');
+    //   return false;
+    // }
+    // if(!bankName){
+    //   Alert.alert('Validation Error', 'Please select Bank Name from the dropdown.');
+    //   return false;
+    // }
+    // if(!acType){
+    //   Alert.alert('Validation Error', 'Please select Account Type from the dropdown.');
+    //   return false;
+    // }
+    // if (!IfscCode) {
+    //   Alert.alert('Validation Error', 'Please enter IFSC Code.');
+    //   return false;
+    // }
 if (!adharFront) {
       setErrorMessage('Please upload Aadhar Front Photo');
       setShowAlert(true);
@@ -1015,7 +1015,6 @@ const HadleSendOTP2 = async () => {
             onChangeText={text => setacnumber(text)}
             hasBorder={hasBorder}
             keyboardTypename="numeric"
-            isMandatory={true}
           />
           <CustomDropbox
             hasBorder={hasBorder}
@@ -1050,7 +1049,6 @@ const HadleSendOTP2 = async () => {
             placeholdername="Enter IFSC Code"
             onChangeText={text => setIfscCode(text.toUpperCase())}
             hasBorder={hasBorder}
-            isMandatory={true}
             autoCapitalize={true}
             isend="true"
           />

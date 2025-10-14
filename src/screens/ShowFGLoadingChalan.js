@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import { darkBlue } from '../components/constant';
@@ -30,16 +31,23 @@ const TableRow = ({title, value, color}) => (
   </View>
 );
 
-const ShowFGLoadingChalan = () => {
+const ShowFGLoadingChalan = ({navigation}) => {
   const route = useRoute();
   const {FGLoading} = route.params;
 
   const FetchminesDetails = FGLoading.apiResult.Result;
   console.log(FetchminesDetails);
-
+const HandleNavigation=()=>{
+  navigation.navigate('updateChalan',{FGLoading:FGLoading})
+}
   return (
     <ScrollView>
+      <View style={{flexDirection:'row',justifyContent:'space-evenly'}}>
       <Text style={styles.levelText}>Mines Details</Text>
+      <TouchableOpacity onPress={HandleNavigation}>
+        <Image style={{width:50,height:50}} source={require('../assets/edit.png')}/>
+      </TouchableOpacity>
+      </View>
       <View style={styles.inputContainer}>
         <TableRow title="Challan No" value={FetchminesDetails.ChallanNo} />
         <TableRow title="Vehicle No" value={FetchminesDetails.VehicleNo} />

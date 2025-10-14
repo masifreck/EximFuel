@@ -1081,7 +1081,7 @@ const openDialScreen = async (number) => {
                       width={80}
                       isMandatory={true}
                       bgImage={require('../assets/frontphoto.png')}
-                      onlyCamera={true}
+                      //onlyCamera={true}
                       title="Driver Photo Front"
                       iconName="camera-enhance"
                       onImagePicked={handleSaveImageData2}

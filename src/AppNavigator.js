@@ -52,6 +52,8 @@ import { MinesQRCode } from './components/MinesQRCode';
 import FGNavigation from './FGLoading/FGNavigation';
 import SubmitPreChallan from './FGLoading/SubmitPreChallan';
 import SuccessUI from './components/SuccessUI';
+import UpdateFGLoading from './screens/UpdateFGLoading';
+import UnloadingChallanUpdate from './screens/UnloadingChallanUpdate';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -274,6 +276,11 @@ options={getScreenOptions('Submit Pre Challan')}
           component={ShowUnloadingDetails}
           options={getScreenOptions('Show Unloading Details')}
         />
+        <Stack.Screen
+        name='updateUnloadingChalan'
+        component={UnloadingChallanUpdate}
+        options={getScreenOptions('Update Unloading Details')}
+        />
         {/* print challan=========== */}
         <Stack.Screen
           name="PrintChallan"
@@ -284,6 +291,11 @@ options={getScreenOptions('Submit Pre Challan')}
           name="NewChalan"
           component={NewChalan}
           options={getScreenOptions('New Challan')}
+        />
+        <Stack.Screen
+        name='updateChalan'
+        component={UpdateFGLoading}
+        options={getScreenOptions('Update Challan')}
         />
         <Stack.Screen
         name='FGLoadingEntry'
