@@ -88,8 +88,8 @@ const codeScanner = useCodeScanner({
   codeTypes: ['qr'],
   onCodeScanned: codes => {
     const scannedValue = codes[0].value;
-    console.log('QR CODE:', scannedValue);
-    console.log('Field No:', route.params.field);
+    // console.log('QR CODE:', scannedValue);
+    // console.log('Field No:', route.params.field);
 
     setCameraActive(false);
     setScannedData(scannedValue);

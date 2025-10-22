@@ -23,7 +23,7 @@ const SubmitPreChallan = ({ route,navigation }) => {
       setapiTokenReceived(TokenReceived);
     });
   const { JobDetails, VEHICLENO, VEHICLEID, DLNo, PANNo ,selectedDate, driverId,driverName,ownerId} = route.params;
-console.log('owner id',ownerId, VEHICLENO)
+//console.log('owner id',ownerId, VEHICLENO)
  
   const [ownerData, setOwnerData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ console.log('owner id',ownerId, VEHICLENO)
     const fetchOwnerDetails = async () => {
   try {
     setLoading(true);
-    console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`);
+   // console.log(`https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`);
 
     const response = await fetch(
       `https://Exim.Tranzol.com/api/OwnerApi/GetOwner?panNo=${PANNo}`,
@@ -53,7 +53,7 @@ console.log('owner id',ownerId, VEHICLENO)
     }
 
     const data = await response.json();
-    console.log("Owner API Response:", data);
+   // console.log("Owner API Response:", data);
 
     if (data?.apiResult?.Result) {
       setOwnerData(data.apiResult.Result); // <-- set the actual owner details
@@ -86,7 +86,7 @@ console.log('owner id',ownerId, VEHICLENO)
        // CreatedBy: 1,
       };
 
-      console.log("Submitting Payload:", payload);
+     // console.log("Submitting Payload:", payload);
 
   const response = await fetch(
   "https://Exim.Tranzol.com/api/LoadingChallan/CreatePreLoading",
@@ -99,15 +99,22 @@ console.log('owner id',ownerId, VEHICLENO)
     body: JSON.stringify(payload),
   }
 );
-console.log('pre loading payload',payload)
+//console.log('pre loading payload',payload)
 
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       const result = await response.json();
-      console.log("Pre-Challan API Response:", result);
+     // console.log("Pre-Challan API Response:", result);
 
-      if (result?.data?.JobId) {
-        Alert.alert("Success", `Allotment ID: ${result.data.JobId}`);
+      if (result?.data) {
+         Alert.alert(
+    "Success",
+    `✅ Successfully created Pre-Challan\n\n` +
+    `Job ID: ${result?.data?.JobId ?? '-'}\n` +
+    `Vehicle ID: ${result?.data?.VehicleId ?? '-'}\n` +
+    `Owner ID: ${result?.data?.OwnerId ?? '-'}\n` +
+    `Driver ID: ${result?.data?.DriverId ?? '-'}\n` +
+    `Driver DL No: ${result?.data?.DriverDlNo ?? '-'}\n`  )
         navigation.goBack();
       } else {
         Alert.alert("Error", "Failed to create Pre-Challan");

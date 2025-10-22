@@ -23,7 +23,7 @@ import { darkBlue } from '../components/constant';
 const ScreenWidth = Dimensions.get('window').width;
 const CheckDetails = () => {
   const navigation = useNavigation();
-  const [challanNumber, setchallanNumber] = useState('');
+  const [challanNumber, setchallanNumber] = useState('E-2526-');
   const [apiTokenReceived, setapiTokenReceived] = useState(null);
   AsyncStorage.getItem('Token')
     .then(token => {
@@ -96,7 +96,7 @@ const CheckDetails = () => {
         setIsLoading(false);
         if (response.ok) {
           const data = await response.json();
-          console.log('API Response:', data);
+         // console.log('API Response:', data);
   
           if (data.apiResult.Result === null) {
             // Case: No Challan details (Result is null)

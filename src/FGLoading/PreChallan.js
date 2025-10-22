@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Animated,
   TextInput,KeyboardAvoidingView,      
-  Alert
+  Alert,Switch
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 // import {TextInput} from 'react-native-gesture-handler';
@@ -66,6 +66,9 @@ const [DLNo,setDLNo]=useState('');
       const [driverName,setDriverName]=useState('')
       const [JobDetails,setJobDetails]=useState({});
     
+      const [isNotJobDetails,setIsNotJobDetails]=useState(false);
+      const toggleSwitch = () => setIsNotJobDetails(previousState => !previousState);
+
   const handleShowToast = () => {
     setShowToast(true);
 
@@ -355,8 +358,12 @@ const fetchDriver = async (search) => {
   setJobDetails({});
 };
 const handleGenerateChallan = () => {
+   if ((!jobNo || jobNo.length === 0) && !isNotJobDetails) {
+    Alert.alert('Please select Job No', 'Job No is required');
+    handleShowToast();
+    return;
+  }
   if (
-    // (!jobNo || jobNo.length === 0) ||
     (!vehicleNo || vehicleNo.length === 0) ||
     (!driverName || driverName.length === 0) ||
     (!selectedDate || selectedDate.length === 0)
@@ -422,10 +429,29 @@ const handleGenerateChallan = () => {
               resizeMode="contain"
             />
           </View>
+         <View style={styles.switchContainer}>
+  <Text
+    style={[
+      styles.switchLabel,
+      {color: isNotJobDetails ? '#e53935' : '#2e7d32'},
+    ]}>
+    {isNotJobDetails ? '🚫 Job not available' : '✅ Job available'}
+  </Text>
+
+  <Switch
+    trackColor={{false: '#bdbdbd', true: '#fcb2b1ff'}}
+    thumbColor={isNotJobDetails ? '#e53935' : '#f4f3f4'}
+    ios_backgroundColor="#3e3e3e"
+    onValueChange={toggleSwitch}
+    value={isNotJobDetails}
+    style={{transform: [{scaleX: 1.3}, {scaleY: 1.3}]}}
+  />
+</View>
             <>
+            {!isNotJobDetails && (
            <View>
    <Text style={styles.levelText}>
-          Job No 
+          Job No <Text style={{color: 'red'}}>*</Text>
         </Text>
         <Dropdown
   style={styles.dropdown}
@@ -455,6 +481,7 @@ const handleGenerateChallan = () => {
   }}
 />
          </View>
+            )}
 
 <View>
              <Text style={styles.levelText}>
@@ -597,6 +624,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
     // borderColor:'#5d92d4',
+  },
+   switchContainer: {
+    width: '75%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginVertical: 10,
+    elevation: 4, // gives soft shadow on Android
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 3, // soft shadow for iOS
+  },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   leftIcon: {
     position: 'absolute',

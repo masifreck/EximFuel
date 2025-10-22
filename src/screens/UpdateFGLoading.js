@@ -9,7 +9,7 @@
   TextInput,
   Image,
   Dimensions,
-  Switch,
+  Switch, Modal
 } from 'react-native';
 import React, {useState, useEffect,useCallback} from 'react';
 import {data, LoadtypeData} from '../components/DropDownData';
@@ -48,7 +48,7 @@ useEffect(() => {
   if (!global.btoa) {
     global.btoa = btoa;
   }
-
+const [isNotJobDetails,setIsNotJobDetails]=useState(false);
   const {FGLoading} = route.params;
   const details = FGLoading?.apiResult?.Result;
   const challan = details?.ChallanNo || '';
@@ -56,7 +56,17 @@ useEffect(() => {
   const JobDetails = {label: details?.JobNo, value: details?.JobId} || {};
   const DLNo = details?.DriverLicenseNo || '';
   const Id = details?.Id || '';
-
+  useEffect(() => {
+    if (
+      !JobDetails.label ||                              // null / undefined
+      (Array.isArray(JobDetails) && JobDetails.length === 0) || // empty array
+      (typeof JobDetails === 'object' && Object.keys(JobDetails).length === 0) // empty object
+    ) {
+      setIsNotJobDetails(true);
+    } else {
+      setIsNotJobDetails(false);
+    }
+  }, [JobDetails.label]);
  // console.log('FGLoading in Update:', FGLoading);
 
 
@@ -106,8 +116,17 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
 
   const [ownerId, setOwnerId] = useState(details?.OwnerId ? details.OwnerId : '');
   const [truckSource, setTruckSource] = useState(details?.TruckSource || '');
-  const [loadingPointId, setLoadingPointId] = useState('');
-  const [unloadingPointId, setUnLoadingPointId] = useState('');
+  
+   const [loadingPointId, setLoadingPointId] = useState('');
+    const [searchLoadingPoint, setSearchLoadingPoint] = useState('');
+    const [loadingPointData, setLoadingPointData] = useState([]);
+    const [loadingPointName, setLoadingPointName] = useState(details?.LoadingPoint || '');
+  
+    const [unloadingPointId, setUnLoadingPointId] = useState('');
+    const [searchUnloadingPoint, setSearchUnloadingPoint] = useState('');
+    const [unloadingPointData, setUnloadingPointData] = useState([]);
+    const [unloadingPointName, setUnloadingPointName] = useState(details?.UnloadingPoint || '');
+
   const [vehicleId, setVehicleId] = useState(details?.VehicleId ? details.VehicleId : '');
   const [driverId, setDriverId] = useState(details?.DriverId ? details.DriverId : '');
   const [brokerId, setBrokerId] = useState(details?.BrokerId ? details.BrokerId : '');
@@ -115,8 +134,17 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
   const [associationName1,setAssociationName1]=useState(details?.AssociationName || '');
 
   const [associationId, setAssociationId] = useState(details?.AssociationId ? details.AssociationId.toString() : '');
-  const [consigneeId, setConsigneeId] = useState(null);
-  const [consignorId, setConsignorId] = useState(null);
+ 
+   const [consigneeId, setConsigneeId] = useState(null);
+    const [searchConsignee, setSearchConsignee] = useState('');
+    const [consigneeData, setConsigneeData] = useState([]);
+    const [consigneeName, setConsigneeName] = useState(details?.ConsigneeName || '');
+  
+    const [consignorId, setConsignorId] = useState(null);
+    const [searchConsignor, setSearchConsignor] = useState('');
+    const [consignorData, setConsignorData] = useState([]);
+    const [consignorName, setConsignorName] = useState(details?.ConsignorName || '');
+
   const [VehicleType, setVehicleType] = useState('');
   const [hasBorder, setHasBorder] = useState(false);
   const [grossWt, setGrossWt] = useState(details?.GrossWt? details.GrossWt.toString() : '');
@@ -125,7 +153,12 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
   const [loadType, setLoadType] = useState(details?.LoadType || '');
   const [materialValue, setMaterialValue] = useState(details?.MaterialValues || '');
   const [remarks, setRemarks] = useState(details?.Remarks || '');
-  const [materialId, setMaterialId] = useState('');
+  
+   const [materialId, setMaterialId] = useState('');
+    const [materialsearch, setmaterialsearch] = useState('');
+    const [materialData, setmaterialData] = useState([]);
+    const [materialName, setmaterialName] = useState(details?.MaterialName || '');
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(details?.LoadDate? details.LoadDate.split('T')[0]: null); //27/02/2024
   const [guaranteewt, setGuaranteeWt] = useState(details?.GuaranteeWt? details.GuaranteeWt.toString() : '');
@@ -471,9 +504,9 @@ const [SealNo,setSealNo]=useState(details?.SealNo || '');
           },
         },
       );
-
-      if (response.ok) {
-        const responseText = await response.text();
+ const responseText = await response.text();
+      if (response.ok && responseText.includes('Update successfully')) {
+       
         console.log('Response status:', response.json());
 Alert.alert('Success', `${responseText}`);
 
@@ -515,11 +548,6 @@ Alert.alert('Success', `${responseText}`);
       return;
     }
 
-    
-  if (!jobId) {
-      Alert.alert('Validation Error', 'Please Select Job No');
-      return false;
-    }
     if (!netWt) {
       Alert.alert('Validation Error', 'Please Enter Net Weight');
       return false;
@@ -580,127 +608,135 @@ Alert.alert('Success', `${responseText}`);
 
   //////////////*****************DROP DOWN APIS  *///////////////////////////////////////////////////////////////
 
-  useEffect(() => {
-    if (searchPump) {
-      fetchPump(searchPump);
-    }
-  }, [searchPump]);
-  const fetchPump = async search => {
-    try {
-      const encodedSearch = encodeURIComponent(search);
-      const url = `https://exim.tranzol.com/api/DropDown/Pumpname?search=${encodedSearch}`;
-      console.log('Request URL:', url);
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Basic ${apiTokenReceived}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API Response:', data);
-
-        if (data.PumpList) {
-          // Corrected to use VehicleNoList
-          const pumpData = data.PumpList.map(pump => ({
-            label: pump.PumpName,
-            value: pump.Id,
-          }));
-          setpumpData(pumpData);
-        } else {
-          console.log('PUMP missing in the response');
-        }
-      } else {
-        console.log('Error in fetching PUMP no:', response.status);
-      }
-    } catch (error) {
-      console.log('Error in fetching pump no:', error);
-    }
-  };
-
-  const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    if (searchAssociation) {
-      fetchAssociation(searchAssociation);
-    }
-  }, [searchAssociation]);
-  const fetchAssociation = async search => {
-    try {
-     // console.log('Fetching Association with search:', search);
-      const encodedSearch = encodeURIComponent(search);
-      const url = `https://exim.tranzol.com/api/DropDown/association?search=${encodedSearch}`;
-      console.log('Request URL:', url);
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Basic ${apiTokenReceived}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-      //  console.log('API Response:', data);
-
-        if (data.Association) {
-          // Corrected to use VehicleNoList
-          const associationData = data.Association.map(association => ({
-            label: association.Association,
-            value: association.Id,
-          }));
-          setAssociationData(associationData);
-        } else {
-          console.log('Association missing in the response');
-        }
-      } else {
-        console.log('Error in fetching Association no:', response.status);
-      }
-    } catch (error) {
-      console.log('Error in fetching Association no:', error);
-    }
-  };
-  useEffect(() => {
-    if (searchBroker) {
-      fetchBroker(searchBroker);
-    }
-  }, [searchBroker]);
-  const fetchBroker = async search => {
-    try {
-     // console.log('Fetching broker with search:', search);
-      const encodedSearch = encodeURIComponent(search);
-      const url = `https://exim.tranzol.com/api/DropDown/Broker?search=${encodedSearch}`;
-      console.log('Request URL:', url);
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Basic ${apiTokenReceived}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-      //  console.log('API Response:', data);
-
-        if (data.BrokerList) {
-          // Corrected to use VehicleNoList
-          const brokerData = data.BrokerList.map(broker => ({
-            label: broker.PartyName,
-            value: broker.Id,
-          }));
-          setBrokerData(brokerData);
-        } else {
-          console.log('BROKER missing in the response');
-        }
-      } else {
-        console.log('Error in fetching broker no:', response.status);
-      }
-    } catch (error) {
-      console.log('Error in fetching broker no:', error);
-    }
-  };
+ const fetchDropdownData = async (endpoint, key, labelKey, valueKey, setData) => {
+   try {
+     const encodedSearch = encodeURIComponent(endpoint.search || '');
+     const url = `https://exim.tranzol.com/api/DropDown/${endpoint.name}?search=${encodedSearch}`;
+    // console.log('Request URL:', url);
+ 
+     const response = await fetch(url, {
+       method: 'GET',
+       headers: {
+         Authorization: `Basic ${apiTokenReceived}`,
+       },
+     });
+ 
+     if (response.ok) {
+       const data = await response.json();
+       console.log('API Response:', data);
+ 
+       if (Array.isArray(data[key])) {
+         const formattedData = data[key].map(item => ({
+           label: item[labelKey],
+           value: item[valueKey],
+         }));
+         setData(formattedData);
+       } else {
+         console.log(`${key} missing in the response`);
+         setData([]);
+       }
+     } else {
+       console.log(`Error fetching ${endpoint.name}:`, response.status);
+     }
+   } catch (error) {
+     console.log(`Error fetching ${endpoint.name}:`, error);
+   }
+ };
+ useEffect(() => {
+   if (searchPump) {
+     fetchDropdownData(
+       { name: 'Pumpname', search: searchPump },
+       'PumpList',
+       'PumpName',
+       'Id',
+       setpumpData
+     );
+   }
+ }, [searchPump]);
+ 
+ useEffect(() => {
+   if (searchAssociation) {
+     fetchDropdownData(
+       { name: 'association', search: searchAssociation },
+       'Association',
+       'Association',
+       'Id',
+       setAssociationData
+     );
+   }
+ }, [searchAssociation]);
+ 
+ useEffect(() => {
+   if (searchBroker) {
+     fetchDropdownData(
+       { name: 'Broker', search: searchBroker },
+       'BrokerList',
+       'PartyName',
+       'Id',
+       setBrokerData
+     );
+   }
+ }, [searchBroker]);
+ 
+ useEffect(() => {
+   if (searchConsignee) {
+     fetchDropdownData(
+       { name: 'Consignee', search: searchConsignee },
+       'Consignee',
+       'CName',
+       'Id',
+       setConsigneeData
+     );
+   }
+ }, [searchConsignee]);
+ 
+ useEffect(() => {
+   if (searchConsignor) {
+     fetchDropdownData(
+       { name: 'Consignor', search: searchConsignor },
+       'Consignor',
+       'CName',
+       'Id',
+       setConsignorData
+     );
+   }
+ }, [searchConsignor]);
+ 
+ useEffect(() => {
+   if (searchLoadingPoint) {
+     fetchDropdownData(
+       { name: 'LoadingPoint', search: searchLoadingPoint },
+       'LoadingPoints',
+       'Loading',
+       'Id',
+       setLoadingPointData
+     );
+   }
+ }, [searchLoadingPoint]);
+ 
+ useEffect(() => {
+   if (searchUnloadingPoint) {
+     fetchDropdownData(
+       { name: 'UnloadingPoint', search: searchUnloadingPoint },
+       'UnloadingPoints',
+       'Unloading',
+       'Id',
+       setUnloadingPointData
+     );
+   }
+ }, [searchUnloadingPoint]);
+ 
+ useEffect(() => {
+   if (materialsearch) {
+     fetchDropdownData(
+       { name: 'Material', search: materialsearch },
+       'MaterialList',
+       'MaterialName',
+       'Id',
+       setmaterialData
+     );
+   }
+ }, [materialsearch]);
 
   const [isJobEdit,setJobEdit]=useState(false);
   const JobEditToggle =()=>{
@@ -897,7 +933,7 @@ Alert.alert('Success', `${responseText}`);
                 search
                 labelField="label"
                 valueField="value"
-                placeholder={'Select Load Type'}
+                placeholder={'Select Job No'}
                 value={jobId}
                 onChange={item => {
                   setJobId(item.value);
@@ -912,7 +948,157 @@ Alert.alert('Success', `${responseText}`);
               </View>
                 </>
               )}
-                <View style={{marginTop: 10, marginBottom: 20}}>
+                  {isNotJobDetails ? (
+                <>
+                      <View>
+                   <Text style={styles.levelText}>
+                Select Consignor <Text style={{color:'red'}}>*</Text>
+                <Text style={{color:'black'}}>{consigneeName}</Text>
+              </Text>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={consignorData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Consignor'}
+                value={consigneeId}
+                onChange={item => {
+                  setConsignorId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchConsignor(text);  // Update searchTerm as user types
+  }}
+              />
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Consignee <Text style={{color:'red'}}>*</Text>
+                <Text style={{color:'black'}}>{consignorName}</Text>
+              </Text>
+              <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,
+                  fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={consigneeData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Consignee'}
+                value={consigneeId}
+                onChange={item => {
+                  setConsigneeId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchConsignee(text);  // Update searchTerm as user types
+  }}
+              />
+              <TouchableOpacity style={{marginLeft:10, backgroundColor:'red',width:70 ,height:70}}>
+                <Image style={{width:70,height:70}} source={require('../assets/add.png')}/>
+              </TouchableOpacity>
+              </View>
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Loading Point <Text style={{color:'red'}}>*</Text>
+                <Text style={{color:'black'}}>{loadingPointName}</Text>
+              </Text>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={loadingPointData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Loading Point'}
+                value={loadingPointId}
+                onChange={item => {
+                  setLoadingPointId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchLoadingPoint(text);  // Update searchTerm as user types
+  }}
+              />
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Unloading Point <Text style={{color:'red'}}>*</Text>
+                <Text style={{color:'black'}}>{unloadingPointName}</Text>
+              </Text>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={unloadingPointData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Unloading Point'}
+                value={unloadingPointId}
+                onChange={item => {
+                  setUnLoadingPointId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchUnloadingPoint(text);  // Update searchTerm as user types
+  }}
+              />
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Material <Text style={{color:'red'}}>*</Text>
+                <Text style={{color:'black'}}>{materialName}</Text>
+              </Text>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={materialData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Material'}
+                value={materialId}
+                onChange={item => {
+                  setMaterialId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setmaterialsearch(text);  // Update searchTerm as user types
+  }}
+              />
+              </View>
+</>
+              ):(
+<View style={{marginTop: 10, marginBottom: 20}}>
                       <TouchableOpacity 
                       onPress={JobEditToggle}
                       style={{position:'absolute',top:10,right:10,width:50,height:25,zIndex:10}} >
@@ -971,6 +1157,7 @@ Alert.alert('Success', `${responseText}`);
                     borderBottomRightRadius={16}
                   />
                 </View>
+              )}
                 <View
                   style={{
                     flexDirection: 'row',

@@ -9,13 +9,11 @@
   TextInput,
   Image,
   Dimensions,
-  Switch,
+  Switch,Modal
 } from 'react-native';
 import React, {useState, useEffect,useCallback} from 'react';
 import {data, LoadtypeData} from '../components/DropDownData';
 import {useRoute} from '@react-navigation/native';
-
-import CustomFilePicker from '../components/CustomFilePicker';
 import CalendarModal from '../components/Calander';
 import {darkBlue, inputbgColor, textColor} from '../components/constant';
 import {Dropdown} from 'react-native-element-dropdown';
@@ -27,9 +25,10 @@ import StepIndicator from '../FGLoading/StepIndicator';
 import CardType2 from '../FGLoading/CardType2';
 import Searching from '../components/Searching';
 import {decode as atob, encode as btoa} from 'base-64';
-import Clipboard from '@react-native-clipboard/clipboard';
-import { useFocusEffect } from "@react-navigation/native";
-import SuccessUI from '../components/SuccessUI';
+import RegisterConsignor from './RegisterConsignor';
+import RegisterConsignee from './RegisterConsignee';
+
+
 const NewChalan = ({navigation, route}) => {
 const [apiTokenReceived, setapiTokenReceived] = useState(null);
 
@@ -56,8 +55,25 @@ useEffect(() => {
   }
   const { params } = useRoute();
 
-  const {params: {JobDetails, VEHICLENO, VEHICLEID, DLNo ,Id, challan} = {}} = useRoute();
+const { params: { JobDetails: routeJobDetails, VEHICLENO: routeVEHICLENO, DLNo: routeDLNo, Id: routeId, challan: routeChallan } = {} } = useRoute();
 
+const [JobDetails, setJobDetails] = useState(routeJobDetails || '');
+const [VEHICLENO, setVEHICLENO] = useState(routeVEHICLENO || '');
+const [DLNo, setDLNo] = useState(routeDLNo || '');
+const [Id, setId] = useState(routeId || '');
+const [challan, setChallan] = useState(routeChallan || '');
+
+  useEffect(() => {
+    if (
+      !JobDetails.label ||                              // null / undefined
+      (Array.isArray(JobDetails) && JobDetails.length === 0) || // empty array
+      (typeof JobDetails === 'object' && Object.keys(JobDetails).length === 0) // empty object
+    ) {
+      setIsNotJobDetails(true);
+    } else {
+      setIsNotJobDetails(false);
+    }
+  }, [JobDetails.label]);
   //console.log("Job Details from route:", JobDetails);
   // console.log("Vehicle No:", VEHICLENO);
   // console.log("Vehicle ID:", VEHICLEID);
@@ -106,14 +122,28 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
 
   const [ownerId, setOwnerId] = useState('');
   const [truckSource, setTruckSource] = useState('');
+
   const [loadingPointId, setLoadingPointId] = useState('');
+  const [searchLoadingPoint, setSearchLoadingPoint] = useState('');
+  const [loadingPointData, setLoadingPointData] = useState([]);
+
   const [unloadingPointId, setUnLoadingPointId] = useState('');
+  const [searchUnloadingPoint, setSearchUnloadingPoint] = useState('');
+  const [unloadingPointData, setUnloadingPointData] = useState([]);
+
   const [vehicleId, setVehicleId] = useState('');
   const [driverId, setDriverId] = useState('');
   const [brokerId, setBrokerId] = useState('');
   const [associationId, setAssociationId] = useState('');
+
   const [consigneeId, setConsigneeId] = useState(null);
+  const [searchConsignee, setSearchConsignee] = useState('');
+  const [consigneeData, setConsigneeData] = useState([]);
+
   const [consignorId, setConsignorId] = useState(null);
+  const [searchConsignor, setSearchConsignor] = useState('');
+  const [consignorData, setConsignorData] = useState([]);
+
   const [VehicleType, setVehicleType] = useState('');
   const [hasBorder, setHasBorder] = useState(false);
   const [grossWt, setGrossWt] = useState('');
@@ -122,7 +152,11 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
   const [loadType, setLoadType] = useState('');
   const [materialValue, setMaterialValue] = useState('');
   const [remarks, setRemarks] = useState('');
+
   const [materialId, setMaterialId] = useState('');
+  const [materialsearch, setmaterialsearch] = useState('');
+  const [materialData, setmaterialData] = useState([]);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null); //27/02/2024
   const [guaranteewt, setGuaranteeWt] = useState('');
@@ -136,6 +170,11 @@ const [openvalidtymodal,setvaliditymodal]=useState(false)
    const [EWayBillPhoto,setEWayBillPhoto]=useState();
 
   const [isOtherAccount, setIsOtherAccount] = useState(false);
+   const [isNotJobDetails,setIsNotJobDetails]=useState(false);
+
+   const [modalVisibleConsignor, setModalVisibleConsignor] = useState(false);
+ const [modalVisibleConsignee, setModalVisibleConsignee] = useState(false);
+
  const fetchJob = async (search) => {
     try {
     //  console.log('Fetching jobs with search:', search);
@@ -334,7 +373,7 @@ const fetchJobNo = useCallback(
 
 useEffect(() => {
   if (params?.JobDetails?.label && apiTokenReceived) {
-    console.log('Calling fetchJobNo from route:', params.JobDetails.label);
+   // console.log('Calling fetchJobNo from route:', params.JobDetails.label);
     fetchJobNo(params.JobDetails.label);
     setJobNo(params.JobDetails.label);
   }
@@ -477,6 +516,7 @@ const deleteAlloments = async(Id)=>{
               console.error("Error deleting PreLoading:", error);
             }
 }
+const [isLoading ,setIsLoading] = useState(false);
 
   const HandleSubmit = async () => {
     const isValid = onSubmitSteps();
@@ -589,9 +629,9 @@ const deleteAlloments = async(Id)=>{
           },
         },
       );
-
-      if (response.ok) {
-        const responseText = await response.text();
+const responseText = await response.text();
+      if (response.ok  && responseText.includes('Insert successfully')) {
+        
 
         deleteAlloments(Id)
          navigation.navigate('success', {
@@ -619,6 +659,47 @@ const deleteAlloments = async(Id)=>{
 
   const HandleNext1 = async () => {
     try {
+       if (!challan) {
+    Alert.alert('Validation Error', 'Challan No is mandatory');
+    return;
+  }
+
+  // if (!IsVerified) {
+  //   Alert.alert(
+  //     'Error',
+  //     'Vehicle Verification is required before proceeding!'
+  //   );
+  //   return;
+  // }
+
+  // if (!IsCommercial) {
+  //   Alert.alert(
+  //     'Error',
+  //     'This action is only allowed for Commercial entries!'
+  //   );
+  //   return;
+  // }
+  if(!consigneeId){
+    Alert.alert('Validation Error', 'Please Select Consignee');
+    return;
+  };
+  if(!consignorId){
+    Alert.alert('Validation Error', 'Please Select Consignor');
+    return;
+  };
+  if(!materialId){
+    Alert.alert('Validation Error', 'Please Select Material');
+    return;
+  };
+  if(!loadingPointId){
+    Alert.alert('Validation Error', 'Please Select Loading Point');
+    return;
+  };
+  if(!unloadingPointId){
+    Alert.alert('Validation Error', 'Please Select Unloading Point');
+    return;
+  };
+
       setIsStep1Visible(true); // ✅ Correct setter
       setFirstSetp(false); // ✅ Correct setter
     } catch (err) {
@@ -636,12 +717,6 @@ const deleteAlloments = async(Id)=>{
     if (!selectedDate) {
       Alert.alert('Validation Error', 'Load Date is Mandatory');
       return;
-    }
-
-    
-  if (!jobId) {
-      Alert.alert('Validation Error', 'Please Select Job No');
-      return false;
     }
     if (!netWt) {
       Alert.alert('Validation Error', 'Please Enter Net Weight');
@@ -705,127 +780,136 @@ const deleteAlloments = async(Id)=>{
 
   //////////////*****************DROP DOWN APIS  *///////////////////////////////////////////////////////////////
 
-  useEffect(() => {
-    if (searchPump) {
-      fetchPump(searchPump);
-    }
-  }, [searchPump]);
-  const fetchPump = async search => {
-    try {
-      const encodedSearch = encodeURIComponent(search);
-      const url = `https://exim.tranzol.com/api/DropDown/Pumpname?search=${encodedSearch}`;
-      console.log('Request URL:', url);
+const fetchDropdownData = async (endpoint, key, labelKey, valueKey, setData) => {
+  try {
+    const encodedSearch = encodeURIComponent(endpoint.search || '');
+    const url = `https://exim.tranzol.com/api/DropDown/${endpoint.name}?search=${encodedSearch}`;
+   // console.log('Request URL:', url);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Basic ${apiTokenReceived}`,
-        },
-      });
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Basic ${apiTokenReceived}`,
+      },
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API Response:', data);
+    if (response.ok) {
+      const data = await response.json();
+      console.log('API Response:', data);
 
-        if (data.PumpList) {
-          // Corrected to use VehicleNoList
-          const pumpData = data.PumpList.map(pump => ({
-            label: pump.PumpName,
-            value: pump.Id,
-          }));
-          setpumpData(pumpData);
-        } else {
-          console.log('PUMP missing in the response');
-        }
+      if (Array.isArray(data[key])) {
+        const formattedData = data[key].map(item => ({
+          label: item[labelKey],
+          value: item[valueKey],
+        }));
+        setData(formattedData);
       } else {
-        console.log('Error in fetching PUMP no:', response.status);
+        console.log(`${key} missing in the response`);
+        setData([]);
       }
-    } catch (error) {
-      console.log('Error in fetching pump no:', error);
+    } else {
+      console.log(`Error fetching ${endpoint.name}:`, response.status);
     }
-  };
+  } catch (error) {
+    console.log(`Error fetching ${endpoint.name}:`, error);
+  }
+};
+useEffect(() => {
+  if (searchPump) {
+    fetchDropdownData(
+      { name: 'Pumpname', search: searchPump },
+      'PumpList',
+      'PumpName',
+      'Id',
+      setpumpData
+    );
+  }
+}, [searchPump]);
 
-  const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    if (searchAssociation) {
-      fetchAssociation(searchAssociation);
-    }
-  }, [searchAssociation]);
-  const fetchAssociation = async search => {
-    try {
-     // console.log('Fetching Association with search:', search);
-      const encodedSearch = encodeURIComponent(search);
-      const url = `https://exim.tranzol.com/api/DropDown/association?search=${encodedSearch}`;
-      console.log('Request URL:', url);
+useEffect(() => {
+  if (searchAssociation) {
+    fetchDropdownData(
+      { name: 'association', search: searchAssociation },
+      'Association',
+      'Association',
+      'Id',
+      setAssociationData
+    );
+  }
+}, [searchAssociation]);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Basic ${apiTokenReceived}`,
-        },
-      });
+useEffect(() => {
+  if (searchBroker) {
+    fetchDropdownData(
+      { name: 'Broker', search: searchBroker },
+      'BrokerList',
+      'PartyName',
+      'Id',
+      setBrokerData
+    );
+  }
+}, [searchBroker]);
 
-      if (response.ok) {
-        const data = await response.json();
-      //  console.log('API Response:', data);
+useEffect(() => {
+  if (searchConsignee) {
+    fetchDropdownData(
+      { name: 'Consignee', search: searchConsignee },
+      'Consignee',
+      'CName',
+      'Id',
+      setConsigneeData
+    );
+  }
+}, [searchConsignee]);
 
-        if (data.Association) {
-          // Corrected to use VehicleNoList
-          const associationData = data.Association.map(association => ({
-            label: association.Association,
-            value: association.Id,
-          }));
-          setAssociationData(associationData);
-        } else {
-          console.log('Association missing in the response');
-        }
-      } else {
-        console.log('Error in fetching Association no:', response.status);
-      }
-    } catch (error) {
-      console.log('Error in fetching Association no:', error);
-    }
-  };
-  useEffect(() => {
-    if (searchBroker) {
-      fetchBroker(searchBroker);
-    }
-  }, [searchBroker]);
-  const fetchBroker = async search => {
-    try {
-     // console.log('Fetching broker with search:', search);
-      const encodedSearch = encodeURIComponent(search);
-      const url = `https://exim.tranzol.com/api/DropDown/Broker?search=${encodedSearch}`;
-      console.log('Request URL:', url);
+useEffect(() => {
+  if (searchConsignor) {
+    fetchDropdownData(
+      { name: 'Consignor', search: searchConsignor },
+      'Consignor',
+      'CName',
+      'Id',
+      setConsignorData
+    );
+  }
+}, [searchConsignor]);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Basic ${apiTokenReceived}`,
-        },
-      });
+useEffect(() => {
+  if (searchLoadingPoint) {
+    fetchDropdownData(
+      { name: 'LoadingPoint', search: searchLoadingPoint },
+      'LoadingPoints',
+      'Loading',
+      'Id',
+      setLoadingPointData
+    );
+  }
+}, [searchLoadingPoint]);
 
-      if (response.ok) {
-        const data = await response.json();
-      //  console.log('API Response:', data);
+useEffect(() => {
+  if (searchUnloadingPoint) {
+    fetchDropdownData(
+      { name: 'UnloadingPoint', search: searchUnloadingPoint },
+      'UnloadingPoints',
+      'Unloading',
+      'Id',
+      setUnloadingPointData
+    );
+  }
+}, [searchUnloadingPoint]);
 
-        if (data.BrokerList) {
-          // Corrected to use VehicleNoList
-          const brokerData = data.BrokerList.map(broker => ({
-            label: broker.PartyName,
-            value: broker.Id,
-          }));
-          setBrokerData(brokerData);
-        } else {
-          console.log('BROKER missing in the response');
-        }
-      } else {
-        console.log('Error in fetching broker no:', response.status);
-      }
-    } catch (error) {
-      console.log('Error in fetching broker no:', error);
-    }
-  };
+useEffect(() => {
+  if (materialsearch) {
+    fetchDropdownData(
+      { name: 'Material', search: materialsearch },
+      'MaterialList',
+      'MaterialName',
+      'Id',
+      setmaterialData
+    );
+  }
+}, [materialsearch]);
+
 
   const [isJobEdit,setJobEdit]=useState(false);
   const JobEditToggle =()=>{
@@ -910,28 +994,6 @@ const deleteAlloments = async(Id)=>{
                     borderBottomLeftRadius={16}
                     borderBottomRightRadius={16}
                   />
-                
-{/* <TextInput
-  style={{
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 12,   // ✅ fixes "cut from top"
-    fontSize: 13,
-    lineHeight: 20,
-    //height: 180,
-    textAlignVertical: "top", // ensures text starts at top
-    marginVertical: 20,
-    color: textColor,
-    backgroundColor: "#f9f9f9", // subtle background
-  }}
-  editable={false}
-  multiline={true}
-  value={JSON.stringify(rcValues, null, 2)} // pretty printed JSON
-/> */}
-
-
                 </View>
                 <View style={{marginTop: 10, elevation: 4}}>
                   {loading ? (
@@ -1026,6 +1088,28 @@ const deleteAlloments = async(Id)=>{
                     />
                   </>
                 </View>
+                      <Modal visible={modalVisibleConsignor} 
+                                      animationType="slide" transparent>
+                        <View style={styles.modalOverlay}>
+                          <View style={styles.modalBox}>
+                            <RegisterConsignor
+                              onSuccess={data => console.log('Saved:', data)}
+                              onClose={() => setModalVisibleConsignor(false)}
+                            />
+                          </View>
+                        </View>
+                      </Modal>
+                         <Modal visible={modalVisibleConsignee} 
+                                      animationType="slide" transparent>
+                        <View style={styles.modalOverlay}>
+                          <View style={styles.modalBox}>
+                            <RegisterConsignee
+                              onSuccess={data => console.log('Saved:', data)}
+                              onClose={() => setModalVisibleConsignee(false)}
+                            />
+                          </View>
+                        </View>
+                      </Modal>
               {isJobEdit && (
                 <>
                 <View style={{zIndex:10}}>
@@ -1044,7 +1128,7 @@ const deleteAlloments = async(Id)=>{
                 search
                 labelField="label"
                 valueField="value"
-                placeholder={'Select Load Type'}
+                placeholder={'Select Job No'}
                 value={jobId}
                 onChange={item => {
                   setJobId(item.value);
@@ -1059,7 +1143,159 @@ const deleteAlloments = async(Id)=>{
               </View>
                 </>
               )}
-                <View style={{marginTop: 10, marginBottom: 20}}>
+
+              {isNotJobDetails ? (
+                <>
+                      <View>
+                   <Text style={styles.levelText}>
+                Select Consignor <Text style={{color:'red'}}>*</Text>
+              </Text>
+               <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+              <Dropdown
+                style={[{width:'80%',height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={consignorData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Consignor'}
+                value={consigneeId}
+                onChange={item => {
+                  setConsignorId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchConsignor(text);  // Update searchTerm as user types
+  }}
+              />
+               <TouchableOpacity onPress={()=>setModalVisibleConsignor(true)}>
+                <Image style={{width:50,height:50}} source={require('../assets/add.png')} />
+              </TouchableOpacity>
+              </View>
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Consignee <Text style={{color:'red'}}>*</Text>
+              </Text>
+              <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+              <Dropdown
+                style={[{width:'80%',height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={consigneeData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Consignee'}
+                value={consigneeId}
+                onChange={item => {
+                  setConsigneeId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchConsignee(text);  // Update searchTerm as user types
+  }}
+              />
+               <TouchableOpacity onPress={()=>setModalVisibleConsignee(true)}>
+                <Image style={{width:50,height:50}} source={require('../assets/add.png')} />
+              </TouchableOpacity>
+              </View>
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Loading Point <Text style={{color:'red'}}>*</Text>
+              </Text>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={loadingPointData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Loading Point'}
+                value={loadingPointId}
+                onChange={item => {
+                  setLoadingPointId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchLoadingPoint(text);  // Update searchTerm as user types
+  }}
+              />
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Unloading Point <Text style={{color:'red'}}>*</Text>
+              </Text>
+             
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={unloadingPointData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Unloading Point'}
+                value={unloadingPointId}
+                onChange={item => {
+                  setUnLoadingPointId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setSearchUnloadingPoint(text);  // Update searchTerm as user types
+  }}
+              />
+             
+              </View>
+              <View>
+                   <Text style={styles.levelText}>
+                Select Material <Text style={{color:'red'}}>*</Text>
+              </Text>
+              <Dropdown
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
+                  ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={{color: 'black'}}
+                data={materialData}
+                maxHeight={300}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder={'Select Material'}
+                value={materialId}
+                onChange={item => {
+                  setMaterialId(item.value);
+                  setIsFocus(false);
+                }}
+                  onChangeText={text => {
+    setmaterialsearch(text);  // Update searchTerm as user types
+  }}
+              />
+              </View>
+</>
+              ):(
+<View style={{marginTop: 10, marginBottom: 20}}>
                       <TouchableOpacity 
                       onPress={JobEditToggle}
                       style={{position:'absolute',top:10,right:10,width:50,height:25,zIndex:10}} >
@@ -1118,6 +1354,8 @@ const deleteAlloments = async(Id)=>{
                     borderBottomRightRadius={16}
                   />
                 </View>
+              )}
+
                 <View
                   style={{
                     flexDirection: 'row',
@@ -1133,27 +1371,6 @@ const deleteAlloments = async(Id)=>{
                   </TouchableOpacity>
                   <TouchableOpacity
             onPress={() => {
-  if (!challan) {
-    Alert.alert('Validation Error', 'Challan No is mandatory');
-    return;
-  }
-
-  if (!IsVerified) {
-    Alert.alert(
-      'Error',
-      'Vehicle Verification is required before proceeding!'
-    );
-    return;
-  }
-
-  if (!IsCommercial) {
-    Alert.alert(
-      'Error',
-      'This action is only allowed for Commercial entries!'
-    );
-    return;
-  }
-
   HandleNext1();
 }}
 

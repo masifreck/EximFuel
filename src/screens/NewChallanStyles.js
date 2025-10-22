@@ -147,4 +147,25 @@ export const styles = StyleSheet.create({
     fontFamily: 'PoppinsRegular',
     fontWeight: 'bold',
   },
+    openButton: {
+    backgroundColor: '#007BFF',
+    padding: 14,
+    borderRadius: 12,
+  },
+  openButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalBox: {
+    width: '90%',
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    padding: 20,
+  },
 });
