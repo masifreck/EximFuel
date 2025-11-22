@@ -104,7 +104,7 @@ return()=>clearTimeout(handler)
 FetchSingleDriver(item.Id)
     setModalVisible(true);
   };
- const approveDriver = async (approveStatus,id, statusRemarks) => {
+ const approveDriver = async (approveStatus,id, statusRemarks) => {T
     if( !approveStatus || !statusRemarks){
       Alert.alert( 'Error',"Please fill all the fields")
       return;

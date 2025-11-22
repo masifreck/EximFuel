@@ -24,6 +24,7 @@ import StepIndicator from '../FGLoading/StepIndicator';
 import CardType2 from '../FGLoading/CardType2';
 import Searching from '../components/Searching';
 import {decode as atob, encode as btoa} from 'base-64';
+import RegisterConsignor from './RegisterConsignor';
 const UpdateFGLoading = ({navigation, route}) => {
 const [apiTokenReceived, setapiTokenReceived] = useState(null);
 
@@ -915,6 +916,8 @@ Alert.alert('Success', `${responseText}`);
                     />
                   </>
                 </View>
+                
+
               {isJobEdit && (
                 <>
                 <View style={{zIndex:10}}>
@@ -953,7 +956,7 @@ Alert.alert('Success', `${responseText}`);
                       <View>
                    <Text style={styles.levelText}>
                 Select Consignor <Text style={{color:'red'}}>*</Text>
-                <Text style={{color:'black'}}>{consigneeName}</Text>
+                <Text style={{color:'black'}}>{consignorName}</Text>
               </Text>
               <Dropdown
                 style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
@@ -981,12 +984,11 @@ Alert.alert('Success', `${responseText}`);
               <View>
                    <Text style={styles.levelText}>
                 Select Consignee <Text style={{color:'red'}}>*</Text>
-                <Text style={{color:'black'}}>{consignorName}</Text>
+                <Text style={{color:'black'}}>{consigneeName}</Text>
               </Text>
-              <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+              <View>
               <Dropdown
-                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,
-                  fontSize:13,color:'black'
+                style={[{height: 50,borderRadius:12,borderWidth:1,borderColor:'#ccc',elevation:4,paddingHorizontal:15,fontSize:13,color:'black'
                   ,marginBottom:10,backgroundColor: inputbgColor}, isFocus && {borderColor: darkBlue}]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
@@ -1006,10 +1008,8 @@ Alert.alert('Success', `${responseText}`);
                   onChangeText={text => {
     setSearchConsignee(text);  // Update searchTerm as user types
   }}
+
               />
-              <TouchableOpacity style={{marginLeft:10, backgroundColor:'red',width:70 ,height:70}}>
-                <Image style={{width:70,height:70}} source={require('../assets/add.png')}/>
-              </TouchableOpacity>
               </View>
               </View>
               <View>

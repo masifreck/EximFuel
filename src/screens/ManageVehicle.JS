@@ -115,7 +115,7 @@ FetchSingleVehicle(item.Id)
         Alert.alert("Please confirm the declaration")
         return;
       }
-     console.log('Approving owner with ID:', id, 'Status:', approveStatus, 'Remarks:', statusRemarks);
+    // console.log('Approving owner with ID:', id, 'Status:', approveStatus, 'Remarks:', statusRemarks);
       setLoading(true);
       try {
         const response = await fetch('https://Exim.Tranzol.com/api/VehicleApi/ApprovalVehicle', {

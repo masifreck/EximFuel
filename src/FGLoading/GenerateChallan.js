@@ -84,7 +84,7 @@ useFocusEffect(
   });
 
 const deletePreLoading = async (id) => {
-  console.log("Attempting to delete PreLoading with ID:", id);
+ // console.log("Attempting to delete PreLoading with ID:", id);
   Alert.alert(
     "Confirm Deletion 🗑️",
     `Are you sure you want to delete Allotment ID ${id}?`,

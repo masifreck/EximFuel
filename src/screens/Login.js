@@ -48,48 +48,68 @@ const Login = ({navigation}) => {
     setPassword(text);
   };
 
-  const handleSubmit = () => {
-    setIsLoading(true);
-    const Data = {
-      username: userId,
-      password: password,
-    };
-    // console.log(Data);
+const handleSubmit = async () => {
+  setIsLoading(true);
 
-    if (userId === '' || password === '') {
-      setIsLoading(false);
-      if (userId == '') setuseridError('Enter User Id');
-      else setuseridError('');
+  if (userId === '' || password === '') {
+    setIsLoading(false);
 
-      if (password == '') setpasswordError('Enter Password');
-      else setpasswordError('');
+    setuseridError(userId === '' ? 'Enter User Id' : '');
+    setpasswordError(password === '' ? 'Enter Password' : '');
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      'https://Exim.Tranzol.com/api/AccountApi/Login',
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',   // IMPORTANT
+        },
+        body: JSON.stringify({
+          Username: userId,
+          Password: password,
+        }),
+      },
+    );
+
+    const result = await response.json();
+    setIsLoading(false);
+
+    console.log("API Response:", result);
+
+    if (result === 'Invalid username and password.') {
+      setuseridError('Invalid Credentials!');
+      setpasswordError('Invalid Credentials!');
+      setUserId('');
+      setPassword('');
     } else {
-      myFetchPostRequest(Data)
-        .then(response => response.json())
-        .then(result => {
-          setIsLoading(false);
-          if (result === 'Invalid username and password.') {
-            setuseridError('Invalid Credentials!');
-            setpasswordError('Invalid Credentials!');
-            setUserId('');
-            setPassword('');
-          } else {
-            console.log(result);
-            AsyncStorage.setItem('username', userId);
-            AsyncStorage.setItem('password', password);
-            AsyncStorage.setItem('Token', result.token);
-                AsyncStorage.setItem('Sign', result.signature);
-            navigation.replace('DrawerNavigation');
-          }
-        })
-        .catch(error => {
-          setIsLoading(false);
-          console.log(error);
-          setErrorMessage('Check Internet Connection!');
-          setShowAlert(true);
-        });
+      // Normally result = { token: "...", signature: "..." }
+
+      AsyncStorage.setItem('username', userId);
+      AsyncStorage.setItem('password', password);
+
+      if (result.token) {
+        AsyncStorage.setItem('Token', result.token);
+      }
+      if (result.signature) {
+        AsyncStorage.setItem('Sign', result.signature);
+      }
+
+      navigation.replace('DrawerNavigation');
     }
-  };
+
+  } catch (error) {
+    setIsLoading(false);
+    console.log('Login Error:', error);
+    setErrorMessage('Check Internet Connection!');
+    setShowAlert(true);
+  }
+};
+
+
 
   return (
     <ScrollView style={{backgroundColor: 'white'}}>
@@ -123,7 +143,7 @@ const Login = ({navigation}) => {
                 letterSpacing: 1,
                 fontFamily: 'PoppinsExtraBold',
               }}>
-              Login
+              Login 
             </Text>
 
             <View>
