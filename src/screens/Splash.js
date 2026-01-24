@@ -13,13 +13,13 @@ const Splash = ({navigation}) => {
   }, []);
 
   const getLoginDetails = async () => {
-    let userId = await AsyncStorage.getItem('username');
-    let password = await AsyncStorage.getItem('password');
-    if (userId && password) {
+    let userId = await AsyncStorage.getItem('isLoggedIn');
+  
+    if (userId ) {
       globalusername = userId;
-      globalpassword = password;
+      
       //console.log("i got admin password logging directly", userId, password);
-      navigation.replace('DrawerNavigation', {userId});
+        navigation.replace('dashboard');
     } else {
       navigation.replace('Login');
     }

@@ -1,0 +1,203 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  StatusBar,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const DashboardScreen = ({ navigation }) => {
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout 🚪',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            await AsyncStorage.clear();
+            navigation.replace('Login');
+          },
+        },
+      ],
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor="#2563EB" barStyle="light-content" />
+
+      {/* 🔝 Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.headerTitle}>Tranzol 🚚</Text>
+          <Text style={styles.headerSubTitle}>
+            Logistics Dashboard
+          </Text>
+        </View>
+
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+          <Text style={styles.logoutIcon}>🚪</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 🧩 Cards */}
+      <View style={styles.cardContainer}>
+        {/* 🚛 Fleet Management */}
+        <TouchableOpacity
+          style={[styles.card, styles.fleetCard]}
+          onPress={() =>
+            Alert.alert(
+              '🚧 Coming Soon',
+              'Fleet Management feature will be available soon 🚛',
+              [{ text: 'OK 👍' }],
+            )
+          }
+        >
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardEmoji}>🚛</Text>
+            <Text style={styles.cardTitle}>Fleet Management</Text>
+          </View>
+          <Text style={styles.cardDesc}>
+            Manage vehicles, drivers & routes efficiently
+          </Text>
+        </TouchableOpacity>
+
+        {/* ⛽ Fuel Management */}
+        <TouchableOpacity
+          style={[styles.card, styles.fuelCard]}
+          onPress={() => navigation.navigate('fuelmanagement')}
+        >
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardEmoji}>⛽</Text>
+            <Text style={styles.cardTitle}>Fuel Management</Text>
+          </View>
+          <Text style={styles.cardDesc}>
+            Track fuel usage, balance & expenses
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* ⚡ Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Powered by <Text style={styles.footerBrand}>Tranzol 🚀</Text>
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+export default DashboardScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F3F5F9',
+  },
+
+  /* ===== Header ===== */
+  header: {
+    backgroundColor: '#2563EB',
+    paddingTop: 24,
+    paddingBottom: 28,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 6,
+  },
+
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#FFF',
+  },
+
+  headerSubTitle: {
+    fontSize: 13,
+    color: '#DCE4FF',
+    marginTop: 2,
+  },
+
+  logoutBtn: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    padding: 10,
+    borderRadius: 12,
+  },
+
+  logoutIcon: {
+    fontSize: 20,
+  },
+
+  /* ===== Cards ===== */
+  cardContainer: {
+    padding: 20,
+    marginTop: -10,
+  },
+
+  card: {
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 22,
+    marginBottom: 22,
+    elevation: 5,
+  },
+
+  fleetCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#22C55E',
+  },
+
+  fuelCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#F97316',
+  },
+
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+
+  cardEmoji: {
+    fontSize: 38,
+    marginRight: 12,
+  },
+
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+  },
+
+  cardDesc: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 20,
+    marginTop: 4,
+  },
+
+  /* ===== Footer ===== */
+  footer: {
+    position: 'absolute',
+    bottom: 14,
+    alignSelf: 'center',
+  },
+
+  footerText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+
+  footerBrand: {
+    fontWeight: '700',
+    color: '#2563EB',
+  },
+});

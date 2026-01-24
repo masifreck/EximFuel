@@ -40,7 +40,7 @@ const CustomDrawerContent = (props) => {
       
       <View style={styles.footer}>
         <Text style={styles.footerText}>Powered by Tranzol</Text>
-        <Text style={styles.versionText}>Version 0.1.3</Text>
+        <Text style={styles.versionText}>Version 0.1.4</Text>
       </View>
     </DrawerContentScrollView>
   );

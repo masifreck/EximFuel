@@ -54,6 +54,8 @@ import SubmitPreChallan from './FGLoading/SubmitPreChallan';
 import SuccessUI from './components/SuccessUI';
 import UpdateFGLoading from './screens/UpdateFGLoading';
 import UnloadingChallanUpdate from './screens/UnloadingChallanUpdate';
+import DashboardScreen from './screens/Dashborad';
+import FuelManagementScreen from './screens/FuelMangement';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -81,6 +83,16 @@ const AppNavigator = () => {
           name="Login"
           component={Login}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+        name='dashboard'
+        component={DashboardScreen}
+        options={{headerShown: false}}
+        />
+        <Stack.Screen
+        name = 'fuelmanagement'
+        component={FuelManagementScreen}
+        options={{headerShown: false}}
         />
         <Stack.Screen
         name='qrcode'

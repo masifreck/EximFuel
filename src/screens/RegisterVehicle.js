@@ -99,7 +99,7 @@ useEffect(() => {
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `https://Exim.Tranzol.com/api/OwnerApi/GetOwnerListByName?search=${PanNumber}`,
+            `https://Exim.Tranzol.com/api/OwnerApi/getOwnerList?panno=${PanNumber}`,
             {
               method: 'GET',
               headers: {
@@ -116,11 +116,11 @@ useEffect(() => {
           }
 
           const result = await response.json();
-          //console.log('owner list', result);
+        //  console.log('owner list', result.apiResult);
 
           if (result.apiResult?.Result?.length) {
             const formattedData = result.apiResult.Result.map(owner => ({
-              label: owner.OwnerName,
+              label: owner.OwnerName + ' - ' + owner.PanNo,
               value: owner.Id,
             }));
             setOwnerData(formattedData);
