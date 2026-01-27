@@ -16,25 +16,54 @@ const FuelManagementScreen = ({ navigation }) => {
   const [remarks, setRemarks] = useState('');
 const [balanceFuel, setBalanceFuel] = useState('');
 
+ const [vehicle, setVehicle] = useState(null);
+  const [source, setSource] = useState(null);
+  const [destination, setDestination] = useState(null);
+  const [material, setMaterial] = useState(null);
+  const [distance, setDistance] = useState('');
+
+  const getCurrentDate = () => {
+  const date = new Date();
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
+const currentDate = getCurrentDate();
+
+
+  const vehicleData = [
+    { label: 'MH12 AB 1234', value: 'MH12AB1234' },
+    { label: 'MH14 CD 5678', value: 'MH14CD5678' },
+  ];
+
+  const sourceData = [
+    { label: 'Mumbai', value: 'Mumbai' },
+    { label: 'Pune', value: 'Pune' },
+  ];
+
+  const destinationData = [
+    { label: 'Delhi', value: 'Delhi' },
+    { label: 'Jaipur', value: 'Jaipur' },
+  ];
+
+  const materialData = [
+    { label: 'Steel', value: 'Steel' },
+    { label: 'Cement', value: 'Cement' },
+  ];
+
   // 🧪 Dummy Trip Data
   const tripData = [
     {
       label: 'Trip No: TRP-101',
       value: 'TRP-101',
-      tripNo: 'TRP-101',
-      sectorId: 'SEC-12',
-      distance: '450 KM',
-      vehicleNo: 'OD-02-AB-4567',
-      loadDate: '2024-10-12',
+      
     },
     {
       label: 'Trip No: TRP-102',
       value: 'TRP-102',
-      tripNo: 'TRP-102',
-      sectorId: 'SEC-18',
-      distance: '320 KM',
-      vehicleNo: 'WB-06-CD-8899',
-      loadDate: '2024-10-15',
+     
     },
   ];
 
@@ -66,35 +95,91 @@ const [balanceFuel, setBalanceFuel] = useState('');
       <Dropdown
         style={styles.dropdown}
         data={tripData}
+        search
         labelField="label"
         valueField="value"
         placeholder="Choose Trip Number"
         value={selectedTrip?.value}
         onChange={(item) => setSelectedTrip(item)}
       />
+<Text style={styles.label}>Select Vehicle No 🚚</Text>
+         <Dropdown
+        style={styles.dropdown}
+          search
+        data={vehicleData}
+        labelField="label"
+        valueField="value"
+        placeholder="Select Vehicle No"
+        value={vehicle}
+        onChange={item => setVehicle(item.value)}
+      />
 
-      {/* 📋 Selected Trip Details */}
-      {selectedTrip && (
-        <View style={styles.detailsCard}>
-          <Text style={styles.detailsTitle}>Trip Details 📄</Text>
+      {/* Source */}
+      <Text style={styles.label}>Source Location 📍</Text>
+      <Dropdown
+        style={styles.dropdown}
+        data={sourceData}
+          search
+        labelField="label"
+        valueField="value"
+        placeholder="Select Source"
+        value={source}
+        onChange={item => setSource(item.value)}
+      />
 
-          <Text style={styles.detailText}>
-            🆔 Trip No: {selectedTrip.tripNo}
-          </Text>
-          <Text style={styles.detailText}>
-            📍 Sector ID: {selectedTrip.sectorId}
-          </Text>
-          <Text style={styles.detailText}>
-            🛣️ Distance: {selectedTrip.distance}
-          </Text>
-          <Text style={styles.detailText}>
-            🚚 Vehicle No: {selectedTrip.vehicleNo}
-          </Text>
-          <Text style={styles.detailText}>
-            📅 Load Date: {selectedTrip.loadDate}
-          </Text>
-        </View>
-      )}
+      {/* Destination */}
+      <Text style={styles.label}>Destination Location 🏁</Text>
+      <Dropdown
+        style={styles.dropdown}
+          search
+        data={destinationData}
+        labelField="label"
+        valueField="value"
+        placeholder="Select Destination"
+        value={destination}
+        onChange={item => setDestination(item.value)}
+      />
+
+      {/* Material */}
+      <Text style={styles.label}>Material Type 🧱</Text>
+      <Dropdown
+        style={styles.dropdown}
+          search
+        data={materialData}
+        labelField="label"
+        valueField="value"
+        placeholder="Select Material"
+        value={material}
+        onChange={item => setMaterial(item.value)}
+      />
+
+      {/* Distance */}
+      <Text style={styles.label}>Distance (KM) 📏</Text>
+      <TextInput
+        style={styles.input}
+          search
+        placeholder="Enter Distance (KM)"
+        keyboardType="numeric"
+        value={distance}
+        onChangeText={setDistance}
+      />
+
+      {/* Load Date (Current, Non-editable) */}
+      <Text style={styles.label}>Load Date 📅</Text>
+      <TextInput
+        style={[styles.input, styles.disabledInput]}
+        value={currentDate}
+        editable={false}
+      />
+
+      {/* Balance (Non-editable) */}
+      <Text style={styles.label}>Balance 💰</Text>
+      <TextInput
+        style={[styles.input, styles.disabledInput]}
+        value="auto calculated"
+        editable={false}
+      />
+
 
       {/* 🔢 Fuel Quantity */}
       {/* 🔢 Balance Fuel */}
@@ -135,11 +220,21 @@ const [balanceFuel, setBalanceFuel] = useState('');
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F4F6FA',
-    padding: 20,
-  },
+container: {
+  flex: 1,
+  backgroundColor: '#F4F6FA',
+  padding: 20,
+
+  // ✨ Extra styling
+  borderTopLeftRadius: 24,
+  borderTopRightRadius: 24,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: -2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 6,
+  elevation: 6,
+},
+
 
   header: {
     fontSize: 22,
@@ -161,6 +256,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     elevation: 2,
+    
   },
 
   detailsCard: {
@@ -196,6 +292,10 @@ const styles = StyleSheet.create({
     height: 90,
     textAlignVertical: 'top',
   },
+  disabledInput: {
+    backgroundColor: '#eee',
+    color: '#777',
+  },
 
   submitBtn: {
     backgroundColor: '#2563EB',
@@ -204,6 +304,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
     elevation: 4,
+    marginBottom: 30,
   },
 
   submitText: {

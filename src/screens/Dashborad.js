@@ -85,8 +85,8 @@ const DashboardScreen = ({ navigation }) => {
       {/* ⚡ Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Powered by <Text style={styles.footerBrand}>Tranzol 🚀</Text>
-        </Text>
+          Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
+            V-1.0 </Text>
       </View>
     </View>
   );
