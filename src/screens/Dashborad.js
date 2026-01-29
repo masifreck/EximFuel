@@ -80,13 +80,48 @@ const DashboardScreen = ({ navigation }) => {
             Track fuel usage, balance & expenses
           </Text>
         </TouchableOpacity>
+        
+          {/* 💰 Expense Booking */}
+  <TouchableOpacity
+    style={[styles.card, styles.expenseCard]}
+    onPress={() => navigation.navigate('expensebooking')}
+  >
+    <View style={styles.cardHeader}>
+      <Text style={styles.cardEmoji}>💰</Text>
+      <Text style={styles.cardTitle}>Expense Booking</Text>
+    </View>
+    <Text style={styles.cardDesc}>
+      Record trip-wise expenses and manage cost tracking
+    </Text>
+  </TouchableOpacity>
+
+{/* ✅ Approval */}
+<TouchableOpacity
+  style={[styles.card, styles.approvalCard]}
+  onPress={() =>
+    Alert.alert(
+      '🚧 Coming Soon',
+      'Approval feature will be available soon ✅',
+      [{ text: 'OK 👍' }],
+    )
+  }
+>
+  <View style={styles.cardHeader}>
+    <Text style={styles.cardEmoji}>✅</Text>
+    <Text style={styles.cardTitle}>Approvals</Text>
+  </View>
+  <Text style={styles.cardDesc}>
+    Review and approve expense & fuel requests
+  </Text>
+</TouchableOpacity>
+
       </View>
 
       {/* ⚡ Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-1.0 </Text>
+            V-1.3 </Text>
       </View>
     </View>
   );
@@ -183,6 +218,15 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 4,
   },
+expenseCard: {
+  borderLeftWidth: 5,
+  borderLeftColor: '#A855F7', // purple accent
+},
+approvalCard: {
+  borderLeftWidth: 5,
+  borderLeftColor: '#0EA5E9',
+},
+
 
   /* ===== Footer ===== */
   footer: {

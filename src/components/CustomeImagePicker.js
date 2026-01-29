@@ -106,7 +106,9 @@ const   CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,
   {isMandatory && <Text style={{ color: 'red' }}> *</Text>}
 </Text>
 
-        <ImageBackground source={imageData ? { uri: imageData.uri } : bgImage } style={{width:width?width:120,height:80,margin:10,
+        <ImageBackground source={imageData?.uri ? { uri: imageData.uri } : bgImage}
+
+         style={{width:width?width:120,height:80,margin:10,
         }}  imageStyle={{ borderRadius: 10, }}>
             
                 <TouchableOpacity style={styles.pickbtn} onPress={()=>onlyCamera? takePhotoWithCamera() :setModalVisible(true)}>

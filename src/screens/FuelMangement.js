@@ -16,11 +16,22 @@ const FuelManagementScreen = ({ navigation }) => {
   const [remarks, setRemarks] = useState('');
 const [balanceFuel, setBalanceFuel] = useState('');
 
- const [vehicle, setVehicle] = useState(null);
+const [vehicle, setVehicle] = useState(null);
+const [driverName, setDriverName] = useState('');
+const [driverContact, setDriverContact] = useState('');
+
   const [source, setSource] = useState(null);
   const [destination, setDestination] = useState(null);
   const [material, setMaterial] = useState(null);
   const [distance, setDistance] = useState('');
+
+  const [mileage, setMileage] = useState('');
+const [allottedKm, setAllottedKm] = useState('');
+const [mileage2, setMileage2] = useState('');
+const [dieselRate, setDieselRate] = useState('');
+const [totalLitre, setTotalLitre] = useState('');
+const [amount, setAmount] = useState('');
+const [balancekm, setBalanceKm] = useState('');
 
   const getCurrentDate = () => {
   const date = new Date();
@@ -34,9 +45,20 @@ const currentDate = getCurrentDate();
 
 
   const vehicleData = [
-    { label: 'MH12 AB 1234', value: 'MH12AB1234' },
-    { label: 'MH14 CD 5678', value: 'MH14CD5678' },
-  ];
+  {
+    label: 'MH12 AB 1234',
+    value: 'MH12AB1234',
+    driverName: 'Ramesh Kumar',
+    driverContact: '9876543210',
+  },
+  {
+    label: 'MH14 CD 5678',
+    value: 'MH14CD5678',
+    driverName: 'Suresh Patil',
+    driverContact: '9123456789',
+  },
+];
+
 
   const sourceData = [
     { label: 'Mumbai', value: 'Mumbai' },
@@ -101,18 +123,46 @@ const currentDate = getCurrentDate();
         placeholder="Choose Trip Number"
         value={selectedTrip?.value}
         onChange={(item) => setSelectedTrip(item)}
+         itemTextStyle={styles.dropdownItemText}
+  selectedTextStyle={styles.selectedText}
+  placeholderStyle={styles.placeholderText}
+  inputSearchStyle={styles.searchText}
       />
 <Text style={styles.label}>Select Vehicle No 🚚</Text>
-         <Dropdown
-        style={styles.dropdown}
-          search
-        data={vehicleData}
-        labelField="label"
-        valueField="value"
-        placeholder="Select Vehicle No"
-        value={vehicle}
-        onChange={item => setVehicle(item.value)}
-      />
+<Dropdown
+  style={styles.dropdown}
+  search
+  data={vehicleData}
+  labelField="label"
+  valueField="value"
+  placeholder="Select Vehicle No"
+  value={vehicle}
+  onChange={item => {
+    setVehicle(item.value);
+    setDriverName(item.driverName);
+    setDriverContact(item.driverContact);
+  }}
+   itemTextStyle={styles.dropdownItemText}
+  selectedTextStyle={styles.selectedText}
+  placeholderStyle={styles.placeholderText}
+  inputSearchStyle={styles.searchText}
+/>
+{driverName !== '' && (
+  <View style={styles.card}>
+    <Text style={styles.cardTitle}>Driver Details 👨‍✈️</Text>
+
+    <View style={styles.cardRow}>
+      <Text style={styles.cardLabel}>Name</Text>
+      <Text style={styles.cardValue}>{driverName}</Text>
+    </View>
+
+    <View style={styles.cardRow}>
+      <Text style={styles.cardLabel}>Contact</Text>
+      <Text style={styles.cardValue}>{driverContact}</Text>
+    </View>
+  </View>
+)}
+
 
       {/* Source */}
       <Text style={styles.label}>Source Location 📍</Text>
@@ -125,6 +175,10 @@ const currentDate = getCurrentDate();
         placeholder="Select Source"
         value={source}
         onChange={item => setSource(item.value)}
+         itemTextStyle={styles.dropdownItemText}
+  selectedTextStyle={styles.selectedText}
+  placeholderStyle={styles.placeholderText}
+  inputSearchStyle={styles.searchText}
       />
 
       {/* Destination */}
@@ -138,10 +192,14 @@ const currentDate = getCurrentDate();
         placeholder="Select Destination"
         value={destination}
         onChange={item => setDestination(item.value)}
+         itemTextStyle={styles.dropdownItemText}
+  selectedTextStyle={styles.selectedText}
+  placeholderStyle={styles.placeholderText}
+  inputSearchStyle={styles.searchText}
       />
 
       {/* Material */}
-      <Text style={styles.label}>Material Type 🧱</Text>
+      <Text style={styles.label}>Material  🧱</Text>
       <Dropdown
         style={styles.dropdown}
           search
@@ -151,54 +209,136 @@ const currentDate = getCurrentDate();
         placeholder="Select Material"
         value={material}
         onChange={item => setMaterial(item.value)}
+         itemTextStyle={styles.dropdownItemText}
+  selectedTextStyle={styles.selectedText}
+  placeholderStyle={styles.placeholderText}
+  inputSearchStyle={styles.searchText}
       />
-
-      {/* Distance */}
-      <Text style={styles.label}>Distance (KM) 📏</Text>
-      <TextInput
-        style={styles.input}
-          search
-        placeholder="Enter Distance (KM)"
-        keyboardType="numeric"
-        value={distance}
-        onChangeText={setDistance}
-      />
-
-      {/* Load Date (Current, Non-editable) */}
-      <Text style={styles.label}>Load Date 📅</Text>
+<Text style={styles.label}>Load Date 📅</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
         value={currentDate}
         editable={false}
       />
 
-      {/* Balance (Non-editable) */}
-      <Text style={styles.label}>Balance 💰</Text>
+      {/* Distance */}
+      <Text style={styles.label}>Fixed Actual (KM) 📏</Text>
+      <TextInput
+        style={[styles.input, styles.disabledInput]}
+          search
+        placeholder="Enter Actual (KM)"
+        keyboardType="numeric"
+        value={distance}
+        onChangeText={setDistance}
+        editable={false}
+      />
+
+      {/* Mileage */}
+<Text style={styles.label}>Fixed Mileage  ⛽</Text>
+<TextInput
+ style={[styles.input, styles.disabledInput]}
+  placeholder="Enter Mileage"
+  keyboardType="numeric"
+  value={mileage}
+  editable={false}
+  onChangeText={setMileage}
+/>
+
+{/* Total Litre */}
+<Text style={styles.label}>Fixed Total ltr. 🛢️</Text>
+<TextInput
+  style={[styles.input, styles.disabledInput]}
+  placeholder="Enter Total ltr."
+  keyboardType="numeric"
+  value={totalLitre}
+  onChangeText={setTotalLitre}
+  editable={false}
+/>
+{/* Allotted KM */}
+<Text style={styles.label}>Allotted KM 🛣️</Text>
+<TextInput
+  style={styles.input}
+  placeholderTextColor="#9CA3AF"  
+  placeholder="Enter Allotted KM"
+  keyboardType="numeric"
+  value={allottedKm}
+  onChangeText={setAllottedKm}
+/>
+
+{/* Mileage 2 */}
+<Text style={styles.label}>Alloted Mileage  🔁</Text>
+<TextInput
+  style={styles.input}
+  placeholderTextColor="#9CA3AF"  
+  placeholder="Enter Mileage 2"
+  keyboardType="numeric"
+  value={mileage2}
+  onChangeText={setMileage2}
+/>
+
+{/* Diesel Rate */}
+<Text style={styles.label}>Alloted Diesel Rate (₹/L) 💰</Text>
+<TextInput
+  style={styles.input}
+  placeholderTextColor="#9CA3AF"  
+  placeholder="Enter Diesel Rate"
+  keyboardType="numeric"
+  value={dieselRate}
+  onChangeText={setDieselRate}
+/>
+
+
+  <Text style={styles.label}>Alloted Total ltr. ⛽</Text>
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="#9CA3AF"  
+        keyboardType="numeric"
+        placeholder="Enter alloted ltr"
+        value={fuelQty}
+        onChangeText={setFuelQty}
+      />
+      
+<Text style={styles.label}>Alloted Amount 💰</Text>
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="#9CA3AF"  
+        keyboardType="numeric"
+        placeholder="Enter Amount"
+        value={amount}
+        onChangeText={setAmount}
+      />
+    
+
+      <Text style={styles.label}>Balance Km 💰</Text>
+      <TextInput
+        style={[styles.input, styles.disabledInput]}
+        keyboardType="numeric"
+        placeholder="Enter Balance Km"
+        value={balancekm}
+        onChangeText={setBalanceKm}
+        editable={false}
+      />
+
+      {/* 🔢 Fuel Quantity */}
+      {/* 🔢 Balance Fuel */}
+<Text style={styles.label}>Total ltr. 🛢️</Text>
+<TextInput
+style={[styles.input, styles.disabledInput]}
+  keyboardType="numeric"
+  placeholder="Enter Total ltr"
+  value={balanceFuel}
+  onChangeText={setBalanceFuel}
+  editable={false}
+/>
+
+    
+
+        {/* Balance (Non-editable) */}
+      <Text style={styles.label}>Balance Amtount 💰</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
         value="auto calculated"
         editable={false}
-      />
-
-
-      {/* 🔢 Fuel Quantity */}
-      {/* 🔢 Balance Fuel */}
-<Text style={styles.label}>Balance Fuel (Litres) 🛢️</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  placeholder="Enter balance fuel"
-  value={balanceFuel}
-  onChangeText={setBalanceFuel}
-/>
-
-      <Text style={styles.label}>Fuel Quantity (Litres) ⛽</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        placeholder="Enter fuel quantity"
-        value={fuelQty}
-        onChangeText={setFuelQty}
       />
 
       {/* 💬 Remarks */}
@@ -258,27 +398,61 @@ container: {
     elevation: 2,
     
   },
+dropdownItemText: {
+  color: '#111827',   // item text color (list items)
+  fontSize: 14,
+},
 
-  detailsCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 14,
-    padding: 16,
-    marginTop: 20,
-    elevation: 3,
-  },
+selectedText: {
+  color: '#2563EB',   // selected value color
+  fontSize: 14,
+  fontWeight: '600',
+},
 
-  detailsTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 10,
-    color: '#111',
-  },
+placeholderText: {
+  color: '#9CA3AF',   // placeholder text color
+  fontSize: 14,
+},
 
-  detailText: {
-    fontSize: 14,
-    color: '#444',
-    marginBottom: 6,
-  },
+searchText: {
+  color: '#111827',   // search input text color
+  fontSize: 14,
+},
+card: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 14,
+  padding: 16,
+  marginTop: 16,
+  shadowColor: '#000',
+  shadowOpacity: 0.1,
+  shadowRadius: 8,
+  elevation: 4,
+},
+
+cardTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  marginBottom: 12,
+  color: '#1F2937',
+},
+
+cardRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  paddingVertical: 6,
+},
+
+cardLabel: {
+  fontSize: 14,
+  color: '#6B7280',
+},
+
+cardValue: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#111827',
+},
+
 
   input: {
     backgroundColor: '#FFF',
@@ -286,6 +460,7 @@ container: {
     padding: 14,
     fontSize: 16,
     elevation: 2,
+    color: '#111827',
   },
 
   textArea: {
