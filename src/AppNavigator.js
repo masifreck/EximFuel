@@ -8,6 +8,7 @@ import SuccessUI from './components/SuccessUI';
 import DashboardScreen from './screens/Dashborad';
 import FuelManagementScreen from './screens/FuelMangement';
 import ExpenseBooking from './screens/ExpenseBooking';
+import VehicleExpense from './screens/VehicleExpense';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -49,6 +50,11 @@ const AppNavigator = () => {
      <Stack.Screen
      name='expensebooking'
      component={ExpenseBooking}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen
+      name='vehicleexpense'
+      component={VehicleExpense}
       options={{headerShown: false}}
       />
   <Stack.Screen 

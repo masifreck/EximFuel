@@ -14,26 +14,53 @@ const Login = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
-    if (!username || !password) {
-      Alert.alert('⚠️ Missing Fields', 'Please enter username and password');
-      return;
-    }
+const handleLogin = async () => {
+  if (!username || !password) {
+    Alert.alert('⚠️ Missing Fields', 'Please enter username and password');
+    return;
+  }
 
-    // 🔐 Dummy validation (replace with API later)
-    if (username === 'admin' && password === '1234') {
-      try {
-        await AsyncStorage.setItem('isLoggedIn', 'true');
-        await AsyncStorage.setItem('username', username);
-
-        navigation.replace('dashboard');
-      } catch (error) {
-        Alert.alert('❌ Error', 'Failed to save login session');
+  try {
+    const response = await fetch(
+      'http://eximapi1.tranzol.com/api/Login',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
       }
-    } else {
-      Alert.alert('❌ Login Failed', 'Invalid username or password');
+    );
+
+    const data = await response.json();
+console.log('Login Response:', data);
+    // ✅ Success response
+    if (response.ok && data.userId) {
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+      await AsyncStorage.setItem('userId', data.userId.toString());
+      await AsyncStorage.setItem('username', data.userName);
+
+      navigation.replace('dashboard');
+    } 
+    // ❌ Invalid credentials
+    else {
+      Alert.alert(
+        '❌ Login Failed',
+        data.detail || 'Invalid username or password'
+      );
     }
-  };
+  } catch (error) {
+    Alert.alert(
+      '🚫 Network Error',
+      'Unable to connect to server. Please try again.'
+    );
+    console.error('Login Error:', error);
+  }
+};
+
 
   return (
     <View style={styles.container}>
@@ -123,6 +150,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginVertical: 10,
     elevation: 2,
+    color: '#111',
   },
 
   loginBtn: {

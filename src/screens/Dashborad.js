@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useState, useEffect}from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StatusBar,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const DashboardScreen = ({ navigation }) => {
   const handleLogout = async () => {
@@ -26,46 +27,50 @@ const DashboardScreen = ({ navigation }) => {
       ],
     );
   };
+const [username, setUsername] = useState('');
+useEffect(() => {
+  const getUserData = async () => {
+    try {
+      const storedUsername = await AsyncStorage.getItem('username');
+      if (storedUsername) {
+        setUsername(storedUsername);
+      }
+    } catch (error) {
+      console.log('Failed to load username', error);
+    }
+  };
+
+  getUserData();
+}, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <StatusBar backgroundColor="#2563EB" barStyle="light-content" />
 
       {/* 🔝 Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Tranzol 🚚</Text>
-          <Text style={styles.headerSubTitle}>
-            Logistics Dashboard
-          </Text>
-        </View>
+  <View>
+    <Text style={styles.welcomeText}>👋 Welcome,</Text>
+    <Text style={styles.userName}>{username}</Text>
 
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-          <Text style={styles.logoutIcon}>🚪</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={{ marginTop: 6 }}>
+      <Text style={styles.headerTitle}>Tranzol 🚚</Text>
+      <Text style={styles.headerSubTitle}>
+        Smart Logistics Dashboard
+      </Text>
+    </View>
+  </View>
+
+  <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+    <Text style={styles.logoutIcon}>🚪</Text>
+  </TouchableOpacity>
+</View>
+
 
       {/* 🧩 Cards */}
       <View style={styles.cardContainer}>
         {/* 🚛 Fleet Management */}
-        <TouchableOpacity
-          style={[styles.card, styles.fleetCard]}
-          onPress={() =>
-            Alert.alert(
-              '🚧 Coming Soon',
-              'Fleet Management feature will be available soon 🚛',
-              [{ text: 'OK 👍' }],
-            )
-          }
-        >
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>🚛</Text>
-            <Text style={styles.cardTitle}>Fleet Management</Text>
-          </View>
-          <Text style={styles.cardDesc}>
-            Manage vehicles, drivers & routes efficiently
-          </Text>
-        </TouchableOpacity>
+       
 
         {/* ⛽ Fuel Management */}
         <TouchableOpacity
@@ -95,6 +100,19 @@ const DashboardScreen = ({ navigation }) => {
     </Text>
   </TouchableOpacity>
 
+<TouchableOpacity
+  style={[styles.card, styles.fleetCard]}
+  onPress={() => navigation.navigate('vehicleexpense')}
+>
+  <View style={styles.cardHeader}>
+    <Text style={styles.cardEmoji}>💰🚗</Text>
+    <Text style={styles.cardTitle}>Vehicle Expense</Text>
+  </View>
+  <Text style={styles.cardDesc}>
+    Track fuel, maintenance & other vehicle expenses easily
+  </Text>
+</TouchableOpacity>
+
 {/* ✅ Approval */}
 <TouchableOpacity
   style={[styles.card, styles.approvalCard]}
@@ -121,9 +139,9 @@ const DashboardScreen = ({ navigation }) => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-1.3 </Text>
+            V-1.4 </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -136,40 +154,54 @@ const styles = StyleSheet.create({
   },
 
   /* ===== Header ===== */
-  header: {
-    backgroundColor: '#2563EB',
-    paddingTop: 24,
-    paddingBottom: 28,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    elevation: 6,
-  },
+header: {
+  backgroundColor: '#2563EB',
+  paddingTop: 28,
+  paddingBottom: 32,
+  paddingHorizontal: 20,
+  borderBottomLeftRadius: 26,
+  borderBottomRightRadius: 26,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  elevation: 8,
+},
 
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#FFF',
-  },
+welcomeText: {
+  fontSize: 13,
+  color: '#DCE4FF',
+  fontWeight: '500',
+},
 
-  headerSubTitle: {
-    fontSize: 13,
-    color: '#DCE4FF',
-    marginTop: 2,
-  },
+userName: {
+  fontSize: 20,
+  fontWeight: '800',
+  color: '#FFFFFF',
+  marginTop: 2,
+},
 
-  logoutBtn: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    padding: 10,
-    borderRadius: 12,
-  },
+headerTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#EAF0FF',
+},
 
-  logoutIcon: {
-    fontSize: 20,
-  },
+headerSubTitle: {
+  fontSize: 12,
+  color: '#C7D2FE',
+  marginTop: 2,
+},
+
+logoutBtn: {
+  backgroundColor: 'rgba(255,255,255,0.18)',
+  padding: 12,
+  borderRadius: 14,
+},
+
+logoutIcon: {
+  fontSize: 18,
+},
+
 
   /* ===== Cards ===== */
   cardContainer: {
