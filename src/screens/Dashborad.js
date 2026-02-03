@@ -117,11 +117,7 @@ useEffect(() => {
 <TouchableOpacity
   style={[styles.card, styles.approvalCard]}
   onPress={() =>
-    Alert.alert(
-      '🚧 Coming Soon',
-      'Approval feature will be available soon ✅',
-      [{ text: 'OK 👍' }],
-    )
+    navigation.navigate('pendingapproval')
   }
 >
   <View style={styles.cardHeader}>

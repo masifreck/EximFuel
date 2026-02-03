@@ -9,6 +9,7 @@ import DashboardScreen from './screens/Dashborad';
 import FuelManagementScreen from './screens/FuelMangement';
 import ExpenseBooking from './screens/ExpenseBooking';
 import VehicleExpense from './screens/VehicleExpense';
+import PendingApprovalScreen from './screens/PendingApprovalScreen';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -55,6 +56,11 @@ const AppNavigator = () => {
       <Stack.Screen
       name='vehicleexpense'
       component={VehicleExpense}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen
+      name='pendingapproval'
+      component={PendingApprovalScreen}
       options={{headerShown: false}}
       />
   <Stack.Screen 

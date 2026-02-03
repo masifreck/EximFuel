@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { se } from 'date-fns/locale';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  ScrollView,
+  ScrollView,ActivityIndicator
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -16,23 +17,35 @@ const FuelManagementScreen = ({ navigation }) => {
   const [remarks, setRemarks] = useState('');
 const [balanceFuel, setBalanceFuel] = useState('');
 
-const [vehicle, setVehicle] = useState(null);
+ const [vehicleList, setVehicleList] = useState([]);
+const [selectedVehicle, setSelectedVehicle] = useState(null);
+const [vehicleLoading, setVehicleLoading] = useState(false);
 const [driverName, setDriverName] = useState('');
 const [driverContact, setDriverContact] = useState('');
 
-  const [source, setSource] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [locationData, setLocationData] = useState([]);
+  const [locationLoading, setLocationLoading] = useState(false);
+
   const [destination, setDestination] = useState(null);
+  const [destinationData, setDestinationData] = useState([]);
+  const [destinationLoading, setDestinationLoading] = useState(false);
+
   const [material, setMaterial] = useState(null);
+  const [materailData, setMaterialData] = useState([]);
+  const [materialLoading, setMaterialLoading] = useState(false);
+
   const [distance, setDistance] = useState('');
 
   const [mileage, setMileage] = useState('');
 const [allottedKm, setAllottedKm] = useState('');
+const [netwt, setNetwt] = useState('');
 const [mileage2, setMileage2] = useState('');
 const [dieselRate, setDieselRate] = useState('');
 const [totalLitre, setTotalLitre] = useState('');
 const [amount, setAmount] = useState('');
 const [balancekm, setBalanceKm] = useState('');
-
+const [loading, setLoading] = useState(false);
   const getCurrentDate = () => {
   const date = new Date();
   const day = String(date.getDate()).padStart(2, '0');
@@ -43,37 +56,177 @@ const [balancekm, setBalanceKm] = useState('');
 };
 const currentDate = getCurrentDate();
 
+const fetchVehicleList = async (searchText) => {
+  try {
+    setVehicleLoading(true);
 
-  const vehicleData = [
-  {
-    label: 'MH12 AB 1234',
-    value: 'MH12AB1234',
-    driverName: 'Ramesh Kumar',
-    driverContact: '9876543210',
-  },
-  {
-    label: 'MH14 CD 5678',
-    value: 'MH14CD5678',
-    driverName: 'Suresh Patil',
-    driverContact: '9123456789',
-  },
-];
+    const response = await fetch(
+      `http://eximapi1.tranzol.com/api/Vehicle?search=${searchText}`
+    );
+
+    const data = await response.json();
+//console.log(data)
+    const formattedVehicles = data.map(item => ({
+      label: item.vehicleNo,
+      value: item.id,
+      driverName: item.driverName,
+      contactNo: item.contactNo,
+    }));
+
+    setVehicleList(formattedVehicles);
+  } catch (error) {
+    Alert.alert('❌ Error', 'Failed to fetch vehicles');
+  } finally {
+    setVehicleLoading(false);
+  }
+};
+
+const fetchLocationList = async (searchText) => {
+  try {
+    setLocationLoading(true);
+
+    const response = await fetch(
+      `http://eximapi1.tranzol.com/api/Source?search=${searchText}`
+    );
+
+    const data = await response.json();
+   // console.log('Location API:', data);
+
+    const formattedData = data
+      .filter(item => item.loadingPoints) // ✅ prevent crash
+      .map(item => ({
+        label: item.loadingPoints,
+        value: item.id
+      }));
+
+    setLocationData(formattedData);
+  } catch (error) {
+    Alert.alert('❌ Error', 'Failed to fetch locations');
+  } finally {
+    setLocationLoading(false);
+  }
+};
+
+const fetchDestinationList = async (searchText) => {
+  try {
+    setDestinationLoading(true);
+
+    const response = await fetch(
+      `http://eximapi1.tranzol.com/api/Destination?search=${searchText}`
+    );
+
+    const data = await response.json();
+   // console.log('Location API:', data);
+
+    const formattedData = data
+      .filter(item => item.unloadingPoints) // ✅ prevent crash
+      .map(item => ({
+        label: item.unloadingPoints,
+        value: item.id
+      }));
+
+    setDestinationData(formattedData);
+  } catch (error) {
+    Alert.alert('❌ Error', 'Failed to fetch locations');
+  } finally {
+    setDestinationLoading(false);
+  }
+};
+const fetchMaterialList = async (searchText) => {
+  try {
+    setMaterialLoading(true);
+
+    const response = await fetch(
+      `http://eximapi1.tranzol.com/api/Material?search=${searchText}`
+    );
+
+    const data = await response.json();
+   // console.log('Location API:', data);
+
+    const formattedData = data
+      .filter(item => item.materialName) // ✅ prevent crash
+      .map(item => ({
+        label: item.materialName,
+        value: item.id
+      }));
+
+    setMaterialData(formattedData);
+  } catch (error) {
+    Alert.alert('❌ Error', 'Failed to fetch locations');
+  } finally {
+    setMaterialLoading(false);
+  }
+};
+
+const fetchFixedDetails = async (Location, destination, netwt) => {
+  try {
+    console.log('Fetching fixed details...');
+
+    const response = await fetch(
+      'http://eximapi1.tranzol.com/api/FixedRules',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          sourceId: Location,
+          destinationId: destination,
+          netWt: Number(netwt),
+        }),
+      }
+    );
+
+    console.log('Status:', response.status);
+
+    // ✅ Read as TEXT first
+    const responseText = await response.text();
+    console.log('Fixed Rules Raw Response:', responseText);
+
+    // ❌ Server sent plain text
+    if (!responseText.trim().startsWith('{')) {
+      Alert.alert('Error', responseText);
+      setDistance('');
+      setMileage('');
+      setTotalLitre('');
+      return;
+    }
+
+    // ✅ Safe JSON parse
+    const data = JSON.parse(responseText);
+
+    console.log('Fixed Details Parsed:', data);
+
+    // ✅ Set values
+    setDistance(String(data.distance ?? ''));
+    setMileage(String(data.mileage ?? ''));
+    setTotalLitre(String(data.totalDieselLtr ?? ''));
+
+  } catch (error) {
+    console.log('Fixed Details Error:', error);
+    Alert.alert('❌ Error', 'Failed to fetch fixed details');
+  }
+};
 
 
-  const sourceData = [
-    { label: 'Mumbai', value: 'Mumbai' },
-    { label: 'Pune', value: 'Pune' },
-  ];
 
-  const destinationData = [
-    { label: 'Delhi', value: 'Delhi' },
-    { label: 'Jaipur', value: 'Jaipur' },
-  ];
+useEffect(() => {
+  if (!location || !destination || !netwt) return;
 
-  const materialData = [
-    { label: 'Steel', value: 'Steel' },
-    { label: 'Cement', value: 'Cement' },
-  ];
+  console.log('Waiting before fetching fixed details...');
+
+  const timer = setTimeout(() => {
+    console.log('Fetching fixed details...');
+    fetchFixedDetails(location, destination, netwt);
+  }, 800); // ⏳ wait 800ms
+
+  // cleanup if user types again
+  return () => clearTimeout(timer);
+
+}, [location, destination, netwt]);
+
+
 
   // 🧪 Dummy Trip Data
   const tripData = [
@@ -88,24 +241,92 @@ const currentDate = getCurrentDate();
      
     },
   ];
+  const validateFuelData = () => {
+  if (!location) return 'Source is required';
+  if (!destination) return 'Destination is required';
+  if (!vehicleId) return 'Vehicle is required';
+  if (!netWt) return 'Net weight is required';
+  if (!distance || !mileage || !totalLitre)
+    return 'Fixed rule data not available';
+  return null;
+};
 
-  const handleSubmit = () => {
-    if (!selectedTrip || !balanceFuel || !fuelQty) {
-      Alert.alert('⚠️ Required', 'Please select trip and enter fuel quantity');
+
+ const handleSubmit = async () => {
+  const errorMsg = validateFuelData();
+  if (errorMsg) {
+    Alert.alert('⚠️ Validation', errorMsg);
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const payload = {
+      sourceId: location,
+      destinationId: destination,
+      vehicleId: vehicleId,
+
+      fixedDistance: Number(distance),
+      fixedMileage: Number(mileage),
+      fixedLtr: Number(totalLitre),
+      fixedAmount: Number(fixedAmount || 0),
+
+      requestAmount: Number(requestAmount || 0),
+
+      allottedKm: Number(allottedKm || 0),
+      allottedMileage: Number(allottedMileage || 0),
+      allottedDieselRate: Number(allottedDieselRate || 0),
+      allottedTotalLtr: Number(allottedTotalLtr || 0),
+      allottedAmount: Number(allottedAmount || 0),
+
+      netWt: Number(netWt),
+      remarks: remarks || '',
+      inserUserId: Number(userId),
+    };
+
+    console.log('Fuel Payload:', payload);
+
+    const response = await fetch(
+      'http://eximapi1.tranzol.com/api/Fuel',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const text = await response.text();
+    console.log('Fuel API Raw Response:', text);
+
+    // 🔹 Handle plain text success
+    if (text.includes('Successfully')) {
+      Alert.alert('✅ Success', text);
       return;
     }
 
-    Alert.alert(
-      '✅ Success',
-      'Fuel details submitted successfully ⛽',
-      [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ],
-    );
-  };
+    // 🔹 Try JSON
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      Alert.alert('Server Response', text || 'Unexpected response');
+      return;
+    }
+
+    Alert.alert('Success', 'Fuel submitted successfully');
+
+  } catch (error) {
+    console.log('Fuel API Error:', error);
+    Alert.alert('❌ Error', 'Failed to submit fuel request');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -131,21 +352,39 @@ const currentDate = getCurrentDate();
 <Text style={styles.label}>Select Vehicle No 🚚</Text>
 <Dropdown
   style={styles.dropdown}
+  data={vehicleList}
   search
-  data={vehicleData}
   labelField="label"
   valueField="value"
-  placeholder="Select Vehicle No"
-  value={vehicle}
+  placeholder="Search Vehicle Number"
+  value={selectedVehicle}
+ inputSearchStyle={[
+    styles.searchText,
+    { textTransform: 'uppercase' } // ✅ shows uppercase in input
+  ]}
   onChange={item => {
-    setVehicle(item.value);
-    setDriverName(item.driverName);
-    setDriverContact(item.driverContact);
+    setSelectedVehicle(item.value);
+
+    // auto-fill driver details
+    setDriverName(item.driverName ?? '');
+    setDriverContact(item.contactNo ?? '');
   }}
-   itemTextStyle={styles.dropdownItemText}
+ itemTextStyle={styles.dropdownItemText}
   selectedTextStyle={styles.selectedText}
   placeholderStyle={styles.placeholderText}
-  inputSearchStyle={styles.searchText}
+  onChangeText={text => {
+    const upperText = text.toUpperCase(); // ✅ FORCE UPPERCASE
+
+    if (upperText.length >= 3) {
+      fetchVehicleList(upperText);
+    }
+  }}
+
+  renderRightIcon={() =>
+    vehicleLoading ? (
+      <ActivityIndicator size="small" color="#2563EB" />
+    ) : null
+  }
 />
 {driverName !== '' && (
   <View style={styles.card}>
@@ -166,20 +405,41 @@ const currentDate = getCurrentDate();
 
       {/* Source */}
       <Text style={styles.label}>Source Location 📍</Text>
-      <Dropdown
-        style={styles.dropdown}
-        data={sourceData}
-          search
-        labelField="label"
-        valueField="value"
-        placeholder="Select Source"
-        value={source}
-        onChange={item => setSource(item.value)}
-         itemTextStyle={styles.dropdownItemText}
-  selectedTextStyle={styles.selectedText}
-  placeholderStyle={styles.placeholderText}
-  inputSearchStyle={styles.searchText}
-      />
+     <Dropdown
+       style={styles.dropdown}
+       data={locationData}
+       search
+       labelField="label"
+       valueField="value"
+       placeholder="Search Location"
+       value={location}
+     
+       onChange={item => {
+         setLocation(item.value);
+       }}
+     
+       onChangeText={text => {
+         const upperText = text.toUpperCase(); // ✅ show + search uppercase
+     
+         if (upperText.length >= 3) {
+           fetchLocationList(upperText);
+         }
+       }}
+     
+       itemTextStyle={styles.dropdownItemText}
+       selectedTextStyle={styles.selectedText}
+       placeholderStyle={styles.placeholderText}
+       inputSearchStyle={[
+         styles.searchText,
+         { textTransform: 'uppercase' } // ✅ visible uppercase
+       ]}
+     
+       renderRightIcon={() =>
+         locationLoading ? (
+           <ActivityIndicator size="small" color="#2563EB" />
+         ) : null
+       }
+     />
 
       {/* Destination */}
       <Text style={styles.label}>Destination Location 🏁</Text>
@@ -192,10 +452,27 @@ const currentDate = getCurrentDate();
         placeholder="Select Destination"
         value={destination}
         onChange={item => setDestination(item.value)}
+         onChangeText={text => {
+    const upperText = text.toUpperCase(); // ✅ force uppercase display
+
+    // 🔁 re-trigger search with uppercase text
+    if (upperText.length >= 3) {
+      fetchDestinationList(upperText);
+    }
+  }}
+
+  inputSearchStyle={[
+    styles.searchText,
+    { textTransform: 'uppercase' } // ✅ shows uppercase in input
+  ]}
          itemTextStyle={styles.dropdownItemText}
   selectedTextStyle={styles.selectedText}
   placeholderStyle={styles.placeholderText}
-  inputSearchStyle={styles.searchText}
+  renderRightIcon={() =>
+      destinationLoading ? (
+        <ActivityIndicator size="small" color="#2563EB" />
+      ) : null
+    }
       />
 
       {/* Material */}
@@ -203,29 +480,56 @@ const currentDate = getCurrentDate();
       <Dropdown
         style={styles.dropdown}
           search
-        data={materialData}
+        data={materailData}
         labelField="label"
         valueField="value"
         placeholder="Select Material"
         value={material}
         onChange={item => setMaterial(item.value)}
+         onChangeText={text => {
+    const upperText = text.toUpperCase(); // ✅ force uppercase display
+
+    // 🔁 re-trigger search with uppercase text
+    if (upperText.length >= 3) {
+      fetchMaterialList(upperText);
+    }
+  }}
+
+  inputSearchStyle={[
+    styles.searchText,
+    { textTransform: 'uppercase' } // ✅ shows uppercase in input
+  ]}
          itemTextStyle={styles.dropdownItemText}
   selectedTextStyle={styles.selectedText}
   placeholderStyle={styles.placeholderText}
-  inputSearchStyle={styles.searchText}
+  
+    renderRightIcon={() =>
+      materialLoading ? (
+        <ActivityIndicator size="small" color="#2563EB" />
+      ) : null
+    }
       />
-<Text style={styles.label}>Load Date 📅</Text>
+<Text style={styles.label}>Booking Date 📅</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
         value={currentDate}
         editable={false}
       />
 
+ <Text style={styles.label}>Net Wt.📏</Text>
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="#9CA3AF"
+        placeholder="Enter Net Wt."
+        keyboardType="numeric"
+        value={netwt}
+        onChangeText={setNetwt}
+      />
       {/* Distance */}
       <Text style={styles.label}>Fixed Actual (KM) 📏</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
-          search
+        placeholderTextColor="#9CA3AF"
         placeholder="Enter Actual (KM)"
         keyboardType="numeric"
         value={distance}
@@ -334,7 +638,7 @@ style={[styles.input, styles.disabledInput]}
     
 
         {/* Balance (Non-editable) */}
-      <Text style={styles.label}>Balance Amtount 💰</Text>
+      <Text style={styles.label}>Balance Amount💰</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
         value="auto calculated"
@@ -352,9 +656,21 @@ style={[styles.input, styles.disabledInput]}
       />
 
       {/* 🚀 Submit */}
-      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Submit ✅</Text>
-      </TouchableOpacity>
+     <TouchableOpacity
+  style={[
+    styles.submitBtn,
+    loading && { opacity: 0.6 },
+  ]}
+  onPress={handleSubmit}
+  disabled={loading}
+>
+  {loading ? (
+    <ActivityIndicator color="#fff" />
+  ) : (
+    <Text style={styles.submitText}>Submit ✅</Text>
+  )}
+</TouchableOpacity>
+
     </ScrollView>
   );
 };
