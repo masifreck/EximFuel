@@ -11,12 +11,11 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import CustomImagePicker from '../components/CustomeImagePicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNFetchBlob from "rn-fetch-blob";
 
 const VehicleExpense = ({ navigation }) => {
       const [vehicleList, setVehicleList] = useState([]);
 const [selectedVehicle, setSelectedVehicle] = useState(null);
-
-const [vehicleSearchText, setVehicleSearchText] = useState('');
 const [vehicleLoading, setVehicleLoading] = useState(false);
 
         const [driverName, setDriverName] = useState('');
@@ -34,6 +33,12 @@ const [locationLoading, setLocationLoading] = useState(false);
 
             const [Attachments, setAttachments] = useState([]);
             const [submitLoading, setSubmitLoading] = useState(false);
+     const [selectedFiles, setSelectedFiles] = useState([]);
+   const handleFileSelected = (files) => {
+        // console.log('Selected files:', files);
+      setSelectedFiles(files);
+      };
+
 const fetchVehicleList = async (searchText) => {
   try {
     setVehicleLoading(true);
@@ -140,6 +145,10 @@ const handleAttachment = useCallback(image => {
     Alert.alert('⚠️ Validation', 'Please enter remarks');
     return false;
   }
+  if (selectedFiles.length === 0) {
+    Alert.alert('⚠️ Validation', 'Please attach at least one file');
+    return false;
+  }
   return true;
 };
 
@@ -156,46 +165,56 @@ const handleSubmit = async () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('ExpenseTypeId', expenseType);
-    formData.append('InsertUserId', storedUserId);
-    formData.append('LocationId', location);
-    formData.append('RequestAmount', requsestAmount);
-    formData.append('VehicleId', selectedVehicle);
-    formData.append('Remarks', remarks);
+    // 🔹 Build multipart form data array
+    const formData = [
+      { name: 'ExpenseTypeId', data: String(expenseType) },
+      { name: 'InsertUserId', data: String(storedUserId) },
+      { name: 'LocationId', data: String(location) },
+      { name: 'RequestAmount', data: String(requsestAmount) },
+      { name: 'VehicleId', data: String(selectedVehicle) },
+      { name: 'Remarks', data: remarks ?? '' },
+    ];
 
-    const response = await fetch(
-      'http://eximapi1.tranzol.com/api/VehicleExpenseBooking',
+    // 🔹 Attach files
+    selectedFiles.forEach((file, index) => {
+      formData.push({
+        name: `Attachment`,
+        filename: file.name || `file_${index + 1}.jpg`,
+        type: file.type || 'application/octet-stream',
+        data: RNFetchBlob.wrap(
+          file.uri.replace('file://', '')
+        ),
+      });
+    });
+
+    // 🔹 API call
+    const response = await RNFetchBlob.fetch(
+      'POST',
+      'http://eximapi1.tranzol.com/api/VehicleExpenseBooking/Create',
       {
-        method: 'POST',
-        body: formData,
-      }
+        'Content-Type': 'multipart/form-data',
+      },
+      formData
     );
-//console.log('submitting form data:', formData);
-    // ⚠️ API may return JSON OR plain text
-    const rawText = await response.text();
-//console.log('Submission Response:', rawText);
-    let parsed;
+
+    const rawText = response.data;
+    let parsed = null;
+
     try {
       parsed = JSON.parse(rawText);
-    } catch {
-      parsed = null;
-    }
+    } catch (e) {}
 
-    // ✅ SUCCESS CASE
+    // ✅ Success
     if (
-      response.ok &&
       parsed?.message &&
       parsed.message.toLowerCase().includes('insert')
     ) {
       Alert.alert('✅ Success', parsed.message);
-
-      // optional reset
-      navigation.goBack()
+      navigation.goBack();
       return;
     }
 
-    // ❌ BACKEND / FK ERROR (plain text)
+    // ❌ Backend error
     Alert.alert('❌ Submission Failed', rawText);
 
   } catch (error) {
@@ -206,9 +225,11 @@ const handleSubmit = async () => {
 };
 
 
+
   return (
     
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+         <Text style={styles.header}>VEHICLE EXPENSE BOOKING 🚚</Text>
     <Text style={styles.label}>Select Vehicle 🚛</Text>
 
 <Dropdown
@@ -362,15 +383,10 @@ const handleSubmit = async () => {
 />
 
              
-                          <View style={{flexDirection: 'row', justifyContent: 'space-evenly',marginTop:20}}>  
-             <CustomImagePicker
-                           bgImage={require('../assets/upload-file.png')}
-                           title="Add Attachments   📎"
-                           onImagePicked={handleAttachment}
-                           imageData={Attachments}
-                             width={80}
-                         />
-                         </View>
+                         <CustomImagePicker onFileSelected={handleFileSelected} 
+               selectedFiles={selectedFiles}
+          setSelectedFiles={setSelectedFiles}
+              />
                <TouchableOpacity
   style={[
     styles.submitBtn,

@@ -10,6 +10,7 @@ import {
   ScrollView,ActivityIndicator
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FuelManagementScreen = ({ navigation }) => {
   const [selectedTrip, setSelectedTrip] = useState(null);
@@ -36,9 +37,9 @@ const [driverContact, setDriverContact] = useState('');
   const [materialLoading, setMaterialLoading] = useState(false);
 
   const [distance, setDistance] = useState('');
-
   const [mileage, setMileage] = useState('');
 const [allottedKm, setAllottedKm] = useState('');
+
 const [netwt, setNetwt] = useState('');
 const [mileage2, setMileage2] = useState('');
 const [dieselRate, setDieselRate] = useState('');
@@ -171,13 +172,13 @@ const fetchFixedDetails = async (Location, destination, netwt) => {
           Accept: 'application/json',
         },
         body: JSON.stringify({
-          sourceId: Location,
+          sourceId: location,
           destinationId: destination,
           netWt: Number(netwt),
         }),
       }
     );
-
+console.log('sending data', location, destination, netwt)
     console.log('Status:', response.status);
 
     // ✅ Read as TEXT first
@@ -214,7 +215,7 @@ const fetchFixedDetails = async (Location, destination, netwt) => {
 useEffect(() => {
   if (!location || !destination || !netwt) return;
 
-  console.log('Waiting before fetching fixed details...');
+  //console.log('Waiting before fetching fixed details...');
 
   const timer = setTimeout(() => {
     console.log('Fetching fixed details...');
@@ -242,13 +243,19 @@ useEffect(() => {
     },
   ];
   const validateFuelData = () => {
+    if (!selectedVehicle) return 'Please select a vehicle';
   if (!location) return 'Source is required';
   if (!destination) return 'Destination is required';
-  if (!vehicleId) return 'Vehicle is required';
-  if (!netWt) return 'Net weight is required';
+  if (!netwt) return 'Net weight is required';
   if (!distance || !mileage || !totalLitre)
     return 'Fixed rule data not available';
+   if (!allottedKm) return 'Please enter allotted KM';
+  if (!mileage2) return 'Please enter alloted mileage';
+  if (!dieselRate) return 'Please enter alloted diesel rate';
+  if (!fuelQty) return 'Please enter alloted total litre';
+  if (!amount) return 'Please enter alloted amount';
   return null;
+ 
 };
 
 
@@ -258,29 +265,33 @@ useEffect(() => {
     Alert.alert('⚠️ Validation', errorMsg);
     return;
   }
-
+const userId = await AsyncStorage.getItem('userId');
+    if (!userId) {
+      Alert.alert('❌ Error', 'User not logged in');
+      return;
+    }
   try {
     setLoading(true);
 
     const payload = {
       sourceId: location,
       destinationId: destination,
-      vehicleId: vehicleId,
+      vehicleId: selectedVehicle,
 
       fixedDistance: Number(distance),
       fixedMileage: Number(mileage),
       fixedLtr: Number(totalLitre),
-      fixedAmount: Number(fixedAmount || 0),
+      fixedAmount: 0,
 
-      requestAmount: Number(requestAmount || 0),
+      requestAmount: 0,
 
       allottedKm: Number(allottedKm || 0),
-      allottedMileage: Number(allottedMileage || 0),
-      allottedDieselRate: Number(allottedDieselRate || 0),
-      allottedTotalLtr: Number(allottedTotalLtr || 0),
-      allottedAmount: Number(allottedAmount || 0),
+      allottedMileage: Number(mileage2 || 0),
+      allottedDieselRate: Number(dieselRate || 0),
+      allottedTotalLtr: Number(fuelQty || 0),
+      allottedAmount: Number(amount || 0),
 
-      netWt: Number(netWt),
+      netWt: Number(netwt),
       remarks: remarks || '',
       inserUserId: Number(userId),
     };
@@ -303,7 +314,7 @@ useEffect(() => {
     console.log('Fuel API Raw Response:', text);
 
     // 🔹 Handle plain text success
-    if (text.includes('Successfully')) {
+    if (text.includes('Insert successfully')) {
       Alert.alert('✅ Success', text);
       return;
     }
@@ -317,7 +328,7 @@ useEffect(() => {
       return;
     }
 
-    Alert.alert('Success', 'Fuel submitted successfully');
+    Alert.alert('Eroor', text || 'something went wrong');
 
   } catch (error) {
     console.log('Fuel API Error:', error);
@@ -574,7 +585,7 @@ useEffect(() => {
 <TextInput
   style={styles.input}
   placeholderTextColor="#9CA3AF"  
-  placeholder="Enter Mileage 2"
+  placeholder="Enter Mileage "
   keyboardType="numeric"
   value={mileage2}
   onChangeText={setMileage2}

@@ -96,7 +96,7 @@ useEffect(() => {
       <Text style={styles.cardTitle}>Expense Booking</Text>
     </View>
     <Text style={styles.cardDesc}>
-      Record trip-wise expenses and manage cost tracking
+      Record trip-wise expenses and cost tracking
     </Text>
   </TouchableOpacity>
 
@@ -109,7 +109,7 @@ useEffect(() => {
     <Text style={styles.cardTitle}>Vehicle Expense</Text>
   </View>
   <Text style={styles.cardDesc}>
-    Track fuel, maintenance & other vehicle expenses easily
+    Track vehicle expenses easily
   </Text>
 </TouchableOpacity>
 
@@ -135,7 +135,7 @@ useEffect(() => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-1.4 </Text>
+            V-1.6 </Text>
       </View>
     </ScrollView>
   );
@@ -226,7 +226,7 @@ logoutIcon: {
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
   },
 
   cardEmoji: {
@@ -241,7 +241,7 @@ logoutIcon: {
   },
 
   cardDesc: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6B7280',
     lineHeight: 20,
     marginTop: 4,

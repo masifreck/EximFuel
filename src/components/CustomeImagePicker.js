@@ -1,38 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Button, Image, StyleSheet, Alert, PermissionsAndroid, Platform, Modal, Text, SafeAreaView, Pressable, TouchableOpacity ,Dimensions, ImageBackground} from 'react-native';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
-import { darkBlue, inputbgColor, textColor } from './constant';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import React, { useState ,useEffect} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Image,
+  Alert,
+  ImageBackground,PermissionsAndroid
+} from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
+import { launchImageLibrary,launchCamera } from 'react-native-image-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ScreenWidth=Dimensions.get('window').width
-const   CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,width,imageData,isMandatory}) => {
+const CustomImagePicker = ({ selectedFiles, setSelectedFiles }) => {
+  const [modalVisible, setModalVisible] = useState(false);
 
-    const [isModalVisible, setModalVisible] = useState(false);
-
-    const requestStoragePermission = async () => {
-        if (Platform.OS === 'android') {
-            try {
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                    {
-                        title: 'Storage Permission',
-                        message: 'This app needs access to your storage to pick images.',
-                        buttonNeutral: 'Ask Me Later',
-                        buttonNegative: 'Cancel',
-                        buttonPositive: 'OK',
-                    }
-                );
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log('Storage permission granted');
-                } else {
-                    console.log('Storage permission denied');
-                }
-            } catch (err) {
-                console.warn(err);
-            }
-        }
-    };
-    const requestCameraPermission = async () => {
+  const openPickerModal = () => setModalVisible(true);
+  const closePickerModal = () => setModalVisible(false);
+const requestCameraPermission = async () => {
         if (Platform.OS === 'android') {
           try {
             const granted = await PermissionsAndroid.request(
@@ -53,179 +39,223 @@ const   CustomImagePicker = ({ onImagePicked,title,iconName,onlyCamera ,bgImage,
         return true; // iOS permissions are handled in the app settings
       };
     useEffect(() => {
-        requestStoragePermission();
+      requestCameraPermission();
     }, []);
 
-    const pickImageFromLibrary = () => {
-        launchImageLibrary({ mediaType: 'photo' }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.error('ImagePicker Error: ', response.error);
-                Alert.alert('Error', 'Something went wrong. Please try again later.');
-            } else if (response.assets && response.assets.length > 0) {
-                const { uri, fileName, type, fileSize } = response.assets[0];
-                const imageData = { uri, fileName, type, fileSize };
-                
-                setModalVisible(false);
-                onImagePicked(imageData); // Callback to parent component with image data
-            }
-        });
-    };
+    const takePhotoWithCamera = async () => {
+  console.log('clicked');
 
-   const takePhotoWithCamera = async () => {
-        console.log('clicked');
-        
-        const hasPermission = await requestCameraPermission();
-        if (!hasPermission) {
-            Alert.alert('Permission Denied', 'Camera access is required to take photos.');
-            return;
-        }
-    
-        launchCamera({ mediaType: 'photo' }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.error('ImagePicker Error: ', response.error);
-                Alert.alert('Error', 'Something went wrong. Please try again later.');
-            } else if (response.assets && response.assets.length > 0) {
-                const { uri, fileName, type, fileSize } = response.assets[0];
-                const imageData = { uri, fileName, type, fileSize };
-                
-                setModalVisible(false);
-                onImagePicked(imageData); // Callback to parent component with image data
-            }
-        });
-    };
+  const hasPermission = await requestCameraPermission();
+  if (!hasPermission) {
+    Alert.alert('Permission Denied', 'Camera access is required to take photos.');
+    return;
+  }
 
-    return (
-        <>
-        <View style={{flexDirection:'column'}}>
-        <Text style={styles.pickbtntext}>
-  {title}
-  {isMandatory && <Text style={{ color: 'red' }}> *</Text>}
-</Text>
+  launchCamera({ mediaType: 'photo', quality: 1 }, (response) => {
+    if (response.didCancel) {
+      console.log('User cancelled camera');
+    } else if (response.errorCode) {
+      console.error('Camera Error: ', response.errorMessage);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+    } else if (response.assets && response.assets.length > 0) {
+      const img = response.assets[0];
 
-        <ImageBackground source={imageData?.uri ? { uri: imageData.uri } : bgImage}
+      const newImage = {
+        uri: img.uri,
+        name: img.fileName || `camera_image_${Date.now()}.jpg`,
+        type: img.type || 'image/jpeg',
+        isPdf: false,
+      };
 
-         style={{width:width?width:120,height:80,margin:10,
-        }}  imageStyle={{ borderRadius: 10, }}>
-            
-                <TouchableOpacity style={styles.pickbtn} onPress={()=>onlyCamera? takePhotoWithCamera() :setModalVisible(true)}>
-                {/* <Icon name={iconName} size={30} color={textColor} /> */}
+      const totalFiles = selectedFiles.length + 1;
+      if (totalFiles > 6) {
+        Alert.alert('Limit Reached', 'You can select a maximum of 6 files.');
+        return;
+      }
 
-                  
-                </TouchableOpacity>
-            {
-            // imageData && (
-            //     <View style={styles.imagePreviewContainer}>
-            //         <Image source={{ uri: imageData.uri }} style={styles.imagePreview} />
-            //        {/* <Text style={styles.imageDetails}>
-            //             Filename: {imageData.fileName}{'\n'}
-            //             Type: {imageData.type}{'\n'}
-            //             Size: {imageData.fileSize / 1024} KB
-            //         </Text>*/}
-            //     </View>
-            // )
-            }
-            <Modal
-                visible={isModalVisible}
-                transparent={true}
-                animationType="slide"
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={styles.modalContainer}>
-                    <SafeAreaView style={styles.buttons}>
-                        <Pressable
-                            style={styles.imageChangeButton}
-                            onPress={pickImageFromLibrary}
-                        >
-                            <Text style={styles.buttonText}>🖼️ Pick from Gallery</Text>
-                        </Pressable>
-                        <Pressable
-                            style={styles.imageChangeButton}
-                            onPress={takePhotoWithCamera}
-                        >
-                            <Text style={styles.buttonText}>📷 Take Photo</Text>
-                        </Pressable>
-                        <Pressable
-                            style={styles.cancelButton}
-                            onPress={() => setModalVisible(false)}
-                        >
-                            <Text style={styles.cancelButtonText}>❌ Cancel</Text>
-                        </Pressable>
-                    </SafeAreaView>
-                </View>
-            </Modal>
-        </ImageBackground>
-        
-</View>
-        </>
-    );
+      const updatedFiles = [...selectedFiles, newImage];
+      setSelectedFiles(updatedFiles);
+
+      setModalVisible(false);
+    }
+  });
 };
 
-const styles = StyleSheet.create({
-    imagePreviewContainer: {
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    imagePreview: {
-        width: 200,
-        height: 200,
-        resizeMode: 'cover',
-        marginBottom: 10,
-    },
-    imageDetails: {
-        textAlign: 'center',
-        fontSize: 14,
-        color: '#666',
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    pickbtn:{
-        flexDirection:'row',
-justifyContent:'',
-gap:20,
-alignItems:'center',
-borderRadius:10,
-height:50,margin:10,paddingHorizontal:20
-    },
-    pickbtntext:{
-        color:textColor,
-        fontSize:12,
-        fontWeight:'bold',
-        textAlign:'left',
-        marginLeft:10,marginBottom:0
-    },
-    buttons: {
-        backgroundColor: 'white',
-        padding: 16,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
-    },
-    imageChangeButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 16,
-        justifyContent: 'center',
-    },
-    cancelButton: {
-        alignItems: 'center',
-        paddingVertical: 16,
-        justifyContent: 'center',
-        marginTop: 10,
-    },
-    buttonText: {
-        fontSize: 18,
-        color: textColor
-    },
-    cancelButtonText: {
-        fontSize: 18,
-        color: 'red',
-    },
-});
+  const handlePickImages = async () => {
+    closePickerModal();
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        quality: 1,
+        selectionLimit: 0,
+      });
+
+      if (result.assets?.length > 0) {
+        const newFiles = result.assets.map((img) => ({
+          uri: img.uri,
+          name: img.fileName || `image_${Date.now()}.jpg`,
+          type: img.type || 'image/jpeg',
+          isPdf: false,
+        }));
+
+        const totalFiles = selectedFiles.length + newFiles.length;
+        if (totalFiles > 6) {
+          Alert.alert('Limit Reached', 'You can select a maximum of 6 files.');
+          return;
+        }
+
+        const updated = [...selectedFiles, ...newFiles];
+        setSelectedFiles(updated);
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  const handlePickPDFs = async () => {
+    closePickerModal();
+    try {
+      const res = await DocumentPicker.pickMultiple({
+        type: [DocumentPicker.types.pdf],
+      });
+
+      const newFiles = res.map((doc) => ({
+        uri: doc.uri,
+        name: doc.name,
+        type: doc.type || 'application/pdf',
+        isPdf: true,
+      }));
+
+      const totalFiles = selectedFiles.length + newFiles.length;
+      if (totalFiles > 10) {
+        Alert.alert('Limit Reached', 'You can select a maximum of 10 files.');
+        return;
+      }
+
+      const updated = [...selectedFiles, ...newFiles];
+      setSelectedFiles(updated);
+    } catch (error) {
+      if (!DocumentPicker.isCancel(error)) {
+        Alert.alert('Error', error.message);
+      }
+    }
+  };
+
+  const removeFile = (index) => {
+    const updated = selectedFiles.filter((_, i) => i !== index);
+    setSelectedFiles(updated);
+  };
+
+  const renderFile = ({ item, index }) => (
+    <View style={styles.fileContainer}>
+      {item.isPdf ? (
+        <Text style={styles.fileText}>📄 {item.name}</Text>
+      ) : (
+        <Image source={{ uri: item.uri }} style={styles.imagePreview} />
+      )}
+      <TouchableOpacity onPress={() => removeFile(index)} style={styles.crossBtn}>
+        <Icon name="cancel" size={20} color="red" />
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.pickerBtn} onPress={openPickerModal}>
+        <ImageBackground
+          style={{ width: 100, height: 100 }}
+          source={require('../assets/upload-file.png')}
+        />
+      </TouchableOpacity>
+
+      <Text style={styles.btnText}>Choose Files</Text>
+
+      <View style={styles.previewList}>
+        {selectedFiles.map((item, index) => (
+          <View key={item.uri || index}>
+            {renderFile({ item, index })}
+          </View>
+        ))}
+      </View>
+
+      <Modal visible={modalVisible} transparent animationType="slide">
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          onPress={closePickerModal}
+          activeOpacity={1}
+        >
+          <View style={styles.modalContainer}>
+             <TouchableOpacity style={styles.optionBtn} onPress={takePhotoWithCamera}>
+              <Text style={styles.optionText}>📷 From Camera</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.optionBtn} onPress={handlePickImages}>
+              <Text style={styles.optionText}>🖼️ Pick Images</Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity style={styles.optionBtn} onPress={handlePickPDFs}>
+              <Text style={styles.optionText}>📄 Pick PDFs</Text>
+            </TouchableOpacity> */}
+
+            <TouchableOpacity style={styles.cancelBtn} onPress={closePickerModal}>
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+};
 
 export default CustomImagePicker;
+
+
+const styles = StyleSheet.create({
+  container: { alignItems: 'center', marginTop: 20 },
+  pickerBtn: {
+    
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    width: '90%',
+    alignItems: 'center',
+  },
+  btnText: { color: 'black', fontSize: 16 },
+  previewList: { marginTop: 20, width: '100%', alignItems: 'center' },
+  fileContainer: {
+    width: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
+    backgroundColor: '#f1f1f1',
+    padding: 5,
+    borderRadius: 8,
+    position: 'relative',
+  },
+  imagePreview: { width: 60, height: 60, resizeMode: 'cover', borderRadius: 5 },
+  fileText: { fontSize: 16, color: '#333' },
+  crossBtn: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    padding: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  optionBtn: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  optionText: { fontSize: 18,color:'#000' },
+  cancelBtn: { marginTop: 10, paddingVertical: 15 },
+  cancelText: { textAlign: 'center', color: 'red', fontSize: 16 },
+});
