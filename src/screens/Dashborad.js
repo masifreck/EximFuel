@@ -28,12 +28,27 @@ const DashboardScreen = ({ navigation }) => {
     );
   };
 const [username, setUsername] = useState('');
+const [isFuelManagement, setIsFuelManagement] = useState(false);
+const [isMaintenance, setIsMaintenance] = useState(false);
+const [isFinalApproval, setisFinalApproval]=useState(false)
 useEffect(() => {
   const getUserData = async () => {
     try {
       const storedUsername = await AsyncStorage.getItem('username');
+       const maintenance = await AsyncStorage.getItem('isMaintenance');
+      const fuelManagement = await AsyncStorage.getItem('isFuelManagement');
+      const finalApproval = await AsyncStorage.getItem('isFinalApproval')
       if (storedUsername) {
         setUsername(storedUsername);
+      }
+      if (maintenance === 'true') {
+        setIsMaintenance(true);
+      }
+      if (fuelManagement === 'true') {
+        setIsFuelManagement(true);
+      }
+      if(finalApproval === 'true'){
+        setisFinalApproval(true)
       }
     } catch (error) {
       console.log('Failed to load username', error);
@@ -68,74 +83,166 @@ useEffect(() => {
 
 
       {/* 🧩 Cards */}
-      <View style={styles.cardContainer}>
-        {/* 🚛 Fleet Management */}
-       
+      {/* 🧩 Cards */}
+<View style={styles.cardContainer}>
 
-        {/* ⛽ Fuel Management */}
-        <TouchableOpacity
-          style={[styles.card, styles.fuelCard]}
-          onPress={() => navigation.navigate('fuelmanagement')}
-        >
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>⛽</Text>
-            <Text style={styles.cardTitle}>Fuel Management</Text>
-          </View>
+  {isFuelManagement && (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={[styles.card, styles.fuelCard]}
+      onPress={() => navigation.navigate('fuelmanagement')}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.iconCircle}>
+          <Text style={styles.cardEmoji}>⛽</Text>
+        </View>
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Fuel Management</Text>
           <Text style={styles.cardDesc}>
             Track fuel usage, balance & expenses
           </Text>
-        </TouchableOpacity>
-        
-          {/* 💰 Expense Booking */}
+        </View>
+        <Text style={styles.cardArrow}>›</Text>
+      </View>
+    </TouchableOpacity>
+  )}
+
   <TouchableOpacity
+    activeOpacity={0.85}
     style={[styles.card, styles.expenseCard]}
-    onPress={() => navigation.navigate('expensebooking')}
+    onPress={() =>
+      Alert.alert('🚧 Coming Soon', 'Vehicle inspection feature will be available soon.')
+    }
   >
     <View style={styles.cardHeader}>
-      <Text style={styles.cardEmoji}>💰</Text>
-      <Text style={styles.cardTitle}>Expense Booking</Text>
+      <View style={styles.iconCircle}>
+        <Text style={styles.cardEmoji}>🛠️</Text>
+      </View>
+      <View style={styles.cardText}>
+        <Text style={styles.cardTitle}>Vehicle Inspection</Text>
+        <Text style={styles.cardDesc}>
+          Inspect vehicle condition and safety
+        </Text>
+      </View>
+      <Text style={styles.cardArrow}>›</Text>
     </View>
-    <Text style={styles.cardDesc}>
-      Record trip-wise expenses and cost tracking
-    </Text>
   </TouchableOpacity>
 
-<TouchableOpacity
-  style={[styles.card, styles.fleetCard]}
-  onPress={() => navigation.navigate('vehicleexpense')}
->
-  <View style={styles.cardHeader}>
-    <Text style={styles.cardEmoji}>💰🚗</Text>
-    <Text style={styles.cardTitle}>Vehicle Expense</Text>
-  </View>
-  <Text style={styles.cardDesc}>
-    Track vehicle expenses easily
-  </Text>
-</TouchableOpacity>
-
-{/* ✅ Approval */}
-<TouchableOpacity
-  style={[styles.card, styles.approvalCard]}
-  onPress={() =>
-    navigation.navigate('pendingapproval')
-  }
->
-  <View style={styles.cardHeader}>
-    <Text style={styles.cardEmoji}>✅</Text>
-    <Text style={styles.cardTitle}>Approvals</Text>
-  </View>
-  <Text style={styles.cardDesc}>
-    Review and approve expense & fuel requests
-  </Text>
-</TouchableOpacity>
-
+  {isMaintenance && (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={[styles.card, styles.fleetCard]}
+      onPress={() => navigation.navigate('vehicleexpense')}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.iconCircle}>
+          <Text style={styles.cardEmoji}>💰🚗</Text>
+        </View>
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Vehicle Maintenance</Text>
+          <Text style={styles.cardDesc}>
+            Track vehicle expenses easily
+          </Text>
+        </View>
+        <Text style={styles.cardArrow}>›</Text>
       </View>
+    </TouchableOpacity>
+  )}
+
+  {isMaintenance && (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={[styles.card, styles.pendingCard]}
+      onPress={() => navigation.navigate('pendingapproval')}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.iconCircle}>
+          <Text style={styles.cardEmoji}>⏳</Text>
+        </View>
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Pending</Text>
+          <Text style={styles.cardDesc}>
+            Requests waiting for approval
+          </Text>
+        </View>
+        <Text style={styles.cardArrow}>›</Text>
+      </View>
+    </TouchableOpacity>
+  )}
+
+  {isMaintenance && (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={[styles.card, styles.approvedCard]}
+      onPress={() => navigation.navigate('approvedlist')}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.iconCircle}>
+          <Text style={styles.cardEmoji}>🟢</Text>
+        </View>
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Approved</Text>
+          <Text style={styles.cardDesc}>
+            View approved requests
+          </Text>
+        </View>
+        <Text style={styles.cardArrow}>›</Text>
+      </View>
+    </TouchableOpacity>
+  )}
+
+  {isMaintenance && (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={[styles.card, styles.rejectedCard]}
+      onPress={() => navigation.navigate('rejectedlist')}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.iconCircle}>
+          <Text style={styles.cardEmoji}>🔴</Text>
+        </View>
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Rejected</Text>
+          <Text style={styles.cardDesc}>
+            View rejected requests
+          </Text>
+        </View>
+        <Text style={styles.cardArrow}>›</Text>
+      </View>
+    </TouchableOpacity>
+  )}
+
+{isFinalApproval && (
+  <TouchableOpacity
+    activeOpacity={0.85}
+    style={[styles.card, styles.finalApprovedCard]}
+    onPress={() => navigation.navigate('finalapprovedlist')}
+  >
+    <View style={styles.cardHeader}>
+      <View style={styles.iconCircle}>
+        <Text style={styles.cardEmoji}>🏁</Text>
+      </View>
+
+      <View style={styles.cardText}>
+        <Text style={styles.cardTitle}>Final Approved</Text>
+        <Text style={styles.cardDesc}>
+          Final approved vehicle expenses
+        </Text>
+      </View>
+
+      <Text style={styles.cardArrow}>›</Text>
+    </View>
+  </TouchableOpacity>
+)}
+
+</View>
+
 
       {/* ⚡ Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-1.6 </Text>
+            V-1.9 </Text>
       </View>
     </ScrollView>
   );
@@ -150,54 +257,52 @@ const styles = StyleSheet.create({
   },
 
   /* ===== Header ===== */
-header: {
-  backgroundColor: '#2563EB',
-  paddingTop: 28,
-  paddingBottom: 32,
-  paddingHorizontal: 20,
-  borderBottomLeftRadius: 26,
-  borderBottomRightRadius: 26,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  elevation: 8,
-},
+  header: {
+    backgroundColor: '#2563EB',
+    paddingTop: 28,
+    paddingBottom: 32,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 26,
+    borderBottomRightRadius: 26,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 8,
+  },
 
-welcomeText: {
-  fontSize: 13,
-  color: '#DCE4FF',
-  fontWeight: '500',
-},
+  welcomeText: {
+    fontSize: 13,
+    color: '#DCE4FF',
+    fontWeight: '500',
+  },
 
-userName: {
-  fontSize: 20,
-  fontWeight: '800',
-  color: '#FFFFFF',
-  marginTop: 2,
-},
+  userName: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
 
-headerTitle: {
-  fontSize: 16,
-  fontWeight: '700',
-  color: '#EAF0FF',
-},
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#EAF0FF',
+  },
 
-headerSubTitle: {
-  fontSize: 12,
-  color: '#C7D2FE',
-  marginTop: 2,
-},
+  headerSubTitle: {
+    fontSize: 12,
+    color: '#C7D2FE',
+    marginTop: 2,
+  },
 
-logoutBtn: {
-  backgroundColor: 'rgba(255,255,255,0.18)',
-  padding: 12,
-  borderRadius: 14,
-},
+  logoutBtn: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    padding: 12,
+    borderRadius: 14,
+  },
 
-logoutIcon: {
-  fontSize: 18,
-},
-
+  logoutIcon: {
+    fontSize: 18,
+  },
 
   /* ===== Cards ===== */
   cardContainer: {
@@ -206,36 +311,42 @@ logoutIcon: {
   },
 
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 22,
-    marginBottom: 22,
-    elevation: 5,
-  },
-
-  fleetCard: {
-    borderLeftWidth: 5,
-    borderLeftColor: '#22C55E',
-  },
-
-  fuelCard: {
-    borderLeftWidth: 5,
-    borderLeftColor: '#F97316',
+    padding: 18,
+    marginBottom: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 6,
   },
 
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
+  },
+
+  iconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#EEF2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
   },
 
   cardEmoji: {
-    fontSize: 38,
-    marginRight: 12,
+    fontSize: 26,
+  },
+
+  cardText: {
+    flex: 1,
   },
 
   cardTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
     color: '#111827',
   },
@@ -243,24 +354,59 @@ logoutIcon: {
   cardDesc: {
     fontSize: 13,
     color: '#6B7280',
-    lineHeight: 20,
     marginTop: 4,
   },
-expenseCard: {
-  borderLeftWidth: 5,
-  borderLeftColor: '#A855F7', // purple accent
-},
-approvalCard: {
-  borderLeftWidth: 5,
-  borderLeftColor: '#0EA5E9',
-},
 
+  cardArrow: {
+    fontSize: 28,
+    color: '#9CA3AF',
+    marginLeft: 8,
+  },
+
+  /* ===== Card Variants ===== */
+  fuelCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#F97316',
+  },
+
+  fleetCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#22C55E',
+  },
+
+  expenseCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#A855F7',
+  },
+
+  pendingCard: {
+    backgroundColor: '#EFF6FF',
+    borderLeftWidth: 5,
+    borderLeftColor: '#2563EB',
+  },
+
+  approvedCard: {
+    backgroundColor: '#ECFDF5',
+    borderLeftWidth: 5,
+    borderLeftColor: '#16A34A',
+  },
+
+  rejectedCard: {
+    backgroundColor: '#FEF2F2',
+    borderLeftWidth: 5,
+    borderLeftColor: '#DC2626',
+  },
+finalApprovedCard: {
+  backgroundColor: '#F0FDF4',
+  borderLeftWidth: 5,
+  borderLeftColor: '#15803D',
+},
 
   /* ===== Footer ===== */
   footer: {
-    position: 'absolute',
-    bottom: 14,
-    alignSelf: 'center',
+    marginTop: 24,
+    marginBottom: 16,
+    alignItems: 'center',
   },
 
   footerText: {
@@ -273,3 +419,4 @@ approvalCard: {
     color: '#2563EB',
   },
 });
+

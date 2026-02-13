@@ -18,7 +18,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 const SUBMIT_API =
   'http://eximapi1.tranzol.com/api/VehicleExpenseBooking/Approve';
 
-const PendingApprovalScreen = () => {
+const RejectedList = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -68,13 +68,12 @@ const onDateChange = (event, date) => {
 };
 
 let url = isAdmin
-  ? `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?statusId=1`
-  : `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?userId=${username}&statusId=1`;
+  ? `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?statusId=5`
+  : `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?userId=${username}&statusId=5`;
 
 if (selectedDate) {
   url += `&bookingDate=${selectedDate}`;
 }
-
 
   //console.log('List API URL:', url);
   // 🔹 Fetch List
@@ -92,16 +91,15 @@ if (selectedDate) {
     }
   };
 
-  useEffect(() => {
-  if (!username) return;
-
-  const timer = setTimeout(() => {
-    fetchPendingList();
-  }, 400); // ⏳ delay in ms (300–500 is ideal)
-
-  return () => clearTimeout(timer); // 🧹 cleanup on re-render
-}, [username, selectedDate]);
-
+    useEffect(() => {
+    if (!username) return;
+  
+    const timer = setTimeout(() => {
+      fetchPendingList();
+    }, 400); 
+  
+    return () => clearTimeout(timer); 
+  }, [username, selectedDate]);
 
   // 🔍 Search Filter
   const filteredList = useMemo(() => {
@@ -136,7 +134,7 @@ const handleSubmit = async (statusId) => {
     approveRemarks: approveRemarks?.trim() || '',
   };
 
-  console.log('Submit Payload:', payload);
+  //console.log('Submit Payload:', payload);
 
   try {
     setSubmitLoading(true);
@@ -153,8 +151,8 @@ const handleSubmit = async (statusId) => {
     // ✅ READ RESPONSE ONCE
     const responseText = await res.text();
 
-    console.log('HTTP Status:', res.status);
-    console.log('Server Message:', responseText);
+   // console.log('HTTP Status:', res.status);
+    //console.log('Server Message:', responseText);
 
     if (res.ok) {
       Alert.alert(
@@ -246,7 +244,7 @@ const parsedAttachments = React.useMemo(
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Text style={styles.title}>Pending Expense Approvals</Text>
+      <Text style={styles.title}>Rejected Expense Approvals</Text>
 
       {/* 🔍 Search */}
       <View style={styles.searchContainer}>
@@ -283,7 +281,7 @@ const parsedAttachments = React.useMemo(
         <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 40 }} />
       ) : (
         <ScrollView horizontal>
-          <View style={{ width: 900 , marginTop:20}}>
+          <View style={{ width: 900, marginTop:20 }}>
             {/* Header */}
             <View style={styles.headerRow}>
               <Text style={styles.headerCellVehicle}>Vehicle No</Text>
@@ -719,4 +717,4 @@ loadingText: {
 
 });
 
-export default PendingApprovalScreen;
+export default RejectedList;

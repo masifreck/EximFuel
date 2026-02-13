@@ -10,6 +10,9 @@ import FuelManagementScreen from './screens/FuelMangement';
 import ExpenseBooking from './screens/ExpenseBooking';
 import VehicleExpense from './screens/VehicleExpense';
 import PendingApprovalScreen from './screens/PendingApprovalScreen';
+import RejectedList from './screens/RejectedList'
+import ApprovedList from './screens/Approvedlist';
+import FinalApprovalList from './screens/FinalApprovalList';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -61,6 +64,21 @@ const AppNavigator = () => {
       <Stack.Screen
       name='pendingapproval'
       component={PendingApprovalScreen}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen
+      name='rejectedlist'
+      component={RejectedList}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen
+      name='approvedlist'
+      component={ApprovedList}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen
+      name='finalapprovedlist'
+      component={FinalApprovalList}
       options={{headerShown: false}}
       />
   <Stack.Screen 

@@ -26,6 +26,10 @@ const [vehicleLoading, setVehicleLoading] = useState(false);
 const [expenseTypeData, setExpenseTypeData] = useState([]);
 const [expenseTypeLoading, setExpenseTypeLoading] = useState(false);
 
+const [employeeId, setEmployeeId] = useState(null);
+const [employeeData, setEmployeeData] = useState([]);
+const [employeeLoading, setEmployeeLoading] = useState(false);
+
 const [location, setLocation] = useState(null);
 const [locationData, setLocationData] = useState([]);
 const [locationLoading, setLocationLoading] = useState(false);
@@ -119,6 +123,31 @@ const fetchLocationList = async (searchText) => {
   }
 };
 
+const fetchEmployeeList = async (searchText) => {
+  try {
+    setEmployeeLoading(true);
+
+    const response = await fetch(
+      `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/ApproverList?search=${searchText}`
+    );
+
+    const data = await response.json();
+   // console.log('Location API:', data);
+
+    const formattedData = data
+      .filter(item => item.username) // ✅ prevent crash
+      .map(item => ({
+        label: item.username,
+        value: item.userId
+      }));
+
+    setEmployeeData(formattedData);
+  } catch (error) {
+    Alert.alert('❌ Error', 'Failed to fetch locations');
+  } finally {
+    setEmployeeLoading(false);
+  }
+};
 
 const handleAttachment = useCallback(image => {
         setAttachments(image);
@@ -145,10 +174,14 @@ const handleAttachment = useCallback(image => {
     Alert.alert('⚠️ Validation', 'Please enter remarks');
     return false;
   }
-  if (selectedFiles.length === 0) {
-    Alert.alert('⚠️ Validation', 'Please attach at least one file');
+  if (!employeeId) {
+    Alert.alert('⚠️ Validation', 'Please select employee to approve');
     return false;
   }
+  // if (selectedFiles.length === 0) {
+  //   Alert.alert('⚠️ Validation', 'Please attach at least one file');
+  //   return false;
+  // }
   return true;
 };
 
@@ -170,6 +203,7 @@ const handleSubmit = async () => {
       { name: 'ExpenseTypeId', data: String(expenseType) },
       { name: 'InsertUserId', data: String(storedUserId) },
       { name: 'LocationId', data: String(location) },
+      { name: 'ApproverId', data: String(employeeId) },
       { name: 'RequestAmount', data: String(requsestAmount) },
       { name: 'VehicleId', data: String(selectedVehicle) },
       { name: 'Remarks', data: remarks ?? '' },
@@ -363,6 +397,42 @@ const handleSubmit = async () => {
   }
 />
 
+<Text style={styles.label}>Select Employee to Approve 👔</Text>
+
+<Dropdown
+  style={styles.dropdown}
+  data={employeeData}
+  search
+  labelField="label"
+  valueField="value"
+  placeholder="Search Employee"
+  value={employeeId}
+
+  onChange={item => {
+    setEmployeeId(item.value);
+  }}
+
+  onChangeText={text => {
+
+    if (text.length >= 3) {
+      fetchEmployeeList(text);
+    }
+  }}
+
+  itemTextStyle={styles.dropdownItemText}
+  selectedTextStyle={styles.selectedText}
+  placeholderStyle={styles.placeholderText}
+  inputSearchStyle={[
+    styles.searchText,
+    { textTransform: 'uppercase' } // ✅ visible uppercase
+  ]}
+
+  renderRightIcon={() =>
+    employeeLoading ? (
+      <ActivityIndicator size="small" color="#2563EB" />
+    ) : null
+  }
+/>
   <Text style={styles.label}>Request Amount 💰</Text>
              <TextInput
                style={styles.input}

@@ -7,10 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  ScrollView,ActivityIndicator
+  ScrollView,ActivityIndicator,Modal
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const FuelManagementScreen = ({ navigation }) => {
   const [selectedTrip, setSelectedTrip] = useState(null);
@@ -47,6 +48,15 @@ const [totalLitre, setTotalLitre] = useState('');
 const [amount, setAmount] = useState('');
 const [balancekm, setBalanceKm] = useState('');
 const [loading, setLoading] = useState(false);
+const [showSourceModal, setShowSourceModal] = useState(false);
+const [showDestinationModal, setShowDestinationModal] = useState(false);
+
+const [sourceText, setSourceText] = useState('');
+const [destinationText, setDestinationText] = useState('');
+
+const [postSourceLoading, setPostSourceLoading] = useState(false);
+const [postDestinationLoading, setPostDestinationLoading] = useState(false);
+
   const getCurrentDate = () => {
   const date = new Date();
   const day = String(date.getDate()).padStart(2, '0');
@@ -178,12 +188,10 @@ const fetchFixedDetails = async (Location, destination, netwt) => {
         }),
       }
     );
-console.log('sending data', location, destination, netwt)
-    console.log('Status:', response.status);
 
     // ✅ Read as TEXT first
     const responseText = await response.text();
-    console.log('Fixed Rules Raw Response:', responseText);
+   // console.log('Fixed Rules Raw Response:', responseText);
 
     // ❌ Server sent plain text
     if (!responseText.trim().startsWith('{')) {
@@ -197,8 +205,6 @@ console.log('sending data', location, destination, netwt)
     // ✅ Safe JSON parse
     const data = JSON.parse(responseText);
 
-    console.log('Fixed Details Parsed:', data);
-
     // ✅ Set values
     setDistance(String(data.distance ?? ''));
     setMileage(String(data.mileage ?? ''));
@@ -210,6 +216,68 @@ console.log('sending data', location, destination, netwt)
   }
 };
 
+const submitSource = async () => {
+  if (!sourceText.trim()) {
+    Alert.alert('Error', 'Enter source');
+    return;
+  }
+
+  try {
+    setPostSourceLoading(true);
+
+    const res = await fetch(
+      'http://eximapi1.tranzol.com/api/Source',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loadingPoints: sourceText }),
+      }
+    );
+
+    const textResponse = await res.text();
+
+    if (textResponse.includes('Create Successfully')) {
+      Alert.alert('Success', 'Source created successfully');
+      setShowSourceModal(false);
+      setSourceText('');
+    }
+  } catch (err) {
+    Alert.alert('Error', 'Something went wrong');
+  } finally {
+    setPostSourceLoading(false);
+  }
+};
+const submitDestination = async () => {
+  if (!destinationText.trim()) {
+    Alert.alert('Error', 'Enter destination');
+    return;
+  }
+
+  try {
+    setPostDestinationLoading(true);
+
+    const res = await fetch(
+      'http://eximapi1.tranzol.com/api/Destination',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unloadingPoints: destinationText }),
+      }
+    );
+
+    const textResponse = await res.text();
+
+    if (textResponse.includes('Create Successfully')) {
+      Alert.alert('Success', 'Destination created successfully');
+      setShowDestinationModal(false);
+      setDestinationText('');
+    }
+  } catch (err) {
+    Alert.alert('Error', 'Something went wrong');
+  } finally {
+    setPostDestinationLoading(false);
+  }
+};
 
 
 useEffect(() => {
@@ -247,8 +315,8 @@ useEffect(() => {
   if (!location) return 'Source is required';
   if (!destination) return 'Destination is required';
   if (!netwt) return 'Net weight is required';
-  if (!distance || !mileage || !totalLitre)
-    return 'Fixed rule data not available';
+  // if (!distance || !mileage || !totalLitre)
+  //   return 'Fixed rule data not available';
    if (!allottedKm) return 'Please enter allotted KM';
   if (!mileage2) return 'Please enter alloted mileage';
   if (!dieselRate) return 'Please enter alloted diesel rate';
@@ -296,7 +364,7 @@ const userId = await AsyncStorage.getItem('userId');
       inserUserId: Number(userId),
     };
 
-    console.log('Fuel Payload:', payload);
+   // console.log('Fuel Payload:', payload);
 
     const response = await fetch(
       'http://eximapi1.tranzol.com/api/Fuel',
@@ -311,7 +379,7 @@ const userId = await AsyncStorage.getItem('userId');
     );
 
     const text = await response.text();
-    console.log('Fuel API Raw Response:', text);
+    //console.log('Fuel API Raw Response:', text);
 
     // 🔹 Handle plain text success
     if (text.includes('Insert successfully')) {
@@ -415,6 +483,8 @@ const userId = await AsyncStorage.getItem('userId');
 
 
       {/* Source */}
+      <View style={styles.dropdownRow}>
+        <View style={{ flex: 1 }}>
       <Text style={styles.label}>Source Location 📍</Text>
      <Dropdown
        style={styles.dropdown}
@@ -451,8 +521,58 @@ const userId = await AsyncStorage.getItem('userId');
          ) : null
        }
      />
+     </View>
+      <TouchableOpacity
+    style={styles.plusBtn}
+    onPress={() => setShowSourceModal(true)}
+  >
+    <Text style={styles.plusText}>➕</Text>
+  </TouchableOpacity>
+</View>
+<Modal visible={showSourceModal} transparent animationType="slide">
+  <View style={styles.addPointOverlay}>
+    <View style={styles.addPointCard}>
+
+      {/* Header */}
+      <View style={styles.addPointHeader}>
+        <Text style={styles.addPointTitle}>Add Source</Text>
+
+        <TouchableOpacity onPress={() => setShowSourceModal(false)}>
+           <Icon   style={{
+    position: 'absolute',
+    top: -50,
+    right: 0,
+    zIndex: 10,
+  }}
+ name="close" size={30} color="#f8260b" />
+        </TouchableOpacity>
+      </View>
+
+      <TextInput
+        placeholder="Enter Source"
+        value={sourceText}
+        onChangeText={setSourceText}
+        style={styles.addPointInput}
+      />
+
+      {postSourceLoading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <TouchableOpacity
+          style={styles.addPointSubmitBtn}
+          onPress={submitSource}
+        >
+          <Text style={styles.addPointSubmitText}>Submit</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  </View>
+</Modal>
+
 
       {/* Destination */}
+      <View style={styles.dropdownRow}>
+        <View style={{ flex: 1 }}>
       <Text style={styles.label}>Destination Location 🏁</Text>
       <Dropdown
         style={styles.dropdown}
@@ -485,6 +605,54 @@ const userId = await AsyncStorage.getItem('userId');
       ) : null
     }
       />
+      </View>
+         <TouchableOpacity
+    style={styles.plusBtn}
+    onPress={() => setShowDestinationModal(true)}
+  >
+    <Text style={styles.plusText}>➕</Text>
+  </TouchableOpacity>
+
+</View>
+<Modal visible={showDestinationModal} transparent animationType="slide">
+  <View style={styles.addPointOverlay}>
+    <View style={styles.addPointCard}>
+
+      <View style={styles.addPointHeader}>
+        <Text style={styles.addPointTitle}>Add Destination</Text>
+
+        <TouchableOpacity onPress={() => setShowDestinationModal(false)}>
+          <Icon   style={{
+    position: 'absolute',
+    top: -50,
+    right: 0,
+    zIndex: 10,
+  }}
+ name="close" size={30} color="#f8260b" />
+        </TouchableOpacity>
+      </View>
+
+      <TextInput
+        placeholder="Enter Destination"
+        value={destinationText}
+        onChangeText={setDestinationText}
+        style={styles.addPointInput}
+      />
+
+      {postDestinationLoading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <TouchableOpacity
+          style={styles.addPointSubmitBtn}
+          onPress={submitDestination}
+        >
+          <Text style={styles.addPointSubmitText}>Submit</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  </View>
+</Modal>
+
 
       {/* Material */}
       <Text style={styles.label}>Material  🧱</Text>
@@ -723,6 +891,8 @@ container: {
     borderRadius: 12,
     padding: 14,
     elevation: 2,
+    height: 50,
+    width: '100%',
     
   },
 dropdownItemText: {
@@ -740,6 +910,28 @@ placeholderText: {
   color: '#9CA3AF',   // placeholder text color
   fontSize: 14,
 },
+dropdownRow: {
+    flexDirection: 'row',
+    
+    marginBottom: 12,
+    justifyContent: 'space-between',
+     alignItems: 'center',
+  },
+
+  plusBtn: {
+    marginLeft: 10,
+    padding: 10,
+    backgroundColor: '#E0F2FE',
+    borderRadius: 8,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    marginTop: 35
+  },
+  plusText: {
+    fontSize: 18,
+  },
 
 searchText: {
   color: '#111827',   // search input text color
@@ -797,6 +989,51 @@ cardValue: {
   disabledInput: {
     backgroundColor: '#eee',
     color: '#777',
+  },
+  addPointOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  addPointCard: {
+    width: '85%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 20,
+    elevation: 6,
+  },
+
+  addPointTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 14,
+    color: '#111827',
+  },
+
+  addPointInput: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 15,
+    marginBottom: 18,
+    color: '#111827',
+  },
+
+  addPointSubmitBtn: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  addPointSubmitText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 
   submitBtn: {

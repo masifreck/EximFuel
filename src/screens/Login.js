@@ -36,13 +36,16 @@ const handleLogin = async () => {
     );
 
     const data = await response.json();
-console.log('Login Response:', data);
+//console.log('Login Response:', data);
     // ✅ Success response
     if (response.ok && data.userId) {
       await AsyncStorage.setItem('isLoggedIn', 'true');
       await AsyncStorage.setItem('userId', data.userId.toString());
       await AsyncStorage.setItem('username', data.userName);
-
+await AsyncStorage.setItem('isMaintenance', data.isMaintenance ? 'true' : 'false' );
+await AsyncStorage.setItem('isFuelManagement', data.isFuelManagement ? 'true' : 'false' );
+await AsyncStorage.setItem('isAdmin', data.isAdmin ? 'true' : 'false' );
+await AsyncStorage.setItem('isFinalApproval', data.isFinalApproval ? 'true' : 'false')
       navigation.replace('dashboard');
     } 
     // ❌ Invalid credentials

@@ -16,9 +16,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const SUBMIT_API =
-  'http://eximapi1.tranzol.com/api/VehicleExpenseBooking/Approve';
+  'http://eximapi1.tranzol.com/api/VehicleExpenseBooking/FinalApprove';
 
-const PendingApprovalScreen = () => {
+const FinalApprovalList = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,6 @@ const PendingApprovalScreen = () => {
   const [imageModalVisible, setImageModalVisible] = useState(false);
 const [previewImage, setPreviewImage] = useState('');
 const [username, setUsername] = useState('');
-const [isAdmin, setIsAdmin] = useState(false);
 const [selectedDate, setSelectedDate] = useState(null);
 const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -42,11 +41,6 @@ useEffect(() => {
   const getUserData = async () => {
     try {
       const storedUsername = await AsyncStorage.getItem('userId');
-       const admin = await AsyncStorage.getItem('isAdmin');
-       console.log('Admin Status:', admin);
-        if (admin === 'true') {
-        setIsAdmin(true);
-      }
       if (storedUsername) {
         setUsername(storedUsername);
       }
@@ -67,21 +61,14 @@ const onDateChange = (event, date) => {
   }
 };
 
-let url = isAdmin
-  ? `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?statusId=1`
-  : `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?userId=${username}&statusId=1`;
-
-if (selectedDate) {
-  url += `&bookingDate=${selectedDate}`;
-}
-
-
-  //console.log('List API URL:', url);
+const LIST_API =
+  `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/FinalApproveList?bookingDate=${selectedDate}`;
+  console.log('List API URL:', LIST_API);
   // 🔹 Fetch List
   const fetchPendingList = async () => {
     try {
       setLoading(true);
-      const res = await fetch(url);
+      const res = await fetch(LIST_API);
       const json = await res.json();
       //console.log('Fetched List:', json);
       setList(json || []);
@@ -93,15 +80,11 @@ if (selectedDate) {
   };
 
   useEffect(() => {
-  if (!username) return;
-
-  const timer = setTimeout(() => {
+    if (username && selectedDate) {
     fetchPendingList();
-  }, 400); // ⏳ delay in ms (300–500 is ideal)
+    }
 
-  return () => clearTimeout(timer); // 🧹 cleanup on re-render
-}, [username, selectedDate]);
-
+  }, [username, selectedDate]);
 
   // 🔍 Search Filter
   const filteredList = useMemo(() => {
@@ -117,26 +100,18 @@ const handleSubmit = async (statusId) => {
     Alert.alert('Validation', 'Please enter approve amount');
     return;
   }
-
   if (!statusId) {
     Alert.alert('Validation', 'Invalid action');
     return;
   }
 
-  if (!username) {
-    Alert.alert('Error', 'User not identified. Please login again.');
-    return;
-  }
-
   const payload = {
     id: selectedItem.id,
-    statusId,
-    userId: Number(username),
+    statusId: statusId ,
+    userId: username,
     approveAmount: Number(approveAmount),
-    approveRemarks: approveRemarks?.trim() || '',
+    approveRemarks: approveRemarks,
   };
-
-  console.log('Submit Payload:', payload);
 
   try {
     setSubmitLoading(true);
@@ -149,29 +124,31 @@ const handleSubmit = async (statusId) => {
       },
       body: JSON.stringify(payload),
     });
+console.log('Submit Payload:', payload);
+    console.log('Status Code:', res);
 
-    // ✅ READ RESPONSE ONCE
-    const responseText = await res.text();
-
-    console.log('HTTP Status:', res.status);
-    console.log('Server Message:', responseText);
+    // ✅ Read response safely
+    let responseText = '';
+    try {
+      const blob = await res.blob();
+      responseText = await blob.text();
+    } catch {
+      responseText = '';
+    }
 
     if (res.ok) {
       Alert.alert(
         'Success',
-        responseText || 'Approve Successfully'
+        responseText?.trim() || 'Approve Successfully',
       );
-
       setModalVisible(false);
       setApproveAmount('');
       setApproveRemarks('');
       fetchPendingList();
     } else {
-      // 🔥 THIS WILL SHOW:
-      // "Approve amount is not greater than request amount !!!"
       Alert.alert(
-        'Validation Error',
-        responseText || 'Approval failed'
+        'Server Error',
+        responseText?.trim() || 'Approval failed',
       );
     }
   } catch (error) {
@@ -181,7 +158,6 @@ const handleSubmit = async (statusId) => {
     setSubmitLoading(false);
   }
 };
-
 const IMAGE_PREFIX = 'https://flex.tranzol.com/upload';
 
 const getParsedAttachments = (attachment) => {
@@ -246,7 +222,7 @@ const parsedAttachments = React.useMemo(
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Text style={styles.title}>Pending Expense Approvals</Text>
+      <Text style={styles.title}>Final Vehicle Expense Approvals</Text>
 
       {/* 🔍 Search */}
       <View style={styles.searchContainer}>
@@ -719,4 +695,4 @@ loadingText: {
 
 });
 
-export default PendingApprovalScreen;
+export default FinalApprovalList;
