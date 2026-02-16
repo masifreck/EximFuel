@@ -97,9 +97,9 @@ if (selectedDate) {
 
   const timer = setTimeout(() => {
     fetchPendingList();
-  }, 400); // ⏳ delay in ms (300–500 is ideal)
+  }, 400); 
 
-  return () => clearTimeout(timer); // 🧹 cleanup on re-render
+  return () => clearTimeout(timer); 
 }, [username, selectedDate]);
 
 

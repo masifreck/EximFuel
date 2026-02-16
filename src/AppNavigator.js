@@ -13,6 +13,7 @@ import PendingApprovalScreen from './screens/PendingApprovalScreen';
 import RejectedList from './screens/RejectedList'
 import ApprovedList from './screens/Approvedlist';
 import FinalApprovalList from './screens/FinalApprovalList';
+import FuelList from './screens/FuelList';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -79,6 +80,11 @@ const AppNavigator = () => {
       <Stack.Screen
       name='finalapprovedlist'
       component={FinalApprovalList}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen
+      name='fuellist'
+      component={FuelList}
       options={{headerShown: false}}
       />
   <Stack.Screen 

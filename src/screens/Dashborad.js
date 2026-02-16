@@ -87,24 +87,56 @@ useEffect(() => {
 <View style={styles.cardContainer}>
 
   {isFuelManagement && (
+    <View style={{flexDirection:'row', justifyContent:'space-between',gap:12,height:200,
+      marginTop:10
+    }}>
     <TouchableOpacity
-      activeOpacity={0.85}
-      style={[styles.card, styles.fuelCard]}
-      onPress={() => navigation.navigate('fuelmanagement')}
-    >
-      <View style={styles.cardHeader}>
-        <View style={styles.iconCircle}>
-          <Text style={styles.cardEmoji}>⛽</Text>
-        </View>
-        <View style={styles.cardText}>
-          <Text style={styles.cardTitle}>Fuel Management</Text>
-          <Text style={styles.cardDesc}>
-            Track fuel usage, balance & expenses
-          </Text>
-        </View>
-        <Text style={styles.cardArrow}>›</Text>
-      </View>
-    </TouchableOpacity>
+  activeOpacity={0.85}
+  style={[styles.card, styles.fuelCard,{width:'48%', justifyContent:'center'}]}
+  onPress={() => navigation.navigate('fuellist')}
+>
+  <View>
+  <View style={styles.cardHeader}>
+    {/* <View style={styles.iconCircle}>
+      <Text style={styles.cardEmoji}>🛢️</Text>
+    </View> */}
+    <View style={styles.cardText}>
+      <Text style={styles.cardTitle}>Fuel Requests</Text>
+      <Text style={styles.cardDesc}>
+        Add more details fuel
+      </Text>
+    </View>
+    <Text style={styles.cardArrow}></Text>
+  </View>
+   
+  </View>
+   <View style={[styles.iconCircle,{marginLeft:'auto', marginRight:'auto',marginTop:10}]}>
+      <Text style={styles.cardEmoji}>🛢️ </Text>
+    </View>
+</TouchableOpacity>
+
+
+  <TouchableOpacity
+  activeOpacity={0.85}
+   style={[styles.card, styles.fuelCard,{width:'48%', justifyContent:'center'}]}
+  onPress={() => navigation.navigate('fuelmanagement')}
+>
+  <View style={styles.cardHeader}>
+
+    <View style={styles.cardText}>
+      <Text style={styles.cardTitle}>Fuel Entry</Text>
+      <Text style={styles.cardDesc}>
+        Add new fuel details
+      </Text>
+    </View>
+ 
+  </View>
+   <View style={[styles.iconCircle,{marginLeft:'auto', marginRight:'auto',marginTop:10}]}>
+      <Text style={styles.cardEmoji}>📝</Text>
+    </View>
+</TouchableOpacity>
+
+    </View>
   )}
 
   <TouchableOpacity
@@ -242,7 +274,7 @@ useEffect(() => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-1.9 </Text>
+            V-2.0 </Text>
       </View>
     </ScrollView>
   );
