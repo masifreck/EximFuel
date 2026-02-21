@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -77,7 +78,7 @@ useEffect(() => {
   </View>
 
   <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-    <Text style={styles.logoutIcon}>🚪</Text>
+  <Image style ={{width:30,height:30}} source={require('../assets/logout.png')}/>
   </TouchableOpacity>
 </View>
 
@@ -266,6 +267,26 @@ useEffect(() => {
     </View>
   </TouchableOpacity>
 )}
+<TouchableOpacity
+  activeOpacity={0.85}
+  style={[styles.card, styles.expenseBookingReportCard]}
+  onPress={() => navigation.navigate('report')}
+>
+  <View style={styles.cardHeader}>
+    <View style={styles.iconCircle}>
+      <Text style={styles.cardEmoji}>📊</Text>
+    </View>
+
+    <View style={styles.cardText}>
+      <Text style={styles.cardTitle}>Expense Booking Report</Text>
+      <Text style={styles.cardDesc}>
+        View and analyze expense booking details
+      </Text>
+    </View>
+
+    <Text style={styles.cardArrow}>›</Text>
+  </View>
+</TouchableOpacity>
 
 </View>
 
@@ -274,7 +295,7 @@ useEffect(() => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-2.0 </Text>
+            V-2.2 </Text>
       </View>
     </ScrollView>
   );
@@ -328,7 +349,7 @@ const styles = StyleSheet.create({
 
   logoutBtn: {
     backgroundColor: 'rgba(255,255,255,0.18)',
-    padding: 12,
+    padding: 8,
     borderRadius: 14,
   },
 
@@ -432,6 +453,9 @@ finalApprovedCard: {
   backgroundColor: '#F0FDF4',
   borderLeftWidth: 5,
   borderLeftColor: '#15803D',
+},
+expenseBookingReportCard: {
+  backgroundColor: '#F3E8FF', // soft lavender
 },
 
   /* ===== Footer ===== */

@@ -14,14 +14,12 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Dropdown } from 'react-native-element-dropdown';
 import ImageZoom from 'react-native-image-pan-zoom';
 
 const { width, height } = Dimensions.get('window');
 
-const SUBMIT_API =
-  'http://eximapi1.tranzol.com/api/VehicleExpenseBooking/Approve';
-
-const ApprovedList = ({navigation}) => {
+const ExpenseReport = ({navigation}) => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -30,26 +28,26 @@ const ApprovedList = ({navigation}) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const [approveAmount, setApproveAmount] = useState('');
-  const [approveRemarks, setApproveRemarks] = useState('');
-  const [submitLoading, setSubmitLoading] = useState(false);
-
   const [imageModalVisible, setImageModalVisible] = useState(false);
 const [previewImage, setPreviewImage] = useState('');
 const [username, setUsername] = useState('');
-const [isAdmin, setIsAdmin] = useState(false);
-const [selectedDate, setSelectedDate] = useState(null);
+const [selectedDate, setSelectedDate] = useState(() => {
+  const today = new Date();
+  return today.toISOString().split('T')[0]; // YYYY-MM-DD
+});
 const [showDatePicker, setShowDatePicker] = useState(false);
+const STATUS_OPTIONS = [
+  { label: 'Pending', value: 1 },
+  { label: 'Approved', value: 4 },
+  { label: 'Rejected', value: 5 },
+  {label : 'No Filter', value: null}
+];
 
+const [status, setStatus] = useState(null);
 useEffect(() => {
   const getUserData = async () => {
     try {
       const storedUsername = await AsyncStorage.getItem('userId');
-       const admin = await AsyncStorage.getItem('isAdmin');
-       console.log('Admin Status:', admin);
-        if (admin === 'true') {
-        setIsAdmin(true);
-      }
       if (storedUsername) {
         setUsername(storedUsername);
       }
@@ -70,118 +68,52 @@ const onDateChange = (event, date) => {
   }
 };
 
-let url = isAdmin
-  ? `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?statusId=5`
-  : `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/PendingApprovalList?userId=${username}&statusId=5`;
-
-if (selectedDate) {
-  url += `&bookingDate=${selectedDate}`;
+let url = `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/ExpenseBookingReport?bookingDate=${selectedDate}`
+if (status) {
+  url += `&statusId=${status}`;
 }
+//console.log('status id',status)
 
-  //console.log('List API URL:', url);
+ // console.log('List API URL:', url);
   // 🔹 Fetch List
   const fetchPendingList = async () => {
     try {
       setLoading(true);
       const res = await fetch(url);
       const json = await res.json();
-      //console.log('Fetched List:', json);
+      console.log('Fetched List:', json);
       setList(json || []);
     } catch (e) {
-      Alert.alert('Error', 'Failed to load pending approvals');
+      // Alert.alert('Error', e.message || 'Failed to fetch data');
+      // console.log('Fetch error:', e);
+      setList([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-  if (!username) return;
-
+    if (!selectedDate) return;
   const timer = setTimeout(() => {
     fetchPendingList();
   }, 400); 
 
   return () => clearTimeout(timer); 
-}, [username, selectedDate]);
+}, [username, selectedDate, status]);
 
   // 🔍 Search Filter
-  const filteredList = useMemo(() => {
-    if (!search) return list;
-    return list.filter(item =>
-      item.vehicleNo?.toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [search, list]);
+const filteredList = useMemo(() => {
+  if (!Array.isArray(list)) return [];
 
-  // 📤 Submit Approval (PLAIN TEXT RESPONSE)
-const handleSubmit = async (statusId) => {
-  if (!approveAmount) {
-    Alert.alert('Validation', 'Please enter approve amount');
-    return;
-  }
+  if (!search?.trim()) return list;
 
-  if (!statusId) {
-    Alert.alert('Validation', 'Invalid action');
-    return;
-  }
+  const keyword = search.toLowerCase();
 
-  if (!username) {
-    Alert.alert('Error', 'User not identified. Please login again.');
-    return;
-  }
+  return list.filter(item =>
+    item.vehicleNo?.toLowerCase().includes(keyword)
+  );
+}, [search, list]);
 
-  const payload = {
-    id: selectedItem.id,
-    statusId,
-    userId: Number(username),
-    approveAmount: Number(approveAmount),
-    approveRemarks: approveRemarks?.trim() || '',
-  };
-
-  //console.log('Submit Payload:', payload);
-
-  try {
-    setSubmitLoading(true);
-
-    const res = await fetch(SUBMIT_API, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/plain',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    // ✅ READ RESPONSE ONCE
-    const responseText = await res.text();
-
-    // console.log('HTTP Status:', res.status);
-    // console.log('Server Message:', responseText);
-
-    if (res.ok) {
-      Alert.alert(
-        'Success',
-        responseText || 'Approve Successfully'
-      );
-
-      setModalVisible(false);
-      setApproveAmount('');
-      setApproveRemarks('');
-      fetchPendingList();
-    } else {
-      // 🔥 THIS WILL SHOW:
-      // "Approve amount is not greater than request amount !!!"
-      Alert.alert(
-        'Validation Error',
-        responseText || 'Approval failed'
-      );
-    }
-  } catch (error) {
-    console.log('Approve API Error:', error);
-    Alert.alert('Error', 'Network or server error');
-  } finally {
-    setSubmitLoading(false);
-  }
-};
 
 const IMAGE_PREFIX = 'https://flex.tranzol.com/upload';
 
@@ -197,6 +129,7 @@ const getParsedAttachments = (attachment) => {
     return [];
   }
 };
+
 
 
 const AttachmentImage = ({ uri, onPress }) => {
@@ -235,11 +168,13 @@ const parsedAttachments = React.useMemo(
       }}>
       <Text style={styles.cellVehicle}>{item.vehicleNo}</Text>
       <Text style={styles.cell}>{item.expenseType}</Text>
-      <Text style={styles.cell}>{item.location}</Text>
+      <Text style={styles.cell}>{item.bookingDate? item.bookingDate.split('T')[0] : ''}</Text>
       <Text style={styles.cellAmount}>₹ {item.requestAmount}</Text>
-      <Text style={styles.cell}>{item.createdBy }</Text>
-      <Text style={styles.cell}>{item.approver }</Text>
-      <Text style={styles.cell}>{item.remarks || '-'}</Text>
+      <Text style={styles.cell}>{item.chequeNo || '-'}</Text>
+      <Text style={styles.cell}>{item.paymentDate? item.paymentDate.split('T')[0] : '-'}</Text>
+      <Text style={styles.cell}>{item.loadingPoints }</Text>
+      <Text style={styles.cell}>{item.approveAmount }</Text>
+      <Text style={styles.cell}>{item.statusType || '-'}</Text>
     </TouchableOpacity>
   );
 
@@ -247,7 +182,7 @@ const parsedAttachments = React.useMemo(
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
- <View style={styles.headerContainer}>
+  <View style={styles.headerContainer}>
   <TouchableOpacity
     onPress={() => navigation.goBack()}
     style={styles.backBtn}
@@ -261,20 +196,44 @@ const parsedAttachments = React.useMemo(
   </TouchableOpacity>
 
   <Text style={styles.title}>
-    ✅ Approved Expense List
+    📊 Vehicle Expense Report
   </Text>
 </View>
 
       {/* 🔍 Search */}
-      <View style={styles.searchContainer}>
+<View style={styles.searchContainer}>
   <TextInput
-    placeholder="Search by Vehicle No"
+    placeholder="Search Vehicle No..."
     value={search}
     onChangeText={setSearch}
     style={styles.searchInput}
     placeholderTextColor="#9CA3AF"
   />
 
+  {/* Status Dropdown */}
+  <View style={{ position: 'relative' }}>
+ <Dropdown
+  data={STATUS_OPTIONS}
+  labelField="label"
+  valueField="value"
+  value={status}
+  placeholder="Select Status"
+  onChange={item => setStatus(item.value)}
+  
+ // mode="modal"                 // 🔥 KEY FIX
+  dropdownPosition="auto"       // prevents clipping
+  maxHeight={220}
+
+  style={styles.dropdown}
+  containerStyle={styles.dropdownContainer}
+  selectedTextStyle={styles.selectedText}
+  placeholderStyle={styles.placeholder}
+  itemTextStyle={styles.itemText}
+/>
+
+  </View>
+
+  {/* Date Picker */}
   <TouchableOpacity
     style={styles.dateBox}
     onPress={() => setShowDatePicker(true)}
@@ -284,6 +243,7 @@ const parsedAttachments = React.useMemo(
     </Text>
   </TouchableOpacity>
 </View>
+
 
 {showDatePicker && (
   <DateTimePicker
@@ -305,11 +265,13 @@ const parsedAttachments = React.useMemo(
             <View style={styles.headerRow}>
               <Text style={styles.headerCellVehicle}>Vehicle No</Text>
               <Text style={styles.headerCell}>Expense Type</Text>
-              <Text style={styles.headerCell}>Location</Text>
+              <Text style={styles.headerCell}>booking Date</Text>
               <Text style={styles.headerCell}>Request Amount</Text>
-              <Text style={styles.headerCell}>Created By</Text>
-              <Text style={styles.headerCell}>approver</Text>
-              <Text style={styles.headerCell}>Remarks</Text>
+              <Text style={styles.headerCell}>cheque No</Text>
+              <Text style={styles.headerCell}>payment Date</Text>
+              <Text style={styles.headerCell}>loading P.</Text>
+              <Text style={styles.headerCell}>approve Amt.</Text>
+              <Text style={styles.headerCell}>statusType</Text>
             </View>
 
             {/* Rows */}
@@ -317,7 +279,10 @@ const parsedAttachments = React.useMemo(
               data={filteredList}
               renderItem={renderRow}
               estimatedItemSize={50}
-              keyExtractor={item => item.id.toString()}
+              keyExtractor={(item, index) =>
+  `${item.vehicleNo}-${item.bookingDate}-${index}`
+}
+
               ListEmptyComponent={
                 <Text style={styles.empty}>No pending approvals</Text>
               }
@@ -345,35 +310,38 @@ const parsedAttachments = React.useMemo(
   </View>
 
   <View style={styles.detailLine}>
-    <Text style={styles.detailKey}>Location</Text>
-    <Text style={styles.detailValue}>{selectedItem.location}</Text>
+    <Text style={styles.detailKey}>loadingPoints</Text>
+    <Text style={styles.detailValue}>{selectedItem.loadingPoints}</Text>
   </View>
 
   <View style={styles.detailLine}>
     <Text style={styles.detailKey}>Requested Amt</Text>
     <Text style={styles.detailValue}>₹ {selectedItem.requestAmount}</Text>
   </View>
-
-  <View style={styles.detailLine}>
-    <Text style={styles.detailKey}>Created By</Text>
-    <Text style={styles.detailValue}>{selectedItem.createdBy}</Text>
+<View style={styles.detailLine}>
+    <Text style={styles.detailKey}>Cheque No</Text>
+    <Text style={styles.detailValue}>{selectedItem.chequeNo || '-'}</Text>
+  </View>
+<View style={styles.detailLine}>
+    <Text style={styles.detailKey}>Payment Date</Text>
+    <Text style={styles.detailValue}>  {new Date(selectedItem.paymentDate).toLocaleString()}</Text>
   </View>
 
   <View style={styles.detailLine}>
-    <Text style={styles.detailKey}>Approver</Text>
-    <Text style={styles.detailValue}>{selectedItem.approver}</Text>
+    <Text style={styles.detailKey}>ApproveAmount</Text>
+    <Text style={styles.detailValue}>{selectedItem.approveAmount}</Text>
   </View>
 
   <View style={styles.detailLine}>
-    <Text style={styles.detailKey}>Created On</Text>
+    <Text style={styles.detailKey}>Booking Date</Text>
     <Text style={styles.detailValue}>
-      {new Date(selectedItem.createdOn).toLocaleString()}
+      {new Date(selectedItem.bookingDate).toLocaleString()}
     </Text>
   </View>
 
   <View style={styles.detailLine}>
-    <Text style={styles.detailKey}>Remarks</Text>
-    <Text style={styles.detailValue}>{selectedItem.remarks || '-'}</Text>
+    <Text style={styles.detailKey}>StatusType</Text>
+    <Text style={styles.detailValue}>{selectedItem.statusType || '-'}</Text>
   </View>
 </>
 
@@ -391,50 +359,6 @@ const parsedAttachments = React.useMemo(
     />
   ))}
 </View>
-
-
-
-            <TextInput
-              placeholder="Approve Amount"
-              keyboardType="numeric"
-              value={approveAmount}
-              onChangeText={setApproveAmount}
-              style={styles.input}
-              placeholderTextColor="#9CA3AF"
-            />
-
-            <TextInput
-              placeholder="Approve Remarks"
-              value={approveRemarks}
-              onChangeText={setApproveRemarks}
-              style={[styles.input, { height: 80 }]}
-              multiline
-                placeholderTextColor="#9CA3AF"
-            />
-
-           {submitLoading ? (
-  <ActivityIndicator size="small" color="#2563EB" />
-) : (
-  <View style={styles.actionRow}>
-    {/* APPROVE */}
-    <TouchableOpacity
-      style={styles.submitBtn}
-      onPress={() => handleSubmit(4)}
-    >
-      <Text style={styles.submitText}>Approve</Text>
-    </TouchableOpacity>
-
-    {/* REJECT */}
-    <TouchableOpacity
-      style={styles.rejectBtn}
-      onPress={() => handleSubmit(5)}
-    >
-      <Text style={styles.rejectText}>Reject</Text>
-    </TouchableOpacity>
-  </View>
-)}
-
-
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
               style={styles.cancelBtn}>
@@ -486,14 +410,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F6FA',
     padding: 12,
   },
-headerContainer: {
+  headerContainer: {
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  paddingVertical: 12,
+  paddingVertical: 14,
+  backgroundColor: '#FFFFFF',
   borderBottomWidth: 1,
   borderBottomColor: '#E5E7EB',
-  marginBottom: 10,
+  marginBottom: 6,
 },
 
 backBtn: {
@@ -503,15 +428,16 @@ backBtn: {
 },
 
 backIcon: {
-  width: 30,
-  height: 30,
-  marginRight: 18,
+  width: 22,
+  height: 22,
+  tintColor: '#111827',
 },
 
 title: {
   fontSize: 17,
   fontWeight: '600',
   color: '#111827',
+  textAlign: 'center',
 },
   search: {
     backgroundColor: '#fff',
@@ -629,59 +555,7 @@ detailValue: {
   color: '#111827',
 },
 
-  input: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 10,
-    padding: 12,
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    color: '#111827',
-  },
-  submitBtn: {
-    backgroundColor: '#2563EB',
-    padding: 14,
-    borderRadius: 10,
-    marginTop: 16,
-  },
-  submitText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: '700',
-  },
-  actionRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  marginTop: 16,
-},
 
-submitBtn: {
-  flex: 1,
-  backgroundColor: '#2563EB',
-  paddingVertical: 12,
-  borderRadius: 8,
-  marginRight: 8,
-  alignItems: 'center',
-},
-
-rejectBtn: {
-  flex: 1,
-  backgroundColor: '#DC2626',
-  paddingVertical: 12,
-  borderRadius: 8,
-  marginLeft: 8,
-  alignItems: 'center',
-},
-
-submitText: {
-  color: '#fff',
-  fontWeight: '600',
-},
-
-rejectText: {
-  color: '#fff',
-  fontWeight: '600',
-},
 
   cancelBtn: {
     marginTop: 18,
@@ -756,8 +630,37 @@ imageWrapper: {
 attachmentImage: {
   width: '100%',
   height: '100%',
-  borderRadius: 8,
+  borderRadius: 8,},
+
+  dropdown: {
+  height: 44,
+  width:110,
+  borderWidth: 1,
+  borderColor: '#D1D5DB',
+  borderRadius: 6,
+  paddingHorizontal: 8,
 },
+
+dropdownContainer: {
+  borderRadius: 8,
+  elevation: 10,   // Android
+  zIndex: 9999,    // iOS
+},
+
+selectedText: {
+  fontSize: 14,
+  color: '#111827',
+},
+
+itemText: {
+  fontSize: 14,
+  color: '#374151',
+},
+
+placeholder: {
+  color: '#9CA3AF',
+},
+
 
 imageLoader: {
   position: 'absolute',
@@ -778,4 +681,4 @@ loadingText: {
 
 });
 
-export default ApprovedList;
+export default ExpenseReport;

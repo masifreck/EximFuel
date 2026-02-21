@@ -112,34 +112,37 @@ const requestCameraPermission = async () => {
     }
   };
 
-  const handlePickPDFs = async () => {
-    closePickerModal();
-    try {
-      const res = await DocumentPicker.pickMultiple({
-        type: [DocumentPicker.types.pdf],
-      });
+ const handlePickPDFs = async () => {
+  closePickerModal();
 
-      const newFiles = res.map((doc) => ({
-        uri: doc.uri,
-        name: doc.name,
-        type: doc.type || 'application/pdf',
-        isPdf: true,
-      }));
+  try {
+    const res = await DocumentPicker.pick({
+      type: [DocumentPicker.types.pdf],
+      allowMultiSelection: true,
+    });
 
-      const totalFiles = selectedFiles.length + newFiles.length;
-      if (totalFiles > 10) {
-        Alert.alert('Limit Reached', 'You can select a maximum of 10 files.');
-        return;
-      }
+    const newFiles = res.map((doc) => ({
+      uri: doc.uri,
+      name: doc.name,
+      type: doc.type || 'application/pdf',
+      isPdf: true,
+    }));
 
-      const updated = [...selectedFiles, ...newFiles];
-      setSelectedFiles(updated);
-    } catch (error) {
-      if (!DocumentPicker.isCancel(error)) {
-        Alert.alert('Error', error.message);
-      }
+    const totalFiles = selectedFiles.length + newFiles.length;
+    if (totalFiles > 6) {
+      Alert.alert('Limit Reached', 'You can select a maximum of 6 files.');
+      return;
     }
-  };
+
+    setSelectedFiles([...selectedFiles, ...newFiles]);
+  } catch (error) {
+    if (!DocumentPicker.isCancel(error)) {
+      console.log(error);
+      Alert.alert('Error', 'Failed to pick PDF');
+    }
+  }
+};
+
 
   const removeFile = (index) => {
     const updated = selectedFiles.filter((_, i) => i !== index);
@@ -192,9 +195,9 @@ const requestCameraPermission = async () => {
               <Text style={styles.optionText}>🖼️ Pick Images</Text>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.optionBtn} onPress={handlePickPDFs}>
+            <TouchableOpacity style={styles.optionBtn} onPress={handlePickPDFs}>
               <Text style={styles.optionText}>📄 Pick PDFs</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.cancelBtn} onPress={closePickerModal}>
               <Text style={styles.cancelText}>Cancel</Text>

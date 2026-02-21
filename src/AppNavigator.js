@@ -14,6 +14,7 @@ import RejectedList from './screens/RejectedList'
 import ApprovedList from './screens/Approvedlist';
 import FinalApprovalList from './screens/FinalApprovalList';
 import FuelList from './screens/FuelList';
+import ExpenseReport from './screens/ExpenseReport';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -85,6 +86,11 @@ const AppNavigator = () => {
       <Stack.Screen
       name='fuellist'
       component={FuelList}
+      options={{headerShown: false}}
+      />
+      <Stack.Screen
+      name='report'
+      component={ExpenseReport}
       options={{headerShown: false}}
       />
   <Stack.Screen 

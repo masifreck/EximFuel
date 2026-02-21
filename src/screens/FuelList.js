@@ -9,17 +9,18 @@ import {
   Modal,
   Alert,
   StatusBar,
-  ScrollView,Image,FlatList
+  ScrollView,Image,FlatList,Dimensions
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { fi } from 'date-fns/locale';
+import ImageZoom from 'react-native-image-pan-zoom';
+const { width, height } = Dimensions.get('window');
 
 const SUBMIT_API =
   'http://eximapi1.tranzol.com/api/Fuel/FuelDetailRequest';
 
-const FuelList = () => {
+const FuelList = ({navigation}) => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -325,7 +326,22 @@ const renderRow = ({ item }) => (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <Text style={styles.title}>Add More Fuel Details</Text>
+    <View style={styles.headerContainer}>
+  <TouchableOpacity
+    onPress={() => navigation.goBack()}
+    style={styles.backBtn}
+    activeOpacity={0.7}
+  >
+    <Image 
+    style={styles.backIcon}
+    source={require('../assets/arrow.png')}
+    />
+  </TouchableOpacity>
+
+  <Text style={styles.title}>
+    ⛽ Add More Fuel Details
+  </Text>
+</View>
 
       {/* 🔍 Search */}
       <View style={styles.searchContainer}>
@@ -389,7 +405,8 @@ const renderRow = ({ item }) => (
 </View>
 
     {/* ROWS */}
-<ScrollView horizontal showsHorizontalScrollIndicator>
+<ScrollView horizontal showsHorizontalScrollIndicator
+  keyboardShouldPersistTaps="handled" >
   <View style={{ minWidth: TABLE_WIDTH, marginTop: 20 }}>
     
     {/* HEADER */}
@@ -594,13 +611,14 @@ const renderRow = ({ item }) => (
   </View>
 </Modal>
 
-      <Modal
+<Modal
   visible={imageModalVisible}
   transparent
   animationType="fade"
   onRequestClose={() => setImageModalVisible(false)}
 >
   <View style={styles.imageModalWrapper}>
+    {/* CLOSE */}
     <TouchableOpacity
       style={styles.closeBtn}
       onPress={() => setImageModalVisible(false)}
@@ -608,11 +626,21 @@ const renderRow = ({ item }) => (
       <Text style={styles.closeText}>✕</Text>
     </TouchableOpacity>
 
-    <Image
-      source={{ uri: previewImage }}
-      style={styles.fullImage}
-      resizeMode="contain"
-    />
+    <ImageZoom
+      cropWidth={width}
+      cropHeight={height}
+      imageWidth={width}
+      imageHeight={height}
+      enableCenterFocus={true}
+      minScale={1}
+      maxScale={4}
+    >
+      <Image
+        source={{ uri: previewImage }}
+        style={{ width, height }}
+        resizeMode="contain"
+      />
+    </ImageZoom>
   </View>
 </Modal>
 
@@ -626,12 +654,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F6FA',
     padding: 12,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 10,
-    color: '#111827',
-  },
+headerContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 12,
+  borderBottomWidth: 1,
+  borderBottomColor: '#E5E7EB',
+  marginBottom: 10,
+},
+
+backBtn: {
+  position: 'absolute',
+  left: 12,
+  padding: 8,
+},
+
+backIcon: {
+  width: 30,
+  height: 30,
+},
+
+title: {
+  fontSize: 17,
+  fontWeight: '600',
+  color: '#111827',
+},
   search: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -885,11 +933,21 @@ fullImage: {
   height: '85%',
 },
 
+imageModalWrapper: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.95)',
+},
+
 closeBtn: {
   position: 'absolute',
   top: 40,
   right: 20,
   zIndex: 10,
+},
+
+closeText: {
+  fontSize: 22,
+  color: '#FFFFFF',
 },
 
 closeText: {

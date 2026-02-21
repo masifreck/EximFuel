@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  ScrollView,ActivityIndicator,Modal
+  ScrollView,ActivityIndicator,Modal,Image
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -410,7 +410,23 @@ const userId = await AsyncStorage.getItem('userId');
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* 🔝 Header */}
-      <Text style={styles.header}>Fuel Management ⛽</Text>
+    <View style={styles.headerContainer}>
+  {/* GO BACK ICON */}
+  <TouchableOpacity
+    onPress={() => navigation.goBack()}
+    style={styles.backBtn}
+    activeOpacity={0.7}
+  >
+    <Image
+      source={require('../assets/arrow.png')}
+      style={styles.backIcon}
+      resizeMode="contain"
+    />
+  </TouchableOpacity>
+
+  {/* TITLE */}
+  <Text style={styles.header}>⛽ Fuel Management</Text>
+</View>
 
       {/* 🔽 Trip Dropdown */}
       <Text style={styles.label}>Select Trip 🚛</Text>
@@ -439,7 +455,6 @@ const userId = await AsyncStorage.getItem('userId');
   value={selectedVehicle}
  inputSearchStyle={[
     styles.searchText,
-    { textTransform: 'uppercase' } // ✅ shows uppercase in input
   ]}
   onChange={item => {
     setSelectedVehicle(item.value);
@@ -452,10 +467,9 @@ const userId = await AsyncStorage.getItem('userId');
   selectedTextStyle={styles.selectedText}
   placeholderStyle={styles.placeholderText}
   onChangeText={text => {
-    const upperText = text.toUpperCase(); // ✅ FORCE UPPERCASE
 
-    if (upperText.length >= 3) {
-      fetchVehicleList(upperText);
+    if (text.length >= 3) {
+      fetchVehicleList(text);
     }
   }}
 
@@ -500,10 +514,9 @@ const userId = await AsyncStorage.getItem('userId');
        }}
      
        onChangeText={text => {
-         const upperText = text.toUpperCase(); // ✅ show + search uppercase
      
-         if (upperText.length >= 3) {
-           fetchLocationList(upperText);
+         if (text.length >= 3) {
+           fetchLocationList(text);
          }
        }}
      
@@ -512,7 +525,6 @@ const userId = await AsyncStorage.getItem('userId');
        placeholderStyle={styles.placeholderText}
        inputSearchStyle={[
          styles.searchText,
-         { textTransform: 'uppercase' } // ✅ visible uppercase
        ]}
      
        renderRightIcon={() =>
@@ -584,17 +596,13 @@ const userId = await AsyncStorage.getItem('userId');
         value={destination}
         onChange={item => setDestination(item.value)}
          onChangeText={text => {
-    const upperText = text.toUpperCase(); // ✅ force uppercase display
-
-    // 🔁 re-trigger search with uppercase text
-    if (upperText.length >= 3) {
-      fetchDestinationList(upperText);
+    if (text.length >= 3) {
+      fetchDestinationList(text);
     }
   }}
 
   inputSearchStyle={[
     styles.searchText,
-    { textTransform: 'uppercase' } // ✅ shows uppercase in input
   ]}
          itemTextStyle={styles.dropdownItemText}
   selectedTextStyle={styles.selectedText}
@@ -666,17 +674,13 @@ const userId = await AsyncStorage.getItem('userId');
         value={material}
         onChange={item => setMaterial(item.value)}
          onChangeText={text => {
-    const upperText = text.toUpperCase(); // ✅ force uppercase display
-
-    // 🔁 re-trigger search with uppercase text
-    if (upperText.length >= 3) {
-      fetchMaterialList(upperText);
+    if (text.length >= 3) {
+      fetchMaterialList(text);
     }
   }}
 
   inputSearchStyle={[
     styles.searchText,
-    { textTransform: 'uppercase' } // ✅ shows uppercase in input
   ]}
          itemTextStyle={styles.dropdownItemText}
   selectedTextStyle={styles.selectedText}
@@ -869,14 +873,35 @@ container: {
   shadowRadius: 6,
   elevation: 6,
 },
+headerContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 14,
+  backgroundColor: '#FFFFFF',
+  borderBottomWidth: 1,
+  borderBottomColor: '#E5E7EB',
+},
+
+backBtn: {
+  position: 'absolute',
+  left: 12,
+  padding: 8,
+},
+
+backIcon: {
+  width: 22,
+  height: 22,
+
+},
+
+header: {
+  fontSize: 18,
+  fontWeight: '700',
+  color: '#2563EB',
+},
 
 
-  header: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#2563EB',
-    marginBottom: 20,
-  },
 
   label: {
     fontSize: 14,

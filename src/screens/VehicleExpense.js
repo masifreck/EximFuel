@@ -276,7 +276,6 @@ const handleSubmit = async () => {
   value={selectedVehicle}
  inputSearchStyle={[
     styles.searchText,
-    { textTransform: 'uppercase' } // ✅ shows uppercase in input
   ]}
   onChange={item => {
     setSelectedVehicle(item.value);
@@ -289,10 +288,8 @@ const handleSubmit = async () => {
   selectedTextStyle={styles.selectedText}
   placeholderStyle={styles.placeholderText}
   onChangeText={text => {
-    const upperText = text.toUpperCase(); // ✅ FORCE UPPERCASE
-
-    if (upperText.length >= 3) {
-      fetchVehicleList(upperText);
+    if (text.length >= 3) {
+      fetchVehicleList(text);
     }
   }}
 
@@ -335,17 +332,15 @@ const handleSubmit = async () => {
   }}
 
   onChangeText={text => {
-    const upperText = text.toUpperCase(); // ✅ force uppercase display
 
     // 🔁 re-trigger search with uppercase text
-    if (upperText.length >= 3) {
-      fetchExpenseTypeList(upperText);
+    if (text.length >= 3) {
+      fetchExpenseTypeList(text);
     }
   }}
 
   inputSearchStyle={[
     styles.searchText,
-    { textTransform: 'uppercase' } // ✅ shows uppercase in input
   ]}
 
   itemTextStyle={styles.dropdownItemText}
@@ -375,10 +370,9 @@ const handleSubmit = async () => {
   }}
 
   onChangeText={text => {
-    const upperText = text.toUpperCase(); // ✅ show + search uppercase
 
-    if (upperText.length >= 3) {
-      fetchLocationList(upperText);
+    if (text.length >= 3) {
+      fetchLocationList(text);
     }
   }}
 
@@ -387,7 +381,6 @@ const handleSubmit = async () => {
   placeholderStyle={styles.placeholderText}
   inputSearchStyle={[
     styles.searchText,
-    { textTransform: 'uppercase' } // ✅ visible uppercase
   ]}
 
   renderRightIcon={() =>
@@ -424,7 +417,6 @@ const handleSubmit = async () => {
   placeholderStyle={styles.placeholderText}
   inputSearchStyle={[
     styles.searchText,
-    { textTransform: 'uppercase' } // ✅ visible uppercase
   ]}
 
   renderRightIcon={() =>
