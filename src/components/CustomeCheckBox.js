@@ -11,10 +11,10 @@ const CustomCheckbox = ({ label, value = 0, onChange }) => {
   };
 
   return (
-    <View style={{ padding: 10,marginLeft:10 ,marginVertical:10}}>
+    <View style={{ padding: 10,marginLeft:10 ,marginVertical:0,marginBottom:-10}}>
       <BouncyCheckbox
         size={30}
-        fillColor="#ffb703"
+        fillColor="#2563EB"
         unfillColor="#FFFFFF"
         text={label}
         iconStyle={{ borderColor: 'green' }}

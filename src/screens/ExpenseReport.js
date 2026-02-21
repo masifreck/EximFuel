@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Dropdown } from 'react-native-element-dropdown';
 import ImageZoom from 'react-native-image-pan-zoom';
-
+import CustomCheckbox from '../components/CustomeCheckBox';
 const { width, height } = Dimensions.get('window');
 
 const ExpenseReport = ({navigation}) => {
@@ -44,6 +44,7 @@ const STATUS_OPTIONS = [
 ];
 
 const [status, setStatus] = useState(null);
+const [IsPaid, setIsPaid]=useState(false);
 useEffect(() => {
   const getUserData = async () => {
     try {
@@ -67,25 +68,29 @@ const onDateChange = (event, date) => {
     setSelectedDate(formattedDate);
   }
 };
-
+  const handleCheckboxChange = (value) => {
+    console.log('Checkbox value:', value); // true / false
+    setIsPaid(value);
+  };
 let url = `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/ExpenseBookingReport?bookingDate=${selectedDate}`
 if (status) {
   url += `&statusId=${status}`;
 }
-//console.log('status id',status)
-
- // console.log('List API URL:', url);
+if (IsPaid){
+  url += `&IsPaid=1`;
+}
+ //console.log('List API URL:', url);
   // 🔹 Fetch List
   const fetchPendingList = async () => {
     try {
       setLoading(true);
       const res = await fetch(url);
       const json = await res.json();
-      console.log('Fetched List:', json);
+     // console.log('Fetched List:', json);
       setList(json || []);
     } catch (e) {
       // Alert.alert('Error', e.message || 'Failed to fetch data');
-      // console.log('Fetch error:', e);
+       console.log('Fetch error:', e);
       setList([]);
     } finally {
       setLoading(false);
@@ -99,7 +104,7 @@ if (status) {
   }, 400); 
 
   return () => clearTimeout(timer); 
-}, [username, selectedDate, status]);
+}, [username, selectedDate, status, IsPaid]);
 
   // 🔍 Search Filter
 const filteredList = useMemo(() => {
@@ -253,7 +258,13 @@ const parsedAttachments = React.useMemo(
     onChange={onDateChange}
   />
 )}
-
+<View>
+   <CustomCheckbox
+        label="Only Paid"
+        value={IsPaid}
+        onChange={handleCheckboxChange}
+      />
+</View>
 
       {/* 📊 Grid */}
       {loading ? (
@@ -284,7 +295,7 @@ const parsedAttachments = React.useMemo(
 }
 
               ListEmptyComponent={
-                <Text style={styles.empty}>No pending approvals</Text>
+                <Text style={styles.empty}>No Data Available</Text>
               }
             />
           </View>
