@@ -12,9 +12,10 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import { loadType, CardType } from '../components/DropDownData';
 const FuelManagementScreen = ({ navigation }) => {
-  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [loadTypeId, setloadTypeId] = useState(null);
+  const [fuelCardTypeId, setfuelCardTypeId] = useState(null);
   const [fuelQty, setFuelQty] = useState('');
   const [remarks, setRemarks] = useState('');
 const [balanceFuel, setBalanceFuel] = useState('');
@@ -45,12 +46,19 @@ const [netwt, setNetwt] = useState('');
 const [mileage2, setMileage2] = useState('');
 const [dieselRate, setDieselRate] = useState('');
 const [totalLitre, setTotalLitre] = useState('');
-const [amount, setAmount] = useState('');
+const [amount, setAmount] = useState(0);
 const [balancekm, setBalanceKm] = useState('');
 const [loading, setLoading] = useState(false);
 const [showSourceModal, setShowSourceModal] = useState(false);
 const [showDestinationModal, setShowDestinationModal] = useState(false);
 
+const [guarantorId, setguarantorId]=useState(null);
+const [guarantorName, setguarantorName]=useState('');
+const [fuelCardId, setfuelCardId]=useState(null);
+const [cardNo, setcardNo] = useState('');
+const [driverId, setdriverId]=useState(null);
+
+const [driverCashAdvance, setdriverCashAdvance]=useState(0)
 const [sourceText, setSourceText] = useState('');
 const [destinationText, setDestinationText] = useState('');
 
@@ -81,7 +89,13 @@ const fetchVehicleList = async (searchText) => {
       label: item.vehicleNo,
       value: item.id,
       driverName: item.driverName,
+      driverId : item.driverId,
       contactNo: item.contactNo,
+      guarantorId : item.guarantorId,
+      guarantorName : item.guarantorName,
+      fuelCardId : item.fuelCardId,
+      cardNo : item.cardNo
+
     }));
 
     setVehicleList(formattedVehicles);
@@ -295,22 +309,28 @@ useEffect(() => {
 
 }, [location, destination, netwt]);
 
+useEffect(() => {
+  if (fuelQty && dieselRate){
+    console.log('function called');
+  const qty = Number(fuelQty) || 0;
+  const rate = Number(dieselRate) || 0;
 
+  // Calculate
+  const rawAmount = qty * rate;
+
+  // Round to 2 decimals (safe)
+  const roundedAmount = Math.round(rawAmount * 100) / 100;
+
+  setAmount(roundedAmount);
+  }
+
+}, [fuelQty, dieselRate]);
 
   // 🧪 Dummy Trip Data
-  const tripData = [
-    {
-      label: 'Trip No: TRP-101',
-      value: 'TRP-101',
-      
-    },
-    {
-      label: 'Trip No: TRP-102',
-      value: 'TRP-102',
-     
-    },
-  ];
+ 
   const validateFuelData = () => {
+    if(!loadTypeId) return 'Please select load type';
+    if (!fuelCardTypeId) return 'please select fuel card type';
     if (!selectedVehicle) return 'Please select a vehicle';
   if (!location) return 'Source is required';
   if (!destination) return 'Destination is required';
@@ -342,6 +362,11 @@ const userId = await AsyncStorage.getItem('userId');
     setLoading(true);
 
     const payload = {
+      loadTypeId: loadTypeId,
+      fuelCardTypeId: fuelCardTypeId,
+      guarantorId: guarantorId || 0,
+      driverId : driverId || 0,
+
       sourceId: location,
       destinationId: destination,
       vehicleId: selectedVehicle,
@@ -350,9 +375,7 @@ const userId = await AsyncStorage.getItem('userId');
       fixedMileage: Number(mileage),
       fixedLtr: Number(totalLitre),
       fixedAmount: 0,
-
-      requestAmount: 0,
-
+driverCashAdvance: driverCashAdvance,
       allottedKm: Number(allottedKm || 0),
       allottedMileage: Number(mileage2 || 0),
       allottedDieselRate: Number(dieselRate || 0),
@@ -429,20 +452,31 @@ const userId = await AsyncStorage.getItem('userId');
 </View>
 
       {/* 🔽 Trip Dropdown */}
-      <Text style={styles.label}>Select Trip 🚛</Text>
+      <Text style={styles.label}>Select Load Type 🚛</Text>
       <Dropdown
         style={styles.dropdown}
-        data={tripData}
-        search
+        data={loadType}
         labelField="label"
         valueField="value"
-        placeholder="Choose Trip Number"
-        value={selectedTrip?.value}
-        onChange={(item) => setSelectedTrip(item)}
+        placeholder="Choose Load Type"
+        value={loadTypeId}
+        onChange={(item)=>setloadTypeId(item.value)}
          itemTextStyle={styles.dropdownItemText}
   selectedTextStyle={styles.selectedText}
-  placeholderStyle={styles.placeholderText}
-  inputSearchStyle={styles.searchText}
+ 
+      />
+            <Text style={styles.label}>Fuel Card  Type 💳</Text>
+      <Dropdown
+        style={styles.dropdown}
+        data={CardType}
+        labelField="label"
+        valueField="value"
+        placeholder="Choose Fuel Card Type"
+        value={fuelCardTypeId}
+        onChange={(item) => setfuelCardTypeId(item.value)}
+         itemTextStyle={styles.dropdownItemText}
+  selectedTextStyle={styles.selectedText}
+
       />
 <Text style={styles.label}>Select Vehicle No 🚚</Text>
 <Dropdown
@@ -461,7 +495,12 @@ const userId = await AsyncStorage.getItem('userId');
 
     // auto-fill driver details
     setDriverName(item.driverName ?? '');
+    setdriverId(item.driverId ?? null);
     setDriverContact(item.contactNo ?? '');
+    setguarantorId(item.guarantorId ?? null);
+    setguarantorName(item.guarantorName ?? "");
+    setfuelCardId(item.fuelCardId ?? null);
+    setcardNo(item.cardNo ?? '');
   }}
  itemTextStyle={styles.dropdownItemText}
   selectedTextStyle={styles.selectedText}
@@ -481,7 +520,7 @@ const userId = await AsyncStorage.getItem('userId');
 />
 {driverName !== '' && (
   <View style={styles.card}>
-    <Text style={styles.cardTitle}>Driver Details 👨‍✈️</Text>
+    <Text style={styles.cardTitle}> Details 👨‍✈️</Text>
 
     <View style={styles.cardRow}>
       <Text style={styles.cardLabel}>Name</Text>
@@ -491,6 +530,14 @@ const userId = await AsyncStorage.getItem('userId');
     <View style={styles.cardRow}>
       <Text style={styles.cardLabel}>Contact</Text>
       <Text style={styles.cardValue}>{driverContact}</Text>
+    </View>
+       <View style={styles.cardRow}>
+      <Text style={styles.cardLabel}>guarantor Name</Text>
+      <Text style={styles.cardValue}>{guarantorName}</Text>
+    </View>
+       <View style={styles.cardRow}>
+      <Text style={styles.cardLabel}>card No</Text>
+      <Text style={styles.cardValue}>{cardNo}</Text>
     </View>
   </View>
 )}
@@ -514,7 +561,6 @@ const userId = await AsyncStorage.getItem('userId');
        }}
      
        onChangeText={text => {
-     
          if (text.length >= 3) {
            fetchLocationList(text);
          }
@@ -786,17 +832,17 @@ const userId = await AsyncStorage.getItem('userId');
       />
       
 <Text style={styles.label}>Alloted Amount 💰</Text>
-      <TextInput
-        style={styles.input}
-        placeholderTextColor="#9CA3AF"  
-        keyboardType="numeric"
-        placeholder="Enter Amount"
-        value={amount}
-        onChangeText={setAmount}
-      />
+ <TextInput
+  style={styles.input}
+  placeholderTextColor="#9CA3AF"
+  keyboardType="numeric"
+  placeholder="Auto Calculated"
+  value={amount ? amount.toFixed(2) : ''}
+  editable={false}
+/>
     
 
-      <Text style={styles.label}>Balance Km 💰</Text>
+      {/* <Text style={styles.label}>Balance Km 💰</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
         keyboardType="numeric"
@@ -804,11 +850,11 @@ const userId = await AsyncStorage.getItem('userId');
         value={balancekm}
         onChangeText={setBalanceKm}
         editable={false}
-      />
+      /> */}
 
       {/* 🔢 Fuel Quantity */}
       {/* 🔢 Balance Fuel */}
-<Text style={styles.label}>Total ltr. 🛢️</Text>
+{/* <Text style={styles.label}>Total ltr. 🛢️</Text>
 <TextInput
 style={[styles.input, styles.disabledInput]}
   keyboardType="numeric"
@@ -821,13 +867,21 @@ style={[styles.input, styles.disabledInput]}
     
 
         {/* Balance (Non-editable) */}
-      <Text style={styles.label}>Balance Amount💰</Text>
+      {/* <Text style={styles.label}>Balance Amount💰</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
         value="auto calculated"
         editable={false}
+      />  */}
+  <Text style={styles.label}>Driver Cash Advance 💰</Text>
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="#9CA3AF"  
+        keyboardType="numeric"
+        placeholder="Enter Driver Cash Advance"
+        value={driverCashAdvance}
+        onChangeText={setdriverCashAdvance}
       />
-
       {/* 💬 Remarks */}
       <Text style={styles.label}>Remarks 📝</Text>
       <TextInput
