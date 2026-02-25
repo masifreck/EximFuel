@@ -71,7 +71,7 @@ const [postDestinationLoading, setPostDestinationLoading] = useState(false);
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
 
-  return `${day}-${month}-${year}`;
+  return `${year}-${month}-${day}`;
 };
 const currentDate = getCurrentDate();
 
@@ -311,7 +311,6 @@ useEffect(() => {
 
 useEffect(() => {
   if (fuelQty && dieselRate){
-    console.log('function called');
   const qty = Number(fuelQty) || 0;
   const rate = Number(dieselRate) || 0;
 
@@ -337,8 +336,8 @@ useEffect(() => {
   if (!netwt) return 'Net weight is required';
   // if (!distance || !mileage || !totalLitre)
   //   return 'Fixed rule data not available';
-   if (!allottedKm) return 'Please enter allotted KM';
-  if (!mileage2) return 'Please enter alloted mileage';
+  // if (!allottedKm) return 'Please enter allotted KM';
+ // if (!mileage2) return 'Please enter alloted mileage';
   if (!dieselRate) return 'Please enter alloted diesel rate';
   if (!fuelQty) return 'Please enter alloted total litre';
   if (!amount) return 'Please enter alloted amount';
@@ -364,30 +363,26 @@ const userId = await AsyncStorage.getItem('userId');
     const payload = {
       loadTypeId: loadTypeId,
       fuelCardTypeId: fuelCardTypeId,
-      guarantorId: guarantorId || 0,
-      driverId : driverId || 0,
-
+      vehicleId: selectedVehicle,
+guarantorId: guarantorId || null,
+fuelCardId : fuelCardId || null,
+      driverId : driverId || null,
       sourceId: location,
       destinationId: destination,
-      vehicleId: selectedVehicle,
-
+      netWt: Number(netwt),
       fixedDistance: Number(distance),
       fixedMileage: Number(mileage),
       fixedLtr: Number(totalLitre),
-      fixedAmount: 0,
-driverCashAdvance: driverCashAdvance,
-      allottedKm: Number(allottedKm || 0),
-      allottedMileage: Number(mileage2 || 0),
-      allottedDieselRate: Number(dieselRate || 0),
-      allottedTotalLtr: Number(fuelQty || 0),
+      bookingDate : currentDate,
       allottedAmount: Number(amount || 0),
-
-      netWt: Number(netwt),
+       allottedDieselRate: Number(dieselRate || 0),
+      allottedTotalLtr: Number(fuelQty || 0),
+      driverCashAdvance: driverCashAdvance,
       remarks: remarks || '',
       inserUserId: Number(userId),
     };
 
-   // console.log('Fuel Payload:', payload);
+  // console.log('Fuel Payload:', payload);
 
     const response = await fetch(
       'http://eximapi1.tranzol.com/api/Fuel',
@@ -407,6 +402,7 @@ driverCashAdvance: driverCashAdvance,
     // 🔹 Handle plain text success
     if (text.includes('Insert successfully')) {
       Alert.alert('✅ Success', text);
+      navigation.goBack()
       return;
     }
 
@@ -709,7 +705,7 @@ driverCashAdvance: driverCashAdvance,
 
 
       {/* Material */}
-      <Text style={styles.label}>Material  🧱</Text>
+      {/* <Text style={styles.label}>Material  🧱</Text>
       <Dropdown
         style={styles.dropdown}
           search
@@ -737,7 +733,7 @@ driverCashAdvance: driverCashAdvance,
         <ActivityIndicator size="small" color="#2563EB" />
       ) : null
     }
-      />
+      /> */}
 <Text style={styles.label}>Booking Date 📅</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
@@ -788,7 +784,7 @@ driverCashAdvance: driverCashAdvance,
   editable={false}
 />
 {/* Allotted KM */}
-<Text style={styles.label}>Allotted KM 🛣️</Text>
+{/* <Text style={styles.label}>Allotted KM 🛣️</Text>
 <TextInput
   style={styles.input}
   placeholderTextColor="#9CA3AF"  
@@ -796,10 +792,10 @@ driverCashAdvance: driverCashAdvance,
   keyboardType="numeric"
   value={allottedKm}
   onChangeText={setAllottedKm}
-/>
+/> */}
 
 {/* Mileage 2 */}
-<Text style={styles.label}>Alloted Mileage  🔁</Text>
+{/* <Text style={styles.label}>Alloted Mileage  🔁</Text>
 <TextInput
   style={styles.input}
   placeholderTextColor="#9CA3AF"  
@@ -807,7 +803,7 @@ driverCashAdvance: driverCashAdvance,
   keyboardType="numeric"
   value={mileage2}
   onChangeText={setMileage2}
-/>
+/> */}
 
 {/* Diesel Rate */}
 <Text style={styles.label}>Alloted Diesel Rate (₹/L) 💰</Text>
@@ -962,15 +958,16 @@ header: {
     fontWeight: '600',
     color: '#333',
     marginBottom: 6,
-    marginTop: 15,
+    marginTop: 10,
+    marginLeft:10
   },
 
   dropdown: {
     backgroundColor: '#FFF',
     borderRadius: 12,
-    padding: 14,
+    padding: 10,
     elevation: 2,
-    height: 50,
+    height: 45,
     width: '100%',
     
   },
@@ -1041,7 +1038,7 @@ cardRow: {
 },
 
 cardLabel: {
-  fontSize: 14,
+  fontSize: 12,
   color: '#6B7280',
 },
 
@@ -1055,7 +1052,8 @@ cardValue: {
   input: {
     backgroundColor: '#FFF',
     borderRadius: 12,
-    padding: 14,
+    paddingHorizontal: 14,
+    paddingVertical:10,
     fontSize: 16,
     elevation: 2,
     color: '#111827',

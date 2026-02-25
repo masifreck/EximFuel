@@ -298,24 +298,30 @@ const renderRow = ({ item }) => (
       fetchDetails(item.id);
     }}
   >
+    <Text style={styles.valueBlock} >{item.loadType}</Text>
+     <Text style={styles.valueBlock} >{item.fuelCardType}</Text>
     <Text style={styles.valueBlock}>{item.vehicleNo || '-'}</Text>
+
+    <Text style={styles.valueBlock}>{item.guarantorName || '-'}</Text>
+    <Text style={styles.valueBlock}>{item.cardNo || '-'}</Text>
+    <Text style={styles.valueBlock}>{item.driverName || '-'}</Text>
+    <Text style={styles.valueBlock}>{item.driverContactNo || '-'}</Text>
+
     <Text style={styles.valueBlock}>{item.loadingPoints || '-'}</Text>
     <Text style={styles.valueBlock}>{item.unloadingPoints || '-'}</Text>
-    <Text style={styles.valueBlock}>₹ {item.requestAmount}</Text>
+    <Text style={styles.valueBlock}> {item.balanceLtr}</Text>
+  <Text style={styles.valueBlock}>{item.netWt || '-'}</Text>
+  <Text style={styles.valueBlock}>{item.fixedDistance || '-'}</Text>
+  <Text style={styles.valueBlock}>{item.fixedMileage || '-'}</Text>
+ <Text style={styles.valueBlock}>{item.fixedLtr || '-'}</Text>
+
     <Text style={styles.valueBlock}>
-      {item.fuelDate ? item.fuelDate.split('T')[0] : '-'}
+      {item.bookingDate ? item.bookingDate.split('T')[0] : '-'}
     </Text>
-    <Text style={styles.valueBlock}>{item.balanceAmount || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.allottedKm || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.allottedMileage || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.allottedDieselRate || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.allottedTotalLtr || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.allottedAmount || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.netWt || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.fixedAmount || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.fixedLtr || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.fixedMileage || '-'}</Text>
-    <Text style={styles.valueBlock}>{item.fixedDistance || '-'}</Text>
+      <Text style={styles.valueBlock}>{item.allottedAmount || '-'}</Text>
+ <Text style={styles.valueBlock}>{item.allottedDieselRate || '-'}</Text>
+ <Text style={styles.valueBlock}>{item.allottedTotalLtr || '-'}</Text>
+    <Text style={styles.valueBlock}>{item.driverCashAdvance || '-'}</Text>
     <Text style={styles.valueBlock}>{item.remarks || '-'}</Text>
   </TouchableOpacity>
 );
@@ -385,22 +391,27 @@ const renderRow = ({ item }) => (
 
     {/* HEADER */}
     <View style={styles.tableHeaderRow}>
+      <Text style={styles.headerBlock}>load Type</Text>
+      <Text style={styles.headerBlock}>fuelCardType</Text>
   <Text style={styles.headerBlock}>Vehicle No</Text>
+
+    <Text style={styles.headerBlock}>guarantorName</Text>
+  <Text style={styles.headerBlock}>cardNo</Text>
+  <Text style={styles.headerBlock}>driverName</Text>
+  <Text style={styles.headerBlock}>driverMob.No</Text>
+
   <Text style={styles.headerBlock}>Loading P.</Text>
   <Text style={styles.headerBlock}>Unloading P.</Text>
-  <Text style={styles.headerBlock}>Request Amt</Text>
-  <Text style={styles.headerBlock}>Fuel Date</Text>
-  <Text style={styles.headerBlock}>Balance Amt</Text>
-  <Text style={styles.headerBlock}>Allotted Km</Text>
-  <Text style={styles.headerBlock}>Allotted Mi</Text>
-  <Text style={styles.headerBlock}>A. Diesel Rate</Text>
-  <Text style={styles.headerBlock}>A. Total Ltr</Text>
-  <Text style={styles.headerBlock}>Allotted Amt</Text>
+  <Text style={styles.headerBlock}>balanceLtr</Text>
   <Text style={styles.headerBlock}>Net Wt</Text>
-  <Text style={styles.headerBlock}>Fixed Amt</Text>
-  <Text style={styles.headerBlock}>Fixed Ltr</Text>
+  <Text style={styles.headerBlock}>Fixed Dis.</Text>
   <Text style={styles.headerBlock}>Fixed Mileage</Text>
-  <Text style={styles.headerBlock}>Fixed Distance</Text>
+  <Text style={styles.headerBlock}>Fixed Ltr</Text>
+   <Text style={styles.headerBlock}>B. Date</Text>
+ <Text style={styles.headerBlock}>Allotted Amt</Text>
+   <Text style={styles.headerBlock}>A. Diesel Rate</Text>
+  <Text style={styles.headerBlock}>A. Total Ltr</Text>
+  <Text style={styles.headerBlock}>D. CashAdvance</Text>
   <Text style={styles.headerBlock}>Remarks</Text>
 </View>
 
@@ -456,11 +467,34 @@ const renderRow = ({ item }) => (
 
         {selectedItem && (
           <>
+          <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>load Type</Text>
+              <Text style={styles.detailValue}>{selectedItem.loadType}</Text>
+            </View>
+              <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>fuelCardType</Text>
+              <Text style={styles.detailValue}>{selectedItem.fuelCardType}</Text>
+            </View>
             <View style={styles.detailLine}>
               <Text style={styles.detailKey}>Vehicle</Text>
               <Text style={styles.detailValue}>{selectedItem.vehicleNo}</Text>
             </View>
-
+ <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>guarantorName</Text>
+              <Text style={styles.detailValue}>{selectedItem.guarantorName}</Text>
+            </View>
+            <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>cardNo</Text>
+              <Text style={styles.detailValue}>{selectedItem.cardNo}</Text>
+            </View>
+            <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>driverName</Text>
+              <Text style={styles.detailValue}>{selectedItem.driverName}</Text>
+            </View>
+            <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>driver Mob.</Text>
+              <Text style={styles.detailValue}>{selectedItem.driverContactNo}</Text>
+            </View>
             <View style={styles.detailLine}>
               <Text style={styles.detailKey}>Loading Points</Text>
               <Text style={styles.detailValue}>{selectedItem.loadingPoints}</Text>
@@ -470,29 +504,48 @@ const renderRow = ({ item }) => (
               <Text style={styles.detailKey}>Unloading Points</Text>
               <Text style={styles.detailValue}>{selectedItem.unloadingPoints}</Text>
             </View>
-
-            <View style={styles.detailLine}>
-              <Text style={styles.detailKey}>Requested Amt</Text>
-              <Text style={styles.detailValue}>₹ {selectedItem.requestAmount}</Text>
-            </View>
-             <View style={styles.detailLine}>
+<View style={styles.detailLine}>
               <Text style={styles.detailKey}>balanceLtr</Text>
               <Text style={styles.detailValue}>₹ {selectedItem.balanceLtr}</Text>
+            </View><View style={styles.detailLine}>
+              <Text style={styles.detailKey}>netWt</Text>
+              <Text style={styles.detailValue}>{selectedItem.netWt}</Text>
+            </View>
+            <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>fixedDistance</Text>
+              <Text style={styles.detailValue}>{selectedItem.fixedDistance}</Text>
+            </View>
+
+              <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>fixedLtr</Text>
+              <Text style={styles.detailValue}>{selectedItem.fixedLtr}</Text>
+            </View>
+                 <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>bookingDate</Text>
+              <Text style={styles.detailValue}>{selectedItem.bookingDate}</Text>
+            </View>
+                 <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>fixedMileage</Text>
+              <Text style={styles.detailValue}>{selectedItem.fixedMileage}</Text>
+            </View>
+              <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>allottedAmount</Text>
+              <Text style={styles.detailValue}>₹ {selectedItem.allottedAmount}</Text>
+            </View>
+
+             <View style={styles.detailLine}>
+              <Text style={styles.detailKey}>allottedDieselRate</Text>
+              <Text style={styles.detailValue}>{selectedItem.allottedDieselRate}</Text>
             </View>
              <View style={styles.detailLine}>
-              <Text style={styles.detailKey}>balanceAmount</Text>
-              <Text style={styles.detailValue}>₹ {selectedItem.balanceAmount}</Text>
+              <Text style={styles.detailKey}>allottedTotalLtr</Text>
+              <Text style={styles.detailValue}>{selectedItem.allottedTotalLtr}</Text>
             </View>
 
-            {/* <View style={styles.detailLine}>
-              <Text style={styles.detailKey}>Created By</Text>
-              <Text style={styles.detailValue}>{selectedItem.createdBy}</Text>
-            </View> */}
-
             <View style={styles.detailLine}>
-              <Text style={styles.detailKey}>Created On</Text>
+              <Text style={styles.detailKey}>driverCashAdvance</Text>
               <Text style={styles.detailValue}>
-                {new Date(selectedItem.fuelDate).toLocaleString()}
+                {selectedItem.driverCashAdvance}
               </Text>
             </View>
 

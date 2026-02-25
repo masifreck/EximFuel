@@ -1,6 +1,6 @@
 export const loadType = [
     {
-        label : 'ON',
+        label : 'OWN',
         value : 1
     },
       {

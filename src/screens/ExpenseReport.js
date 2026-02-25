@@ -18,6 +18,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 import ImageZoom from 'react-native-image-pan-zoom';
 import CustomCheckbox from '../components/CustomeCheckBox';
 const { width, height } = Dimensions.get('window');
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Pdf from 'react-native-pdf';
 
 const ExpenseReport = ({navigation}) => {
   const [list, setList] = useState([]);
@@ -36,6 +38,9 @@ const [selectedDate, setSelectedDate] = useState(() => {
   return today.toISOString().split('T')[0]; // YYYY-MM-DD
 });
 const [showDatePicker, setShowDatePicker] = useState(false);
+const [previewPdf, setPreviewPdf] = useState(null);
+const [pdfModalVisible, setPdfModalVisible] = useState(false);
+
 const STATUS_OPTIONS = [
   { label: 'Pending', value: 1 },
   { label: 'Approved', value: 4 },
@@ -137,23 +142,33 @@ const getParsedAttachments = (attachment) => {
 
 
 
+const isPdf = (uri = '') =>
+  uri.toLowerCase().endsWith('.pdf');
+
 const AttachmentImage = ({ uri, onPress }) => {
   const [loading, setLoading] = React.useState(true);
-
-  return (
+ const pdf = isPdf(uri);
+ return (
     <TouchableOpacity onPress={onPress} style={styles.imageWrapper}>
-      {loading && (
+      {loading && !pdf && (
         <View style={styles.imageLoader}>
           <ActivityIndicator size="small" color="#2563EB" />
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       )}
 
-      <Image
-        source={{ uri }}
-        style={styles.attachmentImage}
-        onLoadEnd={() => setLoading(false)}
-      />
+      {pdf ? (
+        <View style={styles.pdfWrapper}>
+          <Icon name="file-pdf-box" size={48} color="#E11D48" />
+          <Text style={styles.pdfText}>PDF</Text>
+        </View>
+      ) : (
+        <Image
+          source={{ uri }}
+          style={styles.attachmentImage}
+          onLoadEnd={() => setLoading(false)}
+        />
+      )}
     </TouchableOpacity>
   );
 };
@@ -271,7 +286,7 @@ const parsedAttachments = React.useMemo(
         <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 40 }} />
       ) : (
         <ScrollView horizontal>
-          <View style={{ width: 900, marginTop:20 }}>
+          <View style={{ width: 1400, marginTop: 20 }}>
             {/* Header */}
             <View style={styles.headerRow}>
               <Text style={styles.headerCellVehicle}>Vehicle No</Text>
@@ -358,14 +373,19 @@ const parsedAttachments = React.useMemo(
 
 
             )}
-       <View style={styles.attachmentContainer}>
+     <View style={styles.attachmentContainer}>
   {parsedAttachments.map((item, index) => (
     <AttachmentImage
       key={index}
       uri={item.fullUrl}
       onPress={() => {
-        setPreviewImage(item.fullUrl);
-        setImageModalVisible(true);
+        if (item.fullUrl.toLowerCase().endsWith('.pdf')) {
+          setPreviewPdf(item.fullUrl);
+          setPdfModalVisible(true);
+        } else {
+          setPreviewImage(item.fullUrl);
+          setImageModalVisible(true);
+        }
       }}
     />
   ))}
@@ -410,7 +430,16 @@ const parsedAttachments = React.useMemo(
     </ImageZoom>
   </View>
 </Modal>
-
+<Modal
+  visible={pdfModalVisible}
+  onRequestClose={() => setPdfModalVisible(false)}
+>
+  <Pdf
+    source={{ uri: previewPdf }}
+    style={{ flex: 1 }}
+    trustAllCerts={false}
+  />
+</Modal>
     </View>
   );
 };
@@ -637,7 +666,19 @@ imageWrapper: {
   marginRight: 8,
   marginBottom: 8,
 },
-
+pdfWrapper: {
+  width: 80,
+  height: 80,
+  borderRadius: 8,
+  backgroundColor: '#F3F4F6',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+pdfText: {
+  marginTop: 4,
+  fontSize: 12,
+  color: '#374151',
+},
 attachmentImage: {
   width: '100%',
   height: '100%',
