@@ -295,7 +295,7 @@ useEffect(() => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-2.4 </Text>
+            V-2.5 </Text>
       </View>
     </ScrollView>
   );

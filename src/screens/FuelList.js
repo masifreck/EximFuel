@@ -42,6 +42,7 @@ const [showDatePicker, setShowDatePicker] = useState(false);
 
 const [appFuelRequestId, setAppFuelRequestId] = useState(null);
 const [fuelLoadDate, setfuelLoadDate] = useState(null);
+const [addNewDetails ,setAddNewDetails]=useState(false);
 const [rate, setrate] = useState('');
 const [ltr, setltr] = useState('');
 
@@ -117,6 +118,7 @@ let url = 'http://eximapi1.tranzol.com/api/Fuel/GetAllFuelList'
   }, [search, list]);
 
   // 📤 Submit Approval (PLAIN TEXT RESPONSE)
+  const [submitActionLoading, setActionSubmitLoading] = useState(false);
 const handleSubmit = async (appFuelRequestId) => {
   if (!fuelAmount) {
     Alert.alert('Validation', 'Please enter approve amount');
@@ -185,7 +187,67 @@ const handleSubmit = async (appFuelRequestId) => {
     setSubmitLoading(false);
   }
 };
+const handleActionSubmit = async (statusId) => {
 
+  if (!statusId) {
+    Alert.alert('Validation', 'Invalid action');
+    return;
+  }
+
+  if (!username) {
+    Alert.alert('Error', 'User not identified. Please login again.');
+    return;
+  }
+
+  const payload = {
+    id: selectedItem.id,
+    statusId,
+    userId: Number(username),
+  };
+
+  //console.log('Submit Payload:', payload);
+
+  try {
+    setActionSubmitLoading(true);
+
+    const res = await fetch('http://eximapi1.tranzol.com/api/Fuel/Approve', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'text/plain',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    // ✅ READ RESPONSE ONCE
+    const responseText = await res.text();
+
+   // console.log('HTTP Status:', res.status);
+    //console.log('Server Message:', responseText);
+
+    if (res.ok) {
+      Alert.alert(
+        'Success',
+        responseText || 'Approve Successfully'
+      );
+
+      setModalVisible(false);
+      fetchPendingList();
+    } else {
+      // 🔥 THIS WILL SHOW:
+      // "Approve amount is not greater than request amount !!!"
+      Alert.alert(
+        'Validation Error',
+        responseText || 'Approval failed'
+      );
+    }
+  } catch (error) {
+    console.log('Approve API Error:', error);
+    Alert.alert('Error', 'Network or server error');
+  } finally {
+    setActionSubmitLoading(false);
+  }
+};
 const IMAGE_PREFIX = 'https://flex.tranzol.com/upload';
 
 const getParsedAttachments = (attachment) => {
@@ -231,7 +293,7 @@ const fetchDetails = async (id) => {
 };
 
 const COL_WIDTH = 140;
-const TOTAL_COLS = 17;
+const TOTAL_COLS = 20;
 const TABLE_WIDTH = COL_WIDTH * TOTAL_COLS;
 const AttachmentImage = ({ uri, onPress }) => {
   const [loading, setLoading] = React.useState(true);
@@ -453,7 +515,11 @@ const renderRow = ({ item }) => (
       {/* TITLE (fixed) */}
       <Text style={styles.modalTitle}>Check & Add More Details</Text>
   <TouchableOpacity
-          onPress={() => setModalVisible(false)}
+          onPress={() => 
+          {
+            setModalVisible(false)
+            setAddNewDetails(false)}
+          }
           style={styles.cancelBtn}
         >
           <Text style={styles.cancelText}>❌</Text>
@@ -462,6 +528,7 @@ const renderRow = ({ item }) => (
       {/* SCROLLABLE CONTENT */}
       <ScrollView
         showsVerticalScrollIndicator={false}
+         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.modalScrollContent}
       >
 
@@ -595,7 +662,26 @@ const renderRow = ({ item }) => (
   </ScrollView>
 )}
 
+<TouchableOpacity
+  style={[
+    styles.button1,
+    addNewDetails ? styles.closeBtn1 : styles.addBtn1,
+  ]}
+  onPress={() => setAddNewDetails(!addNewDetails)}
+>
+  <Text
+    style={[
+      styles.buttonText1,
+      addNewDetails && styles.closeText1,
+    ]}
+  >
+    {addNewDetails ? 'Close Fuel Details Form' : 'Add New Fuel Details'}
+  </Text>
+</TouchableOpacity>
+
         {/* INPUTS */}
+        {addNewDetails &&
+        <View>
         <Text style={{ marginTop: 20, fontWeight: '600', color: '#111827', fontSize: 16 ,
             textAlign: 'center'
         }}>
@@ -656,9 +742,36 @@ const renderRow = ({ item }) => (
               <Text style={styles.submitText}>SUMBIT</Text>
             </TouchableOpacity>
         )}
+</View>
+}
+<View style={{
+  width:'100%',
+  height:1,
+  backgroundColor:'black',
+  elevation:4,
+  marginVertical:16,
+  marginHorizontal:-10
+}}></View>
 
-      
+<View style={styles.actionRow}>
+    {/* APPROVE */}
+    <TouchableOpacity
+      style={styles.submitBtn}
+      onPress={() => handleActionSubmit(4)}
+      disabled={submitActionLoading}
+    >
+      <Text style={styles.submitText}>Approve</Text>
+    </TouchableOpacity>
 
+    {/* REJECT */}
+    <TouchableOpacity
+      style={styles.rejectBtn}
+      onPress={() => handleActionSubmit(5)}
+      disabled={submitActionLoading}
+    >
+      <Text style={styles.rejectText}>Reject</Text>
+    </TouchableOpacity>
+  </View>
       </ScrollView>
     </View>
   </View>
@@ -836,7 +949,7 @@ headerCell: {
     fontSize: 12,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 3,
+    marginBottom: 1,
     marginTop: 10,
   },
   cellVehicle: {
@@ -907,8 +1020,9 @@ detailValue: {
     width:'90%',
     backgroundColor: '#F9FAFB',
     borderRadius: 10,
-    padding: 12,
-    marginTop: 10,
+    padding: 6,
+    paddingHorizontal:12,
+    marginTop: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     color: '#111827',
@@ -1099,6 +1213,63 @@ loadingText: {
     textAlign: 'center',
     color: '#111827',
   },
+    button1: {
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+
+  addBtn1: {
+    backgroundColor: '#2563EB', // blue
+  },
+
+  closeBtn1: {
+    backgroundColor: '#DC2626', // red
+  },
+
+  buttonText1: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  closeText1: {
+    color: '#FFFFFF',
+  },
+    actionRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 16,
+},
+
+submitBtn: {
+  flex: 1,
+  backgroundColor: '#2563EB',
+  paddingVertical: 12,
+  borderRadius: 8,
+  marginRight: 8,
+  alignItems: 'center',
+},
+
+rejectBtn: {
+  flex: 1,
+  backgroundColor: '#DC2626',
+  paddingVertical: 12,
+  borderRadius: 8,
+  marginLeft: 8,
+  alignItems: 'center',
+},
+
+submitText: {
+  color: '#fff',
+  fontWeight: '600',
+},
+
+rejectText: {
+  color: '#fff',
+  fontWeight: '600',
+},
 });
 
 export default FuelList;

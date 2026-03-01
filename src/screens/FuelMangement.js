@@ -40,17 +40,16 @@ const [driverContact, setDriverContact] = useState('');
 
   const [distance, setDistance] = useState('');
   const [mileage, setMileage] = useState('');
-const [allottedKm, setAllottedKm] = useState('');
+
 
 const [netwt, setNetwt] = useState('');
-const [mileage2, setMileage2] = useState('');
 const [dieselRate, setDieselRate] = useState('');
 const [totalLitre, setTotalLitre] = useState('');
 const [amount, setAmount] = useState(0);
-const [balancekm, setBalanceKm] = useState('');
 const [loading, setLoading] = useState(false);
 const [showSourceModal, setShowSourceModal] = useState(false);
 const [showDestinationModal, setShowDestinationModal] = useState(false);
+
 
 const [guarantorId, setguarantorId]=useState(null);
 const [guarantorName, setguarantorName]=useState('');
@@ -751,37 +750,34 @@ fuelCardId : fuelCardId || null,
         onChangeText={setNetwt}
       />
       {/* Distance */}
-      <Text style={styles.label}>Fixed Actual (KM) 📏</Text>
+      <Text style={styles.label}>fixed Distance 📏</Text>
       <TextInput
-        style={[styles.input, styles.disabledInput]}
+        style={[styles.input]}
         placeholderTextColor="#9CA3AF"
         placeholder="Enter Actual (KM)"
         keyboardType="numeric"
         value={distance}
         onChangeText={setDistance}
-        editable={false}
       />
 
       {/* Mileage */}
 <Text style={styles.label}>Fixed Mileage  ⛽</Text>
 <TextInput
- style={[styles.input, styles.disabledInput]}
+ style={[styles.input]}
   placeholder="Enter Mileage"
   keyboardType="numeric"
   value={mileage}
-  editable={false}
   onChangeText={setMileage}
 />
 
 {/* Total Litre */}
 <Text style={styles.label}>Fixed Total ltr. 🛢️</Text>
 <TextInput
-  style={[styles.input, styles.disabledInput]}
+  style={[styles.input]}
   placeholder="Enter Total ltr."
   keyboardType="numeric"
   value={totalLitre}
   onChangeText={setTotalLitre}
-  editable={false}
 />
 {/* Allotted KM */}
 {/* <Text style={styles.label}>Allotted KM 🛣️</Text>

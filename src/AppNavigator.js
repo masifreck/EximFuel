@@ -4,7 +4,6 @@ import {NavigationContainer} from '@react-navigation/native';
 import Splash from './screens/Splash';
 import Login from './screens/Login';
 import { darkBlue } from './components/constant';
-import SuccessUI from './components/SuccessUI';
 import DashboardScreen from './screens/Dashborad';
 import FuelManagementScreen from './screens/FuelMangement';
 import ExpenseBooking from './screens/ExpenseBooking';
@@ -93,11 +92,7 @@ const AppNavigator = () => {
       component={ExpenseReport}
       options={{headerShown: false}}
       />
-  <Stack.Screen 
-  name='success'
-  component={SuccessUI}
-  options={{headerShown: false}}
-  />
+ 
       </Stack.Navigator>
     </NavigationContainer>
   );

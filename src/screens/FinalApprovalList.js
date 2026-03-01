@@ -67,26 +67,30 @@ const onDateChange = (event, date) => {
   }
 };
 
-const LIST_API =
-  `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/FinalApproveList?bookingDate=${selectedDate}`;
-  console.log('List API URL:', LIST_API);
+let url =
+  `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/FinalApproveList`;
+ 
+if (selectedDate) {
+  url += `&bookingDate=${selectedDate}`;
+}
+//  console.log('List API URL:', url);
   // 🔹 Fetch List
   const fetchPendingList = async () => {
     try {
       setLoading(true);
-      const res = await fetch(LIST_API);
+      const res = await fetch(url);
       const json = await res.json();
-      //console.log('Fetched List:', json);
+     // console.log('Fetched List:', json);
       setList(json || []);
     } catch (e) {
-      Alert.alert('Error', 'Failed to load pending approvals');
+      setList([])
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (username && selectedDate) {
+    if (username ) {
     fetchPendingList();
     }
 
@@ -230,7 +234,9 @@ const parsedAttachments = React.useMemo(
       <Text style={styles.cellAmount}>₹ {item.requestAmount}</Text>
       <Text style={styles.cell}>{item.createdBy }</Text>
       <Text style={styles.cell}>{item.approver }</Text>
-      <Text style={styles.cell}>{item.remarks || '-'}</Text>
+      <Text style={styles.cellRemark}>{item.remarks || '-'}</Text>
+       <Text style={styles.cell}>{item.approveAmount }</Text>
+        <Text style={styles.cellRemark}>{item.approvalRemarks }</Text>
     </TouchableOpacity>
   );
 
@@ -291,7 +297,7 @@ const parsedAttachments = React.useMemo(
         <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 40 }} />
       ) : (
         <ScrollView horizontal>
-          <View style={{ width: 900 , marginTop:20}}>
+          <View style={{ width: 1600 , marginTop:20}}>
             {/* Header */}
             <View style={styles.headerRow}>
               <Text style={styles.headerCellVehicle}>Vehicle No</Text>
@@ -300,7 +306,9 @@ const parsedAttachments = React.useMemo(
               <Text style={styles.headerCell}>Request Amount</Text>
               <Text style={styles.headerCell}>Created By</Text>
               <Text style={styles.headerCell}>approver</Text>
-              <Text style={styles.headerCell}>Remarks</Text>
+              <Text style={styles.headerRemark}>Remarks</Text>
+               <Text style={styles.headerCell}>approveAmt</Text>
+              <Text style={styles.headerRemark}>approvalRemarks</Text>
             </View>
 
             {/* Rows */}
@@ -365,6 +373,16 @@ const parsedAttachments = React.useMemo(
   <View style={styles.detailLine}>
     <Text style={styles.detailKey}>Remarks</Text>
     <Text style={styles.detailValue}>{selectedItem.remarks || '-'}</Text>
+  </View>
+
+  <View style={styles.detailLine}>
+    <Text style={styles.detailKey}>approveAmount</Text>
+    <Text style={styles.detailValue}>{selectedItem.approveAmount || '-'}</Text>
+  </View>
+
+  <View style={styles.detailLine}>
+    <Text style={styles.detailKey}>approvalRemarks</Text>
+    <Text style={styles.detailValue}>{selectedItem.approvalRemarks || '-'}</Text>
   </View>
 </>
 
@@ -537,6 +555,12 @@ title: {
     fontWeight: '700',
     paddingHorizontal: 10,
   },
+    headerRemark: {
+    width: 200,
+    color: '#fff',
+    fontWeight: '700',
+    paddingHorizontal: 10,
+  },
   headerCellVehicle: {
     width: 140,
     color: '#fff',
@@ -575,6 +599,11 @@ title: {
   },
   cell: {
     width: 160,
+    paddingHorizontal: 10,
+    color: '#374151',
+  },
+  cellRemark: {
+    width: 200,
     paddingHorizontal: 10,
     color: '#374151',
   },
