@@ -253,6 +253,11 @@ const parsedAttachments = React.useMemo(
       <Text style={styles.cell}>{item.createdBy }</Text>
       <Text style={styles.cell}>{item.approver }</Text>
       <Text style={styles.cell}>{item.remarks || '-'}</Text>
+
+<Text style={styles.cell}>{item.createdOn ? item.createdOn.split('T')[0] : '' }</Text>
+    <Text style={styles.cell}>{item.bookingDate? item.bookingDate.split('T')[0] : ''}</Text>
+      <Text style={styles.cell}>{item.approveAmount }</Text>
+      <Text style={styles.cell}>{item.approvalRemarks || '-'}</Text>
     </TouchableOpacity>
   );
 
@@ -313,7 +318,7 @@ const parsedAttachments = React.useMemo(
         <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 40 }} />
       ) : (
         <ScrollView horizontal>
-          <View style={{ width: 900, marginTop:20 }}>
+          <View style={{ width: 1800, marginTop:20 }}>
             {/* Header */}
             <View style={styles.headerRow}>
               <Text style={styles.headerCellVehicle}>Vehicle No</Text>
@@ -323,6 +328,11 @@ const parsedAttachments = React.useMemo(
               <Text style={styles.headerCell}>Created By</Text>
               <Text style={styles.headerCell}>approver</Text>
               <Text style={styles.headerCell}>Remarks</Text>
+
+                <Text style={styles.headerCell}>createdOn</Text>
+              <Text style={styles.headerCell}>bookingDate</Text>
+              <Text style={styles.headerCell}>approve Amt</Text>
+              <Text style={styles.headerCell}>approvalRemarks</Text>
             </View>
 
             {/* Rows */}
@@ -387,6 +397,22 @@ const parsedAttachments = React.useMemo(
   <View style={styles.detailLine}>
     <Text style={styles.detailKey}>Remarks</Text>
     <Text style={styles.detailValue}>{selectedItem.remarks || '-'}</Text>
+  </View>
+<View style={styles.detailLine}>
+    <Text style={styles.detailKey}>booking Date</Text>
+    <Text style={styles.detailValue}>
+      {new Date(selectedItem.bookingDate).toLocaleString()}
+    </Text>
+  </View>
+
+    <View style={styles.detailLine}>
+    <Text style={styles.detailKey}>approveAmt</Text>
+    <Text style={styles.detailValue}>{selectedItem.approveAmount || '-'}</Text>
+  </View>
+
+    <View style={styles.detailLine}>
+    <Text style={styles.detailKey}>approvalRemarks</Text>
+    <Text style={styles.detailValue}>{selectedItem.approvalRemarks || '-'}</Text>
   </View>
 </>
 

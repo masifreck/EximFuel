@@ -31,14 +31,16 @@ const DashboardScreen = ({ navigation }) => {
 const [username, setUsername] = useState('');
 const [isFuelManagement, setIsFuelManagement] = useState(false);
 const [isMaintenance, setIsMaintenance] = useState(false);
-const [isFinalApproval, setisFinalApproval]=useState(false)
+const [isFinalApproval, setisFinalApproval]=useState(false);
+const [isFuelApproval, setisFuelApproval]=useState(false);
 useEffect(() => {
   const getUserData = async () => {
     try {
       const storedUsername = await AsyncStorage.getItem('username');
        const maintenance = await AsyncStorage.getItem('isMaintenance');
       const fuelManagement = await AsyncStorage.getItem('isFuelManagement');
-      const finalApproval = await AsyncStorage.getItem('isFinalApproval')
+      const finalApproval = await AsyncStorage.getItem('isFinalApproval');
+      const fuelapproval = await AsyncStorage.getItem('isFuelApproval');
       if (storedUsername) {
         setUsername(storedUsername);
       }
@@ -50,6 +52,9 @@ useEffect(() => {
       }
       if(finalApproval === 'true'){
         setisFinalApproval(true)
+      }
+      if(fuelapproval === 'true'){
+        setisFuelApproval(true)
       }
     } catch (error) {
       console.log('Failed to load username', error);
@@ -87,10 +92,11 @@ useEffect(() => {
       {/* 🧩 Cards */}
 <View style={styles.cardContainer}>
 
-  {isFuelManagement && (
+
     <View style={{flexDirection:'row', justifyContent:'space-between',gap:12,height:200,
       marginTop:10
     }}>
+      {isFuelApproval && (
     <TouchableOpacity
   activeOpacity={0.85}
   style={[styles.card, styles.fuelCard,{width:'48%', justifyContent:'center'}]}
@@ -115,8 +121,9 @@ useEffect(() => {
       <Text style={styles.cardEmoji}>🛢️ </Text>
     </View>
 </TouchableOpacity>
+  )}
 
-
+  {isFuelManagement && (
   <TouchableOpacity
   activeOpacity={0.85}
    style={[styles.card, styles.fuelCard,{width:'48%', justifyContent:'center'}]}
@@ -136,9 +143,9 @@ useEffect(() => {
       <Text style={styles.cardEmoji}>📝</Text>
     </View>
 </TouchableOpacity>
-
-    </View>
   )}
+    </View>
+
 
   <TouchableOpacity
     activeOpacity={0.85}
