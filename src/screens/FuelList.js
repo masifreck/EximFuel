@@ -513,24 +513,26 @@ const renderRow = ({ item }) => (
     <View style={styles.modalCard}>
 
       {/* TITLE (fixed) */}
-      <Text style={styles.modalTitle}>Check & Add More Details</Text>
-  <TouchableOpacity
-          onPress={() => 
-          {
-            setModalVisible(false)
-            setAddNewDetails(false)}
-          }
-          style={styles.cancelBtn}
-        >
-          <Text style={styles.cancelText}>❌</Text>
+  <View style={styles.modalHeader}>
+  <Text style={styles.modalTitle}>Check & Add More Details</Text>
 
-        </TouchableOpacity>
-      {/* SCROLLABLE CONTENT */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.modalScrollContent}
-      >
+  <TouchableOpacity
+    onPress={() => {
+      setModalVisible(false);
+      setAddNewDetails(false);
+    }}
+    style={styles.cancelBtn}
+    activeOpacity={0.7}
+  >
+    <Text style={styles.cancelText}>❌</Text>
+  </TouchableOpacity>
+</View>
+
+<ScrollView
+  showsVerticalScrollIndicator={false}
+  keyboardShouldPersistTaps="always"
+  contentContainerStyle={styles.modalScrollContent}
+>
 
         {selectedItem && (
           <>
@@ -1056,7 +1058,12 @@ rejectText: {
   color: '#fff',
   fontWeight: '600',
 },
-
+modalHeader: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 10,
+},
   cancelBtn: {
     marginTop: 18,
   },

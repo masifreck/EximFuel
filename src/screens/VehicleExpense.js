@@ -195,43 +195,43 @@ const handleSubmit = async () => {
     const storedUserId = await AsyncStorage.getItem('userId');
     if (!storedUserId) {
       Alert.alert('❌ Error', 'User not logged in');
+      setSubmitLoading(false);
       return;
     }
 
-    // 🔹 Build multipart form data array
-    const formData = [
-      { name: 'ExpenseTypeId', data: String(expenseType) },
-      { name: 'InsertUserId', data: String(storedUserId) },
-      { name: 'LocationId', data: String(location) },
-      { name: 'ApproverId', data: String(employeeId) },
-      { name: 'RequestAmount', data: String(requsestAmount) },
-      { name: 'VehicleId', data: String(selectedVehicle) },
-      { name: 'Remarks', data: remarks ?? '' },
-    ];
+    // 🔹 Create FormData
+    const formData = new FormData();
 
-    // 🔹 Attach files
+    formData.append('ExpenseTypeId', String(expenseType));
+    formData.append('InsertUserId', String(storedUserId));
+    formData.append('LocationId', String(location));
+    formData.append('ApproverId', String(employeeId));
+    formData.append('RequestAmount', String(requsestAmount));
+    formData.append('VehicleId', String(selectedVehicle));
+    formData.append('Remarks', remarks ?? '');
+
+    // 🔹 Attach Files (Images + PDFs)
     selectedFiles.forEach((file, index) => {
-      formData.push({
-        name: `Attachment`,
-        filename: file.name || `file_${index + 1}.jpg`,
+      formData.append('Attachment', {
+        uri: file.uri,
+        name: file.name || `file_${index + 1}`,
         type: file.type || 'application/octet-stream',
-        data: RNFetchBlob.wrap(
-          file.uri.replace('file://', '')
-        ),
       });
     });
 
-    // 🔹 API call
-    const response = await RNFetchBlob.fetch(
-      'POST',
+    // 🔹 API Call
+    const response = await fetch(
       'http://eximapi1.tranzol.com/api/VehicleExpenseBooking/Create',
       {
-        'Content-Type': 'multipart/form-data',
-      },
-      formData
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      }
     );
 
-    const rawText = response.data;
+    const rawText = await response.text();
     let parsed = null;
 
     try {
@@ -239,16 +239,13 @@ const handleSubmit = async () => {
     } catch (e) {}
 
     // ✅ Success
-    if (
-      parsed?.message &&
-      parsed.message.toLowerCase().includes('insert')
-    ) {
+    if (parsed?.message && parsed.message.toLowerCase().includes('insert')) {
       Alert.alert('✅ Success', parsed.message);
       navigation.goBack();
       return;
     }
 
-    // ❌ Backend error
+    // ❌ Backend Error
     Alert.alert('❌ Submission Failed', rawText);
 
   } catch (error) {
