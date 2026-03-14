@@ -18,7 +18,8 @@ const FuelManagementScreen = ({ navigation }) => {
   const [fuelCardTypeId, setfuelCardTypeId] = useState(null);
   const [fuelQty, setFuelQty] = useState('');
   const [remarks, setRemarks] = useState('');
-const [balanceFuel, setBalanceFuel] = useState('');
+const [isFuelAdvApproval, setisFuelAdvApproval] = useState('');
+const [isFuel, setIsFuel]=useState(false);
 
  const [vehicleList, setVehicleList] = useState([]);
 const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -73,7 +74,20 @@ const [postDestinationLoading, setPostDestinationLoading] = useState(false);
   return `${year}-${month}-${day}`;
 };
 const currentDate = getCurrentDate();
+useEffect(() => {
+  const getUserData = async () => {
+    try {
+      const fuelapproval = await AsyncStorage.getItem('isFuelAdvApproval');
+      if (fuelapproval) {
+        setIsFuel(fuelapproval);
+      }
+    } catch (error) {
+      console.log('Failed to load username', error);
+    }
+  };
 
+  getUserData();
+}, []);
 const fetchVehicleList = async (searchText) => {
   try {
     setVehicleLoading(true);
@@ -379,6 +393,7 @@ fuelCardId : fuelCardId || null,
       driverCashAdvance: driverCashAdvance,
       remarks: remarks || '',
       inserUserId: Number(userId),
+      isFuelAdvApproval: isFuelAdvApproval
     };
 
   // console.log('Fuel Payload:', payload);
@@ -874,6 +889,19 @@ style={[styles.input, styles.disabledInput]}
         value={driverCashAdvance}
         onChangeText={setdriverCashAdvance}
       />
+      { isFuel && 
+      (
+        <View>
+       <Text style={styles.label}>Fuel Adv Approval🛢️</Text>
+<TextInput
+style={styles.input}
+  placeholder="Enter Fuel Adv Approval"
+  placeholderTextColor="#9CA3AF"  
+  value={isFuelAdvApproval}
+  onChangeText={setisFuelAdvApproval}
+/>
+</View>
+      )}
       {/* 💬 Remarks */}
       <Text style={styles.label}>Remarks 📝</Text>
       <TextInput
