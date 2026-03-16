@@ -13,6 +13,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { loadType, CardType } from '../components/DropDownData';
+
 const FuelManagementScreen = ({ navigation }) => {
   const [loadTypeId, setloadTypeId] = useState(null);
   const [fuelCardTypeId, setfuelCardTypeId] = useState(null);
@@ -34,10 +35,6 @@ const [driverContact, setDriverContact] = useState('');
   const [destination, setDestination] = useState(null);
   const [destinationData, setDestinationData] = useState([]);
   const [destinationLoading, setDestinationLoading] = useState(false);
-
-  const [material, setMaterial] = useState(null);
-  const [materailData, setMaterialData] = useState([]);
-  const [materialLoading, setMaterialLoading] = useState(false);
 
   const [distance, setDistance] = useState('');
   const [mileage, setMileage] = useState('');
@@ -65,6 +62,7 @@ const [destinationText, setDestinationText] = useState('');
 const [postSourceLoading, setPostSourceLoading] = useState(false);
 const [postDestinationLoading, setPostDestinationLoading] = useState(false);
 
+const [isLocalLoading, setIsLocalLoading]=useState(false)
   const getCurrentDate = () => {
   const date = new Date();
   const day = String(date.getDate()).padStart(2, '0');
@@ -77,12 +75,20 @@ const currentDate = getCurrentDate();
 useEffect(() => {
   const getUserData = async () => {
     try {
+      setIsLocalLoading(true);
+
       const fuelapproval = await AsyncStorage.getItem('isFuelAdvApproval');
-      if (fuelapproval) {
-        setIsFuel(fuelapproval);
+
+      if (fuelapproval !== null) {
+        const fuelBool = fuelapproval === 'true'; // convert to boolean
+        setIsFuel(fuelBool);
       }
+
+      console.log('fuel approval', fuelapproval);
     } catch (error) {
       console.log('Failed to load username', error);
+    } finally {
+      setIsLocalLoading(false);
     }
   };
 
@@ -322,21 +328,47 @@ useEffect(() => {
 
 }, [location, destination, netwt]);
 
-useEffect(() => {
-  if (fuelQty && dieselRate){
-  const qty = Number(fuelQty) || 0;
-  const rate = Number(dieselRate) || 0;
+const handleRateChange = (value) => {
+  setDieselRate(value);
 
-  // Calculate
-  const rawAmount = qty * rate;
+  const rate = parseFloat(value);
+  const qty = parseFloat(fuelQty);
+  const amt = parseFloat(amount);
 
-  // Round to 2 decimals (safe)
-  const roundedAmount = Math.round(rawAmount * 100) / 100;
-
-  setAmount(roundedAmount);
+  if (rate && qty) {
+    setAmount((rate * qty).toFixed(2));
+  } else if (rate && amt) {
+    setFuelQty((amt / rate).toFixed(3));
   }
+};
 
-}, [fuelQty, dieselRate]);
+const handleQtyChange = (value) => {
+  setFuelQty(value);
+
+  const rate = parseFloat(dieselRate);
+  const qty = parseFloat(value);
+  const amt = parseFloat(amount);
+
+  if (rate && qty) {
+    setAmount((rate * qty).toFixed(2));
+  } else if (qty && amt) {
+    setDieselRate((amt / qty).toFixed(2));
+  }
+};
+
+const handleAmountChange = (value) => {
+  setAmount(value);
+
+  const rate = parseFloat(dieselRate);
+  const qty = parseFloat(fuelQty);
+  const amt = parseFloat(value);
+
+  if (rate && amt) {
+    setFuelQty((amt / rate).toFixed(2));
+  } else if (qty && amt) {
+    setDieselRate((amt / qty).toFixed(2));
+  }
+};
 
   // 🧪 Dummy Trip Data
  
@@ -393,7 +425,7 @@ fuelCardId : fuelCardId || null,
       driverCashAdvance: driverCashAdvance,
       remarks: remarks || '',
       inserUserId: Number(userId),
-      isFuelAdvApproval: isFuelAdvApproval
+      isFuelAdvApproval: isFuelAdvApproval || 0
     };
 
   // console.log('Fuel Payload:', payload);
@@ -441,6 +473,13 @@ fuelCardId : fuelCardId || null,
 
 
   return (
+    <>
+    {isLocalLoading ?
+      (
+ <ActivityIndicator color="#6b80e9" size='big' />
+      )
+    :
+    (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* 🔝 Header */}
     <View style={styles.headerContainer}>
@@ -717,37 +756,6 @@ fuelCardId : fuelCardId || null,
   </View>
 </Modal>
 
-
-      {/* Material */}
-      {/* <Text style={styles.label}>Material  🧱</Text>
-      <Dropdown
-        style={styles.dropdown}
-          search
-        data={materailData}
-        labelField="label"
-        valueField="value"
-        placeholder="Select Material"
-        value={material}
-        onChange={item => setMaterial(item.value)}
-         onChangeText={text => {
-    if (text.length >= 3) {
-      fetchMaterialList(text);
-    }
-  }}
-
-  inputSearchStyle={[
-    styles.searchText,
-  ]}
-         itemTextStyle={styles.dropdownItemText}
-  selectedTextStyle={styles.selectedText}
-  placeholderStyle={styles.placeholderText}
-  
-    renderRightIcon={() =>
-      materialLoading ? (
-        <ActivityIndicator size="small" color="#2563EB" />
-      ) : null
-    }
-      /> */}
 <Text style={styles.label}>Booking Date 📅</Text>
       <TextInput
         style={[styles.input, styles.disabledInput]}
@@ -794,92 +802,39 @@ fuelCardId : fuelCardId || null,
   value={totalLitre}
   onChangeText={setTotalLitre}
 />
-{/* Allotted KM */}
-{/* <Text style={styles.label}>Allotted KM 🛣️</Text>
-<TextInput
-  style={styles.input}
-  placeholderTextColor="#9CA3AF"  
-  placeholder="Enter Allotted KM"
-  keyboardType="numeric"
-  value={allottedKm}
-  onChangeText={setAllottedKm}
-/> */}
-
-{/* Mileage 2 */}
-{/* <Text style={styles.label}>Alloted Mileage  🔁</Text>
-<TextInput
-  style={styles.input}
-  placeholderTextColor="#9CA3AF"  
-  placeholder="Enter Mileage "
-  keyboardType="numeric"
-  value={mileage2}
-  onChangeText={setMileage2}
-/> */}
 
 {/* Diesel Rate */}
 <Text style={styles.label}>Alloted Diesel Rate (₹/L) 💰</Text>
 <TextInput
   style={styles.input}
-  placeholderTextColor="#9CA3AF"  
+  placeholderTextColor="#9CA3AF"
   placeholder="Enter Diesel Rate"
   keyboardType="numeric"
   value={dieselRate}
-  onChangeText={setDieselRate}
+  onChangeText={handleRateChange}
 />
 
 
   <Text style={styles.label}>Alloted Total ltr. ⛽</Text>
       <TextInput
-        style={styles.input}
-        placeholderTextColor="#9CA3AF"  
-        keyboardType="numeric"
-        placeholder="Enter alloted ltr"
-        value={fuelQty}
-        onChangeText={setFuelQty}
-      />
-      
-<Text style={styles.label}>Alloted Amount 💰</Text>
- <TextInput
   style={styles.input}
   placeholderTextColor="#9CA3AF"
   keyboardType="numeric"
-  placeholder="Auto Calculated"
-  value={amount ? amount.toFixed(2) : ''}
-  editable={false}
+  placeholder="Enter alloted ltr"
+  value={fuelQty}
+  onChangeText={handleQtyChange}
 />
-    
-
-      {/* <Text style={styles.label}>Balance Km 💰</Text>
-      <TextInput
-        style={[styles.input, styles.disabledInput]}
-        keyboardType="numeric"
-        placeholder="Enter Balance Km"
-        value={balancekm}
-        onChangeText={setBalanceKm}
-        editable={false}
-      /> */}
-
-      {/* 🔢 Fuel Quantity */}
-      {/* 🔢 Balance Fuel */}
-{/* <Text style={styles.label}>Total ltr. 🛢️</Text>
+      
+<Text style={styles.label}>Alloted Amount 💰</Text>
 <TextInput
-style={[styles.input, styles.disabledInput]}
+  style={styles.input}
+  placeholderTextColor="#9CA3AF"
   keyboardType="numeric"
-  placeholder="Enter Total ltr"
-  value={balanceFuel}
-  onChangeText={setBalanceFuel}
-  editable={false}
+  placeholder="Enter Amount"
+  value={amount}
+  onChangeText={handleAmountChange}
 />
-
     
-
-        {/* Balance (Non-editable) */}
-      {/* <Text style={styles.label}>Balance Amount💰</Text>
-      <TextInput
-        style={[styles.input, styles.disabledInput]}
-        value="auto calculated"
-        editable={false}
-      />  */}
   <Text style={styles.label}>Driver Cash Advance 💰</Text>
       <TextInput
         style={styles.input}
@@ -892,10 +847,10 @@ style={[styles.input, styles.disabledInput]}
       { isFuel && 
       (
         <View>
-       <Text style={styles.label}>Fuel Adv Approval🛢️</Text>
+       <Text style={styles.label}>Approve Cash Advance🛢️</Text>
 <TextInput
 style={styles.input}
-  placeholder="Enter Fuel Adv Approval"
+  placeholder="Enter Approve Cash Advance"
   placeholderTextColor="#9CA3AF"  
   value={isFuelAdvApproval}
   onChangeText={setisFuelAdvApproval}
@@ -929,6 +884,9 @@ style={styles.input}
 </TouchableOpacity>
 
     </ScrollView>
+)
+    }
+    </>
   );
 };
 
