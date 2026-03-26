@@ -274,6 +274,8 @@ useEffect(() => {
     </View>
   </TouchableOpacity>
 )}
+
+ 
 <TouchableOpacity
   activeOpacity={0.85}
   style={[styles.card, styles.expenseBookingReportCard]}
@@ -294,7 +296,30 @@ useEffect(() => {
     <Text style={styles.cardArrow}>›</Text>
   </View>
 </TouchableOpacity>
+ <TouchableOpacity
+    activeOpacity={0.85}
+    style={[
+      styles.card,
+      styles.diffOilCard,
+    
+    ]}
+    onPress={() => navigation.navigate('diffoil')}
+  >
+    <View style={styles.cardHeader}>
+        <View style={styles.iconCircle}>
+  <Text style={styles.cardEmoji}>🛢️</Text>
+        </View>
+      <View style={styles.cardText}>
+        <Text style={styles.cardTitle}>Diff Oil Entry</Text>
+        <Text style={styles.cardDesc}>
+          Add differential oil details
+        </Text>
+      </View>
+       <Text style={styles.cardArrow}>›</Text>
+    </View>
 
+
+  </TouchableOpacity>
 </View>
 
 
@@ -460,6 +485,11 @@ finalApprovedCard: {
   backgroundColor: '#F0FDF4',
   borderLeftWidth: 5,
   borderLeftColor: '#15803D',
+},
+diffOilCard: {
+  backgroundColor: '#E8F8F5', // light premium aqua
+  borderColor: '#1ABC9C',
+  borderWidth: 1,
 },
 expenseBookingReportCard: {
   backgroundColor: '#F3E8FF', // soft lavender

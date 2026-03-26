@@ -27,3 +27,14 @@ export const CardType = [
         value : 3
     }
 ]
+
+export const DeffType = [
+  {
+    label : 'Stock',
+    value : 1
+  },
+  {
+    label : 'Buy',
+    value : 2
+  }
+]
