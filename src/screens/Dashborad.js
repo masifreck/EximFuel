@@ -96,7 +96,7 @@ useEffect(() => {
     <View style={{flexDirection:'row', justifyContent:'space-between',gap:12,height:200,
       marginTop:10
     }}>
-      {isFuelApproval && (
+    
     <TouchableOpacity
   activeOpacity={0.85}
   style={[styles.card, styles.fuelCard,{width:'48%', justifyContent:'center'}]}
@@ -121,7 +121,7 @@ useEffect(() => {
       <Text style={styles.cardEmoji}>🛢️ </Text>
     </View>
 </TouchableOpacity>
-  )}
+  
 
   {isFuelManagement && (
   <TouchableOpacity
@@ -327,7 +327,7 @@ useEffect(() => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by <Text style={styles.footerBrand}>Tranzol 🚀 </Text>
-            V-2.7.1 </Text>
+            V-2.7.3 </Text>
       </View>
     </ScrollView>
   );

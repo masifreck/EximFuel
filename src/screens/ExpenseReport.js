@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
-  TextInput,
   Modal,
   Alert,
   StatusBar,
@@ -33,11 +32,16 @@ const ExpenseReport = ({navigation}) => {
   const [imageModalVisible, setImageModalVisible] = useState(false);
 const [previewImage, setPreviewImage] = useState('');
 const [username, setUsername] = useState('');
-const [selectedDate, setSelectedDate] = useState(() => {
-  const today = new Date();
-  return today.toISOString().split('T')[0]; // YYYY-MM-DD
-});
+
+const [bookingFromDate, setbookingFromDate] = useState(null);
+const [bookingToDate , setbookingToDate]=useState(null);
+
+  const [vehicleList, setVehicleList] = useState([]);
+  const [selectedVehicle, setSelectedVehicle] = useState(0);
+  const [vehicleLoading, setVehicleLoading] = useState(false);
+
 const [showDatePicker, setShowDatePicker] = useState(false);
+const [showDatePicker2, setShowDatePicker2] = useState(false);
 const [previewPdf, setPreviewPdf] = useState(null);
 const [pdfModalVisible, setPdfModalVisible] = useState(false);
 
@@ -70,21 +74,38 @@ const onDateChange = (event, date) => {
 
   if (date) {
     const formattedDate = date.toISOString().split('T')[0]; // yyyy-mm-dd
-    setSelectedDate(formattedDate);
+    setbookingFromDate(formattedDate);
+  }
+};
+const onDateChange2 = (event, date) => {
+  setShowDatePicker2(false);
+
+  if (date) {
+    const formattedDate = date.toISOString().split('T')[0]; // yyyy-mm-dd
+    setbookingToDate(formattedDate);
   }
 };
   const handleCheckboxChange = (value) => {
     console.log('Checkbox value:', value); // true / false
     setIsPaid(value);
   };
-let url = `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/ExpenseBookingReport?bookingDate=${selectedDate}`
+let url = `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/NewExpenseBookingReport?vehicleId=${selectedVehicle}`
 if (status) {
   url += `&statusId=${status}`;
 }
 if (IsPaid){
   url += `&IsPaid=1`;
 }
- //console.log('List API URL:', url);
+
+
+if (bookingFromDate) {
+  url += `&bookingFromDate=${bookingFromDate}`;
+}
+if(bookingToDate){
+  url += `&bookingToDate=${bookingToDate}`;
+}
+
+ console.log('List API URL:', url);
   // 🔹 Fetch List
   const fetchPendingList = async () => {
     try {
@@ -103,13 +124,13 @@ if (IsPaid){
   };
 
   useEffect(() => {
-    if (!selectedDate) return;
+   
   const timer = setTimeout(() => {
     fetchPendingList();
   }, 400); 
 
   return () => clearTimeout(timer); 
-}, [username, selectedDate, status, IsPaid]);
+}, [bookingToDate, bookingFromDate, status, IsPaid, selectedVehicle]);
 
   // 🔍 Search Filter
 const filteredList = useMemo(() => {
@@ -124,6 +145,30 @@ const filteredList = useMemo(() => {
   );
 }, [search, list]);
 
+
+  const fetchVehicleList = async (searchText) => {
+    try {
+      setVehicleLoading(true);
+
+      const response = await fetch(
+        `http://eximapi1.tranzol.com/api/Vehicle?search=${searchText}`
+      );
+
+      const data = await response.json();
+      //console.log(data)
+      const formattedVehicles = data.map(item => ({
+        label: item.vehicleNo,
+        value: item.id,
+
+      }));
+
+      setVehicleList(formattedVehicles);
+    } catch (error) {
+      Alert.alert('❌ Error', 'Failed to fetch vehicles');
+    } finally {
+      setVehicleLoading(false);
+    }
+  };
 
 const IMAGE_PREFIX = 'https://flex.tranzol.com/upload';
 
@@ -219,19 +264,77 @@ const parsedAttachments = React.useMemo(
     📊 Vehicle Expense Report
   </Text>
 </View>
+<View style={{flexDirection:'row', justifyContent:'space-evenly',width :"100%",
+gap:10,elevation:3,
+}}>
+  <View>
+   <CustomCheckbox
+        label="Only Paid"
+        value={IsPaid}
+        onChange={handleCheckboxChange}
+      />
+</View>
+<View style={{width:'35%'}}>
+    <Text style={{textAlign:'left',color:'gray',marginLeft:10}}>From Date</Text>
+   <TouchableOpacity
+    style={styles.dateBox}
+    onPress={() => setShowDatePicker(true)}
+  >
+    <Text style={styles.dateText}>
+      {bookingFromDate ? bookingFromDate : '📅 Date'}
+    </Text>
+  </TouchableOpacity>
+</View>
+<View style={{width:'35%'}}>
+   <Text style={{textAlign:'left',color:'gray',marginLeft:10}}>To Date</Text>
+   <TouchableOpacity
+    style={styles.dateBox}
+    onPress={() => setShowDatePicker2(true)}
+  >
+    <Text style={styles.dateText}>
+      {bookingToDate ? bookingToDate : '📅 Date'}
+    </Text>
+  </TouchableOpacity>
+</View>
 
-      {/* 🔍 Search */}
-<View style={styles.searchContainer}>
-  <TextInput
-    placeholder="Search Vehicle No..."
-    value={search}
-    onChangeText={setSearch}
-    style={styles.searchInput}
-    placeholderTextColor="#9CA3AF"
-  />
+</View>
+
+      {/* 🔍 Search< */}
+
+<View style={{flexDirection:'row',justifyContent:'space-evenly'}}>
+ <Dropdown
+          style={styles.dropdown}
+          data={vehicleList}
+          search
+          labelField="label"
+          valueField="value"
+          placeholder="Search Vehicle Number"
+          value={selectedVehicle}
+          inputSearchStyle={[
+            styles.searchText,
+          ]}
+          onChange={item => {
+            setSelectedVehicle(item.value);
+          }}
+          itemTextStyle={styles.dropdownItemText}
+          selectedTextStyle={styles.selectedText}
+          placeholderStyle={styles.placeholderText}
+          onChangeText={text => {
+
+            if (text.length >= 3) {
+              fetchVehicleList(text);
+            }
+          }}
+
+          renderRightIcon={() =>
+            vehicleLoading ? (
+              <ActivityIndicator size="small" color="#2563EB" />
+            ) : null
+          }
+        />
 
   {/* Status Dropdown */}
-  <View style={{ position: 'relative' }}>
+  <View style={{ }}>
  <Dropdown
   data={STATUS_OPTIONS}
   labelField="label"
@@ -239,11 +342,8 @@ const parsedAttachments = React.useMemo(
   value={status}
   placeholder="Select Status"
   onChange={item => setStatus(item.value)}
-  
- // mode="modal"                 // 🔥 KEY FIX
-  dropdownPosition="auto"       // prevents clipping
+  dropdownPosition="auto"      
   maxHeight={220}
-
   style={styles.dropdown}
   containerStyle={styles.dropdownContainer}
   selectedTextStyle={styles.selectedText}
@@ -253,33 +353,28 @@ const parsedAttachments = React.useMemo(
 
   </View>
 
-  {/* Date Picker */}
-  <TouchableOpacity
-    style={styles.dateBox}
-    onPress={() => setShowDatePicker(true)}
-  >
-    <Text style={styles.dateText}>
-      {selectedDate ? selectedDate : '📅 Date'}
-    </Text>
-  </TouchableOpacity>
+ 
 </View>
 
 
 {showDatePicker && (
   <DateTimePicker
-    value={selectedDate ? new Date(selectedDate) : new Date()}
+    value={bookingFromDate ? new Date(bookingFromDate) : new Date()}
     mode="date"
     display={Platform.OS === 'android' ? 'calendar' : 'spinner'}
     onChange={onDateChange}
   />
 )}
-<View>
-   <CustomCheckbox
-        label="Only Paid"
-        value={IsPaid}
-        onChange={handleCheckboxChange}
-      />
-</View>
+
+{showDatePicker2 && (
+  <DateTimePicker
+    value={bookingToDate ? new Date(bookingToDate) : new Date()}
+    mode="date"
+    display={Platform.OS === 'android' ? 'calendar' : 'spinner'}
+    onChange={onDateChange2}
+  />
+)}
+
 
       {/* 📊 Grid */}
       {loading ? (
@@ -479,14 +574,7 @@ title: {
   color: '#111827',
   textAlign: 'center',
 },
-  search: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
+
 
   headerRow: {
     flexDirection: 'row',
@@ -686,7 +774,7 @@ attachmentImage: {
 
   dropdown: {
   height: 44,
-  width:110,
+  width:150,
   borderWidth: 1,
   borderColor: '#D1D5DB',
   borderRadius: 6,

@@ -15,6 +15,7 @@ import FinalApprovalList from './screens/FinalApprovalList';
 import FuelList from './screens/FuelList';
 import ExpenseReport from './screens/ExpenseReport';
 import FuelDeff from './screens/FuelDeff';
+import FuelListDetails from './screens/FuelListDetails';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -87,6 +88,13 @@ const AppNavigator = () => {
       name='fuellist'
       component={FuelList}
       options={{headerShown: false}}
+      />
+         <Stack.Screen
+      name='fuellistdetails'
+      component={FuelListDetails}
+     options={{
+    title: '⛽ Check & Add More Details',
+  }}
       />
       <Stack.Screen
       name='report'

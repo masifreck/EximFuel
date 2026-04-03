@@ -1,4 +1,4 @@
-import { se } from 'date-fns/locale';
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -43,7 +43,7 @@ const [driverContact, setDriverContact] = useState('');
 const [netwt, setNetwt] = useState('');
 const [dieselRate, setDieselRate] = useState('');
 const [totalLitre, setTotalLitre] = useState('');
-const [amount, setAmount] = useState(0);
+const [amount, setAmount] = useState('');
 const [loading, setLoading] = useState(false);
 const [showSourceModal, setShowSourceModal] = useState(false);
 const [showDestinationModal, setShowDestinationModal] = useState(false);
@@ -311,7 +311,17 @@ const submitDestination = async () => {
     setPostDestinationLoading(false);
   }
 };
+useEffect(() => {
+  if (distance && mileage) {
+    const dist = parseFloat(distance);
+    const mil = parseFloat(mileage);
 
+    if (!isNaN(dist) && !isNaN(mil) && mil !== 0) {
+      const total = (dist / mil).toFixed(2);
+      setTotalLitre(total.toString());
+    }
+  }
+}, [distance, mileage]);
 
 useEffect(() => {
   if (!location || !destination || !netwt) return;
