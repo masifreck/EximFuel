@@ -22,15 +22,9 @@ const FuelList = ({navigation}) => {
 
   const [search, setSearch] = useState('');
 
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
 
   const [fuelAmount, setfuelAmount] = useState('');
-  const [remarks, setremarks] = useState('');
-  const [submitLoading, setSubmitLoading] = useState(false);
 
-  const [imageModalVisible, setImageModalVisible] = useState(false);
-const [previewImage, setPreviewImage] = useState('');
 const [username, setUsername] = useState('');
 const [isAdmin, setIsAdmin] = useState(false);
 const [selectedDate, setSelectedDate] = useState(null);

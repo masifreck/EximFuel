@@ -61,6 +61,8 @@ const [destinationText, setDestinationText] = useState('');
 
 const [postSourceLoading, setPostSourceLoading] = useState(false);
 const [postDestinationLoading, setPostDestinationLoading] = useState(false);
+const [lastEdited, setLastEdited] = useState(null); 
+const [manualFields, setManualFields] = useState([]);
 
 const [isLocalLoading, setIsLocalLoading]=useState(false)
   const getCurrentDate = () => {
@@ -317,7 +319,7 @@ useEffect(() => {
     const mil = parseFloat(mileage);
 
     if (!isNaN(dist) && !isNaN(mil) && mil !== 0) {
-      const total = (dist / mil).toFixed(2);
+      const total = (dist / mil).toFixed(3);
       setTotalLitre(total.toString());
     }
   }
@@ -338,46 +340,55 @@ useEffect(() => {
 
 }, [location, destination, netwt]);
 
-const handleRateChange = (value) => {
-  setDieselRate(value);
+const calculate = (updatedField, value) => {
+  let rate = dieselRate;
+  let qty = fuelQty;
+  let amt = amount;
 
-  const rate = parseFloat(value);
-  const qty = parseFloat(fuelQty);
-  const amt = parseFloat(amount);
+  // ✅ Update current field
+  if (updatedField === 'rate') rate = value;
+  if (updatedField === 'qty') qty = value;
+  if (updatedField === 'amount') amt = value;
 
-  if (rate && qty) {
-    setAmount((rate * qty).toFixed(2));
-  } else if (rate && amt) {
-    setFuelQty((amt / rate).toFixed(3));
+  // ✅ Track manual fields
+  let updatedManual = [...manualFields];
+
+  if (!updatedManual.includes(updatedField)) {
+    updatedManual.push(updatedField);
   }
-};
 
-const handleQtyChange = (value) => {
-  setFuelQty(value);
-
-  const rate = parseFloat(dieselRate);
-  const qty = parseFloat(value);
-  const amt = parseFloat(amount);
-
-  if (rate && qty) {
-    setAmount((rate * qty).toFixed(2));
-  } else if (qty && amt) {
-    setDieselRate((amt / qty).toFixed(2));
+  // Keep only last 2 manual fields
+  if (updatedManual.length > 2) {
+    updatedManual.shift();
   }
-};
 
-const handleAmountChange = (value) => {
-  setAmount(value);
+  setManualFields(updatedManual);
 
-  const rate = parseFloat(dieselRate);
-  const qty = parseFloat(fuelQty);
-  const amt = parseFloat(value);
+  const r = parseFloat(rate);
+  const q = parseFloat(qty);
+  const a = parseFloat(amt);
 
-  if (rate && amt) {
-    setFuelQty((amt / rate).toFixed(2));
-  } else if (qty && amt) {
-    setDieselRate((amt / qty).toFixed(2));
+  // console.log('--- FINAL SMART ---');
+  // console.log({ updatedField, r, q, a, updatedManual });
+
+  // 🚀 Only calculate when exactly 2 manual fields
+  if (updatedManual.length === 2) {
+    if (!updatedManual.includes('rate') && q && a) {
+      rate = (a / q).toFixed(2);
+    }
+
+    if (!updatedManual.includes('qty') && r && a) {
+      qty = (a / r).toFixed(3);
+    }
+
+    if (!updatedManual.includes('amount') && r && q) {
+      amt = (r * q).toFixed(2);
+    }
   }
+
+  setDieselRate(rate);
+  setFuelQty(qty);
+  setAmount(amt);
 };
 
   // 🧪 Dummy Trip Data
@@ -821,7 +832,7 @@ fuelCardId : fuelCardId || null,
   placeholder="Enter Diesel Rate"
   keyboardType="numeric"
   value={dieselRate}
-  onChangeText={handleRateChange}
+onChangeText={(val) => calculate('rate', val)}
 />
 
 
@@ -832,7 +843,8 @@ fuelCardId : fuelCardId || null,
   keyboardType="numeric"
   placeholder="Enter alloted ltr"
   value={fuelQty}
-  onChangeText={handleQtyChange}
+onChangeText={(val) => calculate('qty', val)}
+
 />
       
 <Text style={styles.label}>Alloted Amount 💰</Text>
@@ -842,7 +854,7 @@ fuelCardId : fuelCardId || null,
   keyboardType="numeric"
   placeholder="Enter Amount"
   value={amount}
-  onChangeText={handleAmountChange}
+onChangeText={(val) => calculate('amount', val)}
 />
     
   <Text style={styles.label}>Driver Cash Advance 💰</Text>

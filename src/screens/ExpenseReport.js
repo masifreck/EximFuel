@@ -86,7 +86,7 @@ const onDateChange2 = (event, date) => {
   }
 };
   const handleCheckboxChange = (value) => {
-    console.log('Checkbox value:', value); // true / false
+    //console.log('Checkbox value:', value); // true / false
     setIsPaid(value);
   };
 let url = `http://eximapi1.tranzol.com/api/VehicleExpenseBooking/NewExpenseBookingReport?vehicleId=${selectedVehicle}`
@@ -105,7 +105,7 @@ if(bookingToDate){
   url += `&bookingToDate=${bookingToDate}`;
 }
 
- console.log('List API URL:', url);
+// console.log('List API URL:', url);
   // 🔹 Fetch List
   const fetchPendingList = async () => {
     try {
@@ -435,23 +435,29 @@ gap:10,elevation:3,
     <Text style={styles.detailValue}>{selectedItem.loadingPoints}</Text>
   </View>
 
-  <View style={styles.detailLine}>
-    <Text style={styles.detailKey}>Requested Amt</Text>
-    <Text style={styles.detailValue}>₹ {selectedItem.requestAmount}</Text>
-  </View>
+ <View style={styles.detailLine}>
+  <Text style={styles.detailKey}>Requested Amt</Text>
+  <Text style={[styles.detailValue, styles.requested]}>
+    ₹ {selectedItem.requestAmount}
+  </Text>
+</View>
+
+<View style={styles.detailLine}>
+  <Text style={styles.detailKey}>Approved Amt</Text>
+  <Text style={[styles.detailValue, styles.approved]}>
+    ₹ {selectedItem.approveAmount}
+  </Text>
+</View>
 <View style={styles.detailLine}>
     <Text style={styles.detailKey}>Cheque No</Text>
     <Text style={styles.detailValue}>{selectedItem.chequeNo || '-'}</Text>
   </View>
 <View style={styles.detailLine}>
     <Text style={styles.detailKey}>Payment Date</Text>
-    <Text style={styles.detailValue}>  {new Date(selectedItem.paymentDate).toLocaleString()}</Text>
+    <Text style={styles.detailValue}>{new Date(selectedItem.paymentDate).toLocaleString()}</Text>
   </View>
 
-  <View style={styles.detailLine}>
-    <Text style={styles.detailKey}>ApproveAmount</Text>
-    <Text style={styles.detailValue}>{selectedItem.approveAmount}</Text>
-  </View>
+
 
   <View style={styles.detailLine}>
     <Text style={styles.detailKey}>Booking Date</Text>
@@ -683,7 +689,16 @@ detailValue: {
   color: '#111827',
 },
 
+requested: {
+  color: '#2563EB',
+  fontWeight: '700',
+},
 
+// 🟢 Approved Amount (Green)
+approved: {
+  color: '#16A34A',
+  fontWeight: '700',
+},
 
   cancelBtn: {
     marginTop: 18,
